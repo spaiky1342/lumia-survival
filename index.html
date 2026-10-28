@@ -6275,7 +6275,11 @@ async function drawResult(){
 }
 async function resultCard(){
   const cv=await drawResult();const url=cv.toDataURL('image/png');const fn=`lumia_${G.me.p.id}_ending${getEnding().no}.png`;
-  openSheet(`<h4>결과 카드</h4><img class="rcimg" src="${url}" alt="${esc(G.me.p.n)}의 생존 결과 카드"><div class="rcacts"><a class="btn-main" href="${url}" download="${fn}">이미지 저장</a><button class="btn-sub" id="rcshare" type="button">공유</button></div><p class="muted" id="rcmsg"></p>`);
+  openSheet(`<h4>결과 카드</h4><img class="rcimg" src="${url}" alt="${esc(G.me.p.n)}의 생존 결과 카드"><div class="rcacts"><button class="btn-main" id="rcsave" type="button">이미지 저장</button><button class="btn-sub" id="rcshare" type="button">공유</button></div><p class="muted" id="rcmsg"></p>`);
+  document.getElementById('rcsave').onclick=()=>{cv.toBlob(async b=>{const msg=document.getElementById('rcmsg');
+    let dl=null;try{dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null}catch(e){}
+    if(dl){try{await dl.save({filename:fn,data:b});msg.textContent='저장했습니다.'}catch(e){msg.textContent=e&&e.code==='declined'?'저장을 취소했습니다.':'여기서는 저장할 수 없습니다. 이미지를 길게 누르거나 우클릭해 저장해 주세요.'}return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)},'image/png')};
   const sb=document.getElementById('rcshare');
   sb.onclick=()=>{cv.toBlob(async b=>{const msg=document.getElementById('rcmsg');try{const f=new File([b],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'루미아 섬 생존 일지'})}else msg.textContent='이 브라우저에서는 바로 공유할 수 없습니다. 이미지를 저장해서 올려 주세요.'}catch(e){if(e&&e.name!=='AbortError')msg.textContent='공유하지 못했습니다. 이미지를 저장해서 올려 주세요.'}},'image/png')};
 }
