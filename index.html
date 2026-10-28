@@ -229,6 +229,21 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 .copied{font-size:12.5px;color:var(--ok);white-space:pre-wrap}
 @media (max-width:380px){.olist{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+.tip{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--cyan);border-radius:6px;padding:10px 12px;margin:0 0 12px;background:rgba(98,211,228,.07);font-size:14px;line-height:1.55}
+.tip b{font-family:var(--mono);color:var(--cyan);font-size:12px;padding-top:2px}
+.tip span{flex:1}
+.tip button{background:none;border:0;color:var(--dim);font-size:12px;cursor:pointer;white-space:nowrap;padding:2px 0;text-decoration:underline}
+.gal li .hint{font-size:11.5px;line-height:1.45;color:var(--dim);margin-top:3px}
+.ach{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.ach li{border:1px dashed var(--line);border-radius:5px;padding:8px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px;color:var(--dim)}
+.ach li b{color:var(--fg);font-weight:500}
+.ach li small{font-family:var(--mono);font-size:11px;color:var(--cyan)}
+.ach li.on{border-style:solid;border-color:var(--gold)}
+.ach li.on b{color:var(--gold)}
+.achnew{margin:10px 0}
+.rcimg{width:100%;max-width:420px;display:block;margin:6px auto 12px;border:1px solid var(--line);border-radius:6px}
+.rcacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.rcacts a{text-decoration:none;text-align:center}
 </style>
 <div id="app"></div>
 <script>
@@ -555,7 +570,7 @@ function nextPhase(){
     shuffle(ok).slice(0,2).forEach((a,i)=>G.specials[a]=i?'생명의 나무':'운석');
     log(`[방송] 특수 재료 감지: ${Object.entries(G.specials).map(([a,s])=>`${s} · ${a}`).join(', ')}`,'news');
   }
-  if(G.phase<FINAL&&ch(.6)){const ok=AREAS.filter(a=>passable(a)&&!G.zones.has(a)&&!G.next.includes(a));G.drop=pick(ok);log(`[방송] 보급 상자 투하 · ${G.drop}`,'news')}else G.drop=null;
+  if(G.phase<FINAL&&ch(.75)){const ok=AREAS.filter(a=>passable(a)&&!G.zones.has(a)&&!G.next.includes(a));G.drop=pick(ok);log(`[방송] 보급 상자 투하 · ${G.drop}`,'news')}else G.drop=null;
   if(BOSSES[G.phase]){const B=BOSSES[G.phase];const ok=AREAS.filter(a=>!G.zones.has(a)&&!G.next.includes(a)&&a!==LAB);G.boss={...B,max:B.hp,area:pick(ok)};log(`[방송] ${B.name} 출현 · ${G.boss.area}`,'warn')}
   if(G.boss&&G.zones.has(G.boss.area))G.boss=null;
   if(G.phase===FINAL){const D=distMap(G.finalArea);G.me.zt=(D[G.me.area]??3)+2;log(`남은 실험체 전원이 ${J(G.finalArea,'으로')} 몰려든다. ${G.finalArea}만 안전하다. (${G.finalArea}까지 ${D[G.me.area]??'?'}칸)`,'warn')}
@@ -2918,7 +2933,7 @@ function dmgFoe(f,d,by){
   const n=f.n;n.hp-=d;
   if(n.hp<=0&&by==='me'&&G.subdue){n.hp=1;f.gone=true;n.busy=false;n.spared=true;n.hostile=false;n.team=null;aff(n,20);me.st.spare++;if(G.phase>=FINAL){kill(n,`항복 · 아글라이아 처분 · ${me.area}`,null);log(`${J(nm(n),'이')} 무릎을 꿇었다. 손목 장치가 차갑게 울렸다. 당신의 손으로 한 일은 아니다.`,'warn')}else{const to=ADJ[me.area].filter(passable);if(to.length)n.area=pick(to);log(`${J(nm(n),'이')} 쓰러졌다. 숨통을 끊지 않고 물러섰다. 상대는 비틀거리며 달아났다.`)}return}
   if(n.hp<=0){n.busy=false;
-    if(by==='me'){me.kills++;me.killed.push(nm(n));me.killedIds.add(n.c.id);if(n.c.tags.includes('vf'))me.vfKill=true;alignKill(n);kill(n,`처치: ${me.p.n} · ${me.area}`,me.p.n);gainXp(15);if(hasP('bloodthirst')){heal(15);log('피 냄새에 몸이 달아오른다. (체력 +15)','good')}loot(n);lootWitness(n)}
+    if(by==='me'){achKill(n);me.kills++;me.killed.push(nm(n));me.killedIds.add(n.c.id);if(n.c.tags.includes('vf'))me.vfKill=true;alignKill(n);kill(n,`처치: ${me.p.n} · ${me.area}`,me.p.n);gainXp(15);if(hasP('bloodthirst')){heal(15);log('피 냄새에 몸이 달아오른다. (체력 +15)','good')}loot(n);lootWitness(n)}
     else{by.kills++;kill(n,`처치: ${nm(by)} · ${n.area}`,nm(by))}
     f.gone=true;return}
   if(n.hp<foeMax(f)*(G.phase<5?.5:.35)&&ch(.25+.5*(1-n.c.agg)-G.phase*.02)&&G.phase<FINAL&&!n.duel&&!(n.labRush&&G.labOpen)&&!(G.fight&&G.fight.nf&&G.fight.nf.noFlee)){f.gone=true;n.busy=false;n.hostile=true;n.team=null;n.area=pick(ADJ[n.area].filter(passable));log(`${J(nm(n),'이')} 피를 흘리며 달아났다.`)}
@@ -2930,7 +2945,7 @@ function fightRound(act){
   if(me.p.role==='support'&&me.hp<me.max)me.hp=Math.min(me.max,me.hp+2);
   const stunPen=F.stun?.5:1;if(F.stun){F.stun=false;log('굳은 몸 때문에 제대로 힘이 실리지 않았다.','bad')}
   if(act==='skill'){skill=true;
-    const s=me.p.sk;me.cd=me.p.role==='mage'?2:3;log(`「${s.n}」!`,'good');
+    const s=me.p.sk;me.cd=me.p.role==='mage'?2:3;acc('skill');log(`「${s.n}」!`,'good');
     if(SKX[me.p.id]){const o=SKX[me.p.id][2]({t,F,me,up:F.foes.filter(foeUp)})||{};if(o.end){endFightClean();return}mult=o.mult??1;guard=o.guard??1;aoe=!!o.aoe;if(o.cd!=null)me.cd=o.cd;if(o.counter)counterP=Math.max(counterP,o.counter)}else{
     if(s.t==='burst')mult=1.9;
     if(s.t==='multi'){mult=1.3;aoe=true}
@@ -2958,7 +2973,7 @@ function fightRound(act){
     const nf=F.foes.filter(foeUp).length;
     const sure=F.nf.fleeSure;F.nf.fleeSure=false;
     if(sure||ch(clamp((F.nf.fleeBonus||0)+pNum('flee')-(me.inj&&me.inj.fracture?.15:0)+.5-G.phase*.015-(nf-1)*.1+(F.fleeTry||0)*.15+(me.p.role==='assassin'?.06:0)+(hasP('evasive')?.08:0)+(me.wg-1)*.03-(F.foes.some(f=>f.kind==='boss'&&f.b.isMage)?.15:0),.12,.85))){
-      const ok=ADJ[me.area].filter(a=>!G.zones.has(a)&&passable(a));log(ok.length?'등을 돌려 달렸다.':'연막 속으로 몸을 던져 거리를 벌렸다.');
+      acc('flee');const ok=ADJ[me.area].filter(a=>!G.zones.has(a)&&passable(a));log(ok.length?'등을 돌려 달렸다.':'연막 속으로 몸을 던져 거리를 벌렸다.');
       abandonCheck(F.foes.filter(f=>f.kind==='npc'&&foeUp(f)).map(f=>f.n));
       F.foes.forEach(f=>{if(f.kind==='npc'&&foeUp(f)&&!ok.length)f.n.area=pick(ADJ[me.area].filter(passable))});endFight('fled');if(ok.length)move(pick(ok));return}
     F.fleeTry=(F.fleeTry||0)+1;log('도망치려 했지만 막혔다!','bad');mult=0;
@@ -2985,10 +3000,13 @@ function fightRound(act){
   if(F.sleep>0){F.sleep--;log('상대는 아직 잠에서 덜 깼다. 반격하지 못했다.','good');fxTick(F);if(!F.foes.some(foeUp))return endFight('win');return chain(()=>fightCard())}
   for(const f of F.foes.filter(foeUp)){
     if(f.stunned){f.stunned=false;log(`${J(foeName(f),'이')} 제압당해 반격하지 못했다.`,'good');continue}
-    let k=1;
+    let k=1;const it0=f.intent;f.intent=null;f.guardMsg=0;
+    if(it0==='flee'&&f.kind==='npc'&&f.hitR!==F.round&&!F.nf.noFlee&&!f.n.duel){const to=ADJ[me.area].filter(passable);if(to.length){f.gone=true;f.n.busy=false;f.n.hostile=true;f.n.team=null;f.n.area=pick(to);log(`${J(foeName(f),'이')} 틈을 타 달아났다. 붙잡을 기회를 놓쳤다.`,'warn');continue}}
     if(f.kind==='npc'&&npcEat(f))continue;
     if(fxMiss(f,F))continue;
-    if(f.kind==='npc'){f.cd=(f.cd||0)-1;if(f.cd<=0&&ch(f.n.c.role==='mage'?.5:.35)){if(F.nf.interrupt>0){F.nf.interrupt--;log(`${J(foeName(f),'이')} 기술을 쓰려는 순간 손목을 쳐 냈다!`,'good');k=1}else k=npcSkill(f,F);if(!foeUp(f)||k===0)continue}}
+    if(it0==='skill'&&f.kind==='npc'){if(F.nf.interrupt>0||(f.hitR===F.round&&ch(.45))){if(F.nf.interrupt>0)F.nf.interrupt--;acc('cut');log(`${J(foeName(f),'이')} 기술을 쓰려는 순간 손목을 쳐 냈다!`,'good');k=1}else k=npcSkill(f,F);if(!foeUp(f)||k===0)continue}
+    if(it0==='heavy'){k*=1.7;if(act==='def'){k*=.4;acc('read');counterP=Math.max(counterP,.6);log(`읽고 있었다. ${foeName(f)}의 큰 공격을 정면으로 받아 냈다.`,'good')}else log(`${foeName(f)}의 혼신의 일격!`,'bad')}
+    if(it0==='guard')k*=.5;
     if(f.kind==='boss'&&f.b.isMage&&ch(.3)){k=1.6;log('미스터 메이지의 손에서 푸른 번개가 쏟아진다!','bad')}
     const fs=F.friends.filter(x=>x.alive);
     if(fs.length&&!F.nf.protect&&!(F.fx&&F.fx.protect>0)&&ch(.38)){const fr=pick(fs);const d=dmgTo(fr,atkOf(f)*k*ctr(roleOf(f),fr.c.role));fr.hp-=d;if(fr.hp<=0){fr.busy=false;if(f.kind==='npc'){f.n.kills++;kill(fr,`처치: ${foeName(f)} · ${me.area}`,foeName(f))}else kill(fr,`${foeName(f)}에게 당함 · ${me.area}`,null)}else log(`${J(foeName(f),'이')} ${nm(fr)}에게 피해 ${d}`);continue}
@@ -3037,7 +3055,7 @@ function drawCardBase(){
   }
   const enc=1+.35*allies().length;
   const gs=groupsAt(a);
-  if(gs.length>=2)add((G.phase>=FINAL?12:4)*enc,()=>witnessCard(gs[0],gs[1]));
+  if(gs.length>=2)add((G.phase>=FINAL?12:6)*enc,()=>witnessCard(gs[0],gs[1]));
   if(gs.length)add((G.phase>=FINAL?30:7)*enc,()=>npcCard(gs[0]));
   if(npcsAdj().some(n=>n.c.idle==='stalk'))add(1.2,()=>stalkerCard());
   {const amb=npcsAdj().concat(others().filter(n=>n.area===a)).filter(n=>!n.busy&&n.c.agg>=.45&&!bonded(n.c,me.p)&&(n.aff||0)<30);if(amb.length)add(.9*(.15+G.phase*.1+(night()?.3:0)+(me.hp<50?.15:0))*enc*(hasP('stealth')?.5:1)*(me.noAmb===G.phase?0:1)*(hasP('hacker')?.7:1),()=>ambushCard(pick(amb)))}
@@ -3393,7 +3411,7 @@ const FIELDS={
 Object.entries(FIELDS).forEach(([id,[cd,desc]])=>{const p=BY[id];if(p&&p.act){p.act.cd=cd;p.act.desc=desc}});
 PROF.forEach(p=>{if(p.act&&!p.act.desc){p.act.cd=5;p.act.desc='주변을 샅샅이 뒤져 재료를 얻는다'}});
 function useField(){
-  const me=G.me,a=me.p.act,F=FIELDS[me.p.id];me.fcd=F?F[0]:5;log(`「${a.n}」`,'crit-good');
+  const me=G.me,a=me.p.act,F=FIELDS[me.p.id];me.fcd=F?F[0]:5;acc('field');log(`「${a.n}」`,'crit-good');
   if(F)F[2]();else{const o=loot2();log(`(${gain(o)})`)}
 }
 
@@ -3509,7 +3527,7 @@ function initExtra(){
   pHook('init');
 }
 function tickExtra(){
-  const me=G.me;
+  const me=G.me;achTick();
   if(me.eatCd>0)me.eatCd--;
   // injuries
   const I=me.inj;
@@ -3530,7 +3548,7 @@ function tickExtra(){
 const FOODS={food:['식량을 씹어 삼켰다.',22,3,0],snack:['허기만 겨우 달랬다.',15,6,1],meal:['제대로 된 음식을 먹었다.',35,14,3],feast:['특제 요리를 천천히 음미했다.',55,30,8]};
 function eatItem(k,inFight){
   const me=G.me,F=FOODS[k];
-  if(me.eatCd>0){log(`아직 속이 더부룩하다. ${me.eatCd}턴 뒤에 먹을 수 있다.`,'warn');return false}
+  if(me.eatCd>0){log(`아직 속이 더부룩하다. ${me.eatCd}턴 뒤에 먹을 수 있다.`,'warn');return false}acc('eat');
   if(k==='food'){if(!me.inv.food)return false;me.inv.food--}else{if(!me.it[k])return false;me.it[k]--}
   full(F[1]);heal(F[2]);if(F[3])san(F[3]);me.eatCd=2;pHook('eat',k);
   log(`${F[0]} (포만감 +${F[1]}, 체력 +${F[2]}${F[3]?`, 정신 +${F[3]}`:''})${inFight?' 싸움 도중이라 제대로 씹지도 못했다.':''}`,'good');return true;
@@ -3546,7 +3564,7 @@ function treatHerb(){const me=G.me;if(!me.inv.herb||!(me.inj.burn||me.inj.infect
 function bestFood(){const me=G.me;return['feast','meal','snack'].find(k=>me.it[k]>0)||(me.inv.food>0?'food':null)}
 function eatInFight(){const k=bestFood();if(k)eatItem(k,true)}
 function npcEat(f){const n=f.n;if(n.food>0&&n.hp<foeMax(f)*.4&&ch(.45)){n.food--;const v=16+Math.round(G.phase*1.5);n.hp=Math.min(foeMax(f),n.hp+v);log(`${J(nm(n),'이')} 품에서 음식을 꺼내 우겨넣었다. 기력을 되찾았다.`,'warn');return true}return false}
-function fightCard(){
+function fightCardEat(){
   const c=fightCardBase();if(!c)return c;const me=G.me;
   const k=bestFood();
   if(me.kills===0){const t=G.fight.foes.find(foeUp);if(t&&t.kind==='npc')c.opts.splice(1,0,{l:'제압만 한다 (죽이지 않는다)',f:()=>fightRound('subdue')})}
@@ -4180,7 +4198,7 @@ Object.assign(END_TXT,{
 const FX=F=>F.fx||(F.fx={});
 const upOf=F=>F.foes.filter(foeUp);
 function hitOn(x,m,F,label){if(!x||!foeUp(x))return 0;const d=Math.max(1,Math.round(myHit(x)*m*fxDealt(x,F)));log(`${label?label+' ':''}${foeName(x)}에게 피해 ${d}`);dmgFoe(x,d,'me');return d}
-function fxDealt(x,F){const fx=FX(F);let k=1;if(fx.buff&&fx.buff.r>0)k*=fx.buff.v;if(fx.nextHit){k*=fx.nextHit;fx.nextHit=0}if(x&&x.mark&&x.mark.r>0)k*=x.mark.v;return k}
+function fxDealt(x,F){const fx=FX(F);let k=1;if(fx.buff&&fx.buff.r>0)k*=fx.buff.v;if(fx.nextHit){k*=fx.nextHit;fx.nextHit=0}if(x&&x.mark&&x.mark.r>0)k*=x.mark.v;if(x&&x.intent==='guard'){k*=.45;if(!x.guardMsg){x.guardMsg=1;log(`${J(foeName(x),'이')} 몸을 웅크려 공격을 흘려 냈다.`,'warn')}}if(x&&F)x.hitR=F.round;return k}
 function fxTaken(F,f){const fx=FX(F);let k=pDef(f,F);for(const key of['armor','weak','vuln'])if(fx[key]&&fx[key].r>0)k*=fx[key].v;if(fx.armorHits&&fx.armorHits.n>0){k*=fx.armorHits.v;fx.armorHits.n--}return k}
 function fxMiss(f,F){const fx=FX(F);if(pNum('evade')&&ch(pNum('evade'))){log(`${foeName(f)}의 공격을 흘려 냈다.`,'good');pHook('miss',f,F);return true}
   if(fx.blockN>0){fx.blockN--;log(`${fx.blockName||'방벽'}이(가) ${foeName(f)}의 공격을 막아 냈다.`,'good');pHook('block',f,F);return true}
@@ -4485,7 +4503,7 @@ const PASSIVE={
  adriana:{c:'방화범 · 불을 지르고(필드) 화염으로 태워 버린다(전투)',n:'불장난',d:'화상에 걸리지 않는다. 지속 피해(화상·출혈)를 입은 적에게 피해 +20%.',
   tick(){if(G.me.inj&&G.me.inj.burn)delete G.me.inj.burn},atk:x=>x&&x.dot>0?1.2:1},
  shoichi:{c:'사기꾼 · 상대가 먼저 손을 내밀게 만들고(필드), 다섯 번째 수에 확실하게 뜯어낸다(전투)',n:'부당거래',d:'공격 다섯 번마다 한 번은 반드시 치명타가 터진다. 단, 이 치명타의 피해는 125%다.',
-  atk(x,F){const m=G.me;m.shHits=(m.shHits||0)+1;if(m.shHits%5===0){log('부당거래. 확정 치명타! (125%)','crit-good');return 1.25}return 1}},
+  atk(x,F){const m=G.me;m.shHits=(m.shHits||0)+1;if(m.shHits%5===0){acc('sh5');log('부당거래. 확정 치명타! (125%)','crit-good');return 1.25}return 1}},
  emma:{c:'마술사 · 관객 앞에서 빛나고(필드), 비둘기로 시선을 빼앗는다(전투)',n:'관객',d:'근처에 실험체가 있으면 정신 감소 -30%. 적이 헛손질하면 30% 확률로 카드를 던져 반격한다.',
   san:v=>v<0&&near().length?v*.7:v,miss(f,F){if(ch(.3))hitOn(f,.5,F,'카드!')}},
  lenox:{c:'사슬 · 사슬을 정비하고(필드), 묶어 둔 상대를 천천히 끝낸다(전투)',n:'마피아의 수법',d:'도망칠 수 없는 적에게 피해 +20%.',
@@ -4741,7 +4759,7 @@ function D(block,w0=.12){
     const[idw,tag,cond,title,text,opts]=l.split('|');if(!opts)return;
     const[id,ww]=idw.split('*');const w=ww?+ww:w0;
     const npcIds=(cond.match(/n:([\w/]+)/)||[])[1];
-    SCENES.push({id,w,c:a=>{try{return dslCond(cond,a)}catch(e){return false}},make:a=>{
+    SCENES.push({id,w,tag,c:a=>{try{return dslCond(cond,a)}catch(e){return false}},make:a=>{
       const n=npcIds?npcIds.split('/').map(one).find(Boolean):(/\{n\}/.test(text+opts)?pick(others().filter(x=>!x.busy))||null:null);
       if(npcIds&&n)here(n);
       const ctx={a,n};const os=opts.split(';;').map(o=>dslOpt(o,ctx)).filter(Boolean);if(!os.length)return null;if(!os.some(o=>!o.dis))os.push({l:'그냥 지나간다',f:()=>log('발길을 돌렸다.')});
@@ -5748,6 +5766,192 @@ h099|휴식|*|작은 승리|오늘 하루를 버텼다는 게 갑자기 실감 �
 h100|휴식|*|평화로운 순간|아주 잠깐, 이 섬이 평화로워 보인다.|그 순간을 기억한다 => san+10 :: 이 순간을 위해 살아남는다.
 `);
 
+/* ===================== V2.10 · INTENTS, SCENE BALANCE, ACHIEVEMENTS, TIPS ===================== */
+/* ---------- scene balance: rare kinds surface more, flooded kinds less ---------- */
+const SCENE_TAG={"search":"탐색","door":"탐색","blood":"탐색","vend":"탐색","pharm":"탐색","confess":"탐색","boat":"탐색","powder":"탐색","cctv":"탐색","rain":"밤","fire":"밤","chalk":"탐색","record":"기록","bag":"탐색","gunshot":"소리","speaker":"방송","cat":"탐색","drone":"감시","water":"탐색","grave":"탐색","bed":"탐색","armory":"탐색","forest":"탐색","archery":"탐색","factory":"탐색","gas":"위험","quake":"재난","sinkhole":"위험","radio":"소리","mirror":"탐색","greenhouse":"탐색","kitchen":"탐색","library":"탐색","storm":"밤","wounded":"조우","flash":"회상","cargo":"탐색","rooftop":"탐색","musicbox":"탐색","generator":"탐색","sewer":"이동","lab_door":"기록","gacha":"밈","patch":"밈","chicken":"밈","truck":"밈","rps":"밈","cs":"밈","lag":"밈","stream":"밈","mbti":"밈","scam":"밈","gym":"밈","fortune":"밈","wall":"밈","question":"밈","ramen":"밈","doll":"밈","skip":"밈","fish":"식량","nest":"식량","mushroom":"식량","hive":"식량","mart":"식량","mre":"식량","offering":"식량","clam":"식량","orchard":"식량","rats":"식량","campfood":"식량","xiukai":"식량","ration_drone":"식량","frog":"식량","trade":"거래","conveyor_food":"식량","delivery":"밈","spring":"회복","nurse":"회복","suture":"회복","firstaid":"회복","sauna":"회복","pod":"회복","sap":"회복","cathy":"회복","safehouse":"회복","iv":"회복","hammock":"회복","soup":"회복","medevac":"밈","fog":"환경","blackout":"환경","searchlight":"감시","bridge":"이동","barbed":"위험","heli":"소리","survivor_researcher":"조우","safe":"탐색","puppy":"야생","well":"탐색","piano":"탐색","phone":"소리","flood":"재난","car":"탐색","fire_bldg":"재난","tent":"탐색","bell":"소리","lighthouse":"탐색","broadcastroom":"탐색","meteor_live":"재난","photoalbum":"기록","warning_sign":"탐색","siren":"소리","graffiti":"기록","gasstation":"탐색","barbara_inv":"조우","alex_tetris":"밈","silvia_ride":"조우","emma_magic":"밈","jenny_sign":"밈","nicky_ring":"조우","martina_iv":"밈","adela_chess":"조우","dailin_drink":"밈","bianca_blood":"밈","sissela_wilson":"밈","hart_busk":"조우","lucia_tea":"조우","mirka_toll":"조우","craver_gun":"기록","daniel_cut":"밈","isaac_check":"조우","laura_notice":"밈","tsubame_clone":"조우","chloe_nina":"밈","rozzi_intel":"조우","abigail_why":"조우","fenrir_chain":"조우","echion_vf":"위험","bonfire":"밈","quest_npc":"밈","bgm":"밈","survey":"밈","fourthwall":"밈","loading":"밈","mimic":"밈","banana":"밈","lego":"밈","wifi":"밈","toilet":"밈","army":"밈","exam":"밈","mom":"밈","pizza":"밈","gm":"밈","hacker":"밈","exit_btn":"밈","double_xp":"밈","attendance":"밈","mintchoco":"밈","karaoke":"밈","mugunghwa":"밈","cardboard":"밈","potato":"밈","confession":"밈","wallclip":"밈","speedrun":"밈","crab":"밈","auto_aim":"밈","isekai_reverse":"밈","aglaia_ad":"밈","vending_talk":"밈","nap_cat":"밈","streamer_donation":"밈","h_survivor":"히든","h_devroom":"히든","mm_talk":"밈","xk_duel":"제안","r_ayajackie":"목격","r_fire":"목격","r_jam":"휴식","r_mukbang":"식량","r_faith":"회상","r_press":"목격","r_magic":"밈","r_blades":"목격","r_cop":"목격","r_twins":"밈","r_wolf":"목격","s_sunset":"휴식","s_radio":"휴식","s_cat":"휴식","s_letter":"회상","s_stars":"밤","s_tea":"휴식","s_organ":"휴식","s_photo":"회상","s_graffiti":"밈","s_broadcast":"밈","s_lullaby":"소리","bro_meet":"재회"};
+(()=>{if(typeof NO_NORM!=='undefined')return;const T={};SCENES.forEach(s=>{const t=s.tag||SCENE_TAG[s.id];if(!t||['히든','위험','재난','감시'].includes(t))return;s._t=t;T[t]=(T[t]||0)+s.w});
+  const v=Object.values(T).sort((a,b)=>a-b);const ref=v[Math.floor(v.length/2)];
+  SCENES.forEach(s=>{if(s._t)s.w*=Math.max(1,Math.min(2,Math.sqrt(ref/T[s._t])))})})();
+
+/* ---------- enemy intent telegraph ---------- */
+const INTENT_TX={
+ heavy:['무기를 크게 치켜든다','온몸에 힘을 모으고 있다','발을 단단히 딛고 숨을 들이켠다'],
+ guard:['몸을 웅크리고 방어 자세를 잡는다','거리를 벌리며 빈틈을 지운다'],
+ skill:['손놀림이 달라졌다. 뭔가 준비하는 기색이다','눈빛이 바뀌었다. 기술이 온다'],
+ flee:['눈동자가 도망칠 길을 찾고 있다','뒷걸음질 치며 퇴로를 살핀다'],
+ normal:['거리를 재며 돈다','호흡을 고르며 이쪽을 노려본다','무기 끝이 흔들림 없이 이쪽을 향한다'],
+ beast:['몸을 낮추고 으르렁거린다'],
+};
+function rollIntent(f,F){
+  if(f.intent||!foeUp(f))return;
+  if(f.kind==='npc'){const n=f.n;
+    if(foeHp(f)<=foeMax(f)*.3&&G.phase<FINAL&&!n.duel&&!(F.nf&&F.nf.noFlee)&&ch(.32*(1-n.c.agg*.5))){f.intent='flee';return}
+    f.cd=(f.cd||0)-1;if(f.cd<=0&&ch(n.c.role==='mage'?.5:.35)){f.intent='skill';return}
+    const r=rnd();f.intent=r<.22+G.phase*.01?'heavy':r<.36?'guard':'normal';return}
+  f.intent=ch(.25)?'heavy':'normal';
+}
+function intentLine(f){
+  const me=G.me;const t=f.intent||'normal';let mis=me.san<30?.3:.1;if(alignOf(me.p)==='calm')mis*=.5;
+  const shown=ch(mis)?pick(['heavy','guard','normal'].filter(x=>x!==t)):t;
+  const tx=f.kind!=='npc'&&shown==='heavy'&&!(f.kind==='boss'&&f.b.isMage)?INTENT_TX.beast:INTENT_TX[shown];
+  return`▸ ${foeName(f)}: ${pick(tx)}`;
+}
+function fightCard(){
+  const F=G.fight;if(F)F.foes.forEach(f=>rollIntent(f,F));
+  const c=fightCardEat();if(!c||!G.fight)return c;
+  const ls=G.fight.foes.filter(foeUp).map(intentLine);if(ls.length)c.text+='\n'+ls.join('\n');
+  return c;
+}
+
+/* ---------- run counters ---------- */
+function acc(k,v=1){const m=G&&G.me;if(!m)return;m.ac=m.ac||{};m.ac[k]=(m.ac[k]||0)+v}
+function achTick(){const m=G.me;if(!m)return;m.ac=m.ac||{};m.ac.minHp=Math.min(m.ac.minHp??999,m.hp);m.ac.minSan=Math.min(m.ac.minSan??999,m.san)}
+function achKill(n){const m=G.me,F=G.fight;if(m.drunk>0)acc('drunkKill');if(night())acc('nightKill');if(F&&F.opener==='me'&&F.round<=2)acc('ambKill');if(MEM(n).anat)acc('anatKill');if(villainy(n)>=6)acc('villKill')}
+
+/* ---------- achievements ---------- */
+const achW=o=>o&&o.win;
+const achF=n=>(m)=>(m.ac.field||0)>=n,achS=n=>(m)=>(m.ac.skill||0)>=n;
+const ACH_C={
+ jackie:['피의 축제','한 판에 5명 이상 처치한다',m=>m.kills>=5],
+ aya:['현장 수사관','잭키나 아이작을 처치한다',m=>m.killedIds.has('jackie')||m.killedIds.has('isaac')],
+ fiora:['펜싱 챔피언','전투 스킬을 10번 쓴다',achS(10)],
+ magnus:['듬직한 형제','마커스와 동맹을 맺은 채 3번째 페이즈를 넘긴다',(m,o)=>m.allyIds.has('markus')&&o.phase>=3],
+ zahir:['예언자','「예언」을 5번 쓴다',achF(5)],
+ nadine:['숲의 사냥꾼','한 판에 야생동물 8마리를 사냥한다',m=>(m.st.hunt||0)>=8],
+ hyunwoo:['맨주먹 챔피언','무기를 일반 등급 이하로 두고 우승한다',(m,o)=>achW(o)&&m.wg<=1],
+ hart:['앙코르','정신 80 이상으로 우승한다',(m,o)=>achW(o)&&m.san>=80],
+ isol:['지뢰밭','「부비트랩」을 6번 깐다',achF(6)],
+ dailin:['취권 고수','취한 채로 3명을 처치한다',m=>(m.ac.drunkKill||0)>=3],
+ yuki:['일도양단','전투 스킬을 8번 쓴다',achS(8)],
+ hyejin:['부적 장인','「부적 쓰기」를 4번 쓴다',achF(4)],
+ xiukai:['섬의 미슐랭','한 판에 요리를 8번 한다',m=>(m.cooked||0)>=8],
+ chiara:['속죄의 길','5명 이상 처치하고도 정신 60 이상으로 우승한다',(m,o)=>achW(o)&&m.kills>=5&&m.san>=60],
+ sissela:['윌슨과 함께','정신이 한 번도 30 밑으로 떨어지지 않고 우승한다',(m,o)=>achW(o)&&(m.ac.minSan??100)>=30],
+ silvia:['질주 본능','교전에서 5번 도주에 성공한다',m=>(m.ac.flee||0)>=5],
+ adriana:['불꽃놀이','「불 지르기」를 5번 쓴다',achF(5)],
+ shoichi:['부당거래','확정 치명타를 10번 터뜨린다',m=>(m.ac.sh5||0)>=10],
+ emma:['사라지는 마술','「마술 공연」을 5번 한다',achF(5)],
+ lenox:['사슬의 주인','전투 스킬을 8번 쓴다',achS(8)],
+ rozzi:['그림자 공작원','「잠입」을 5번 성공시킨다',achF(5)],
+ luke:['깔끔한 일 처리','7명 이상 처치하고 우승한다',(m,o)=>achW(o)&&m.kills>=7],
+ cathy:['응급실','한 판에 동맹 3명 이상과 함께한다',m=>m.allyHist.length>=3],
+ adela:['체크메이트','전투 스킬을 8번 쓴다',achS(8)],
+ bernice:['덫 사냥꾼','「사냥꾼의 덫」을 6번 놓는다',achF(6)],
+ barbara:['발명왕','「발명」을 6번 한다',achF(6)],
+ alex:['이중 신분','쇼이치와 동맹을 맺는다',m=>m.allyIds.has('shoichi')],
+ sua:['책벌레','「독서」를 5번 한다',achF(5)],
+ leon:['물살을 가르며','「물살 타기」를 5번 쓴다',achF(5)],
+ eleven:['먹방 스트리머','한 판에 15번 먹는다',m=>(m.ac.eat||0)>=15],
+ rio:['명궁','전투 스킬을 10번 쓴다',achS(10)],
+ william:['에이스','우승한다',(m,o)=>achW(o)],
+ nicky:['카운터 펀치','적의 큰 공격을 방어로 5번 받아 낸다',m=>(m.ac.read||0)>=5],
+ nathapon:['찰칵','「사진 촬영」을 5번 한다',achF(5)],
+ jan:['스파링 파트너','「스파링」을 6번 한다',achF(6)],
+ eva:['염동력','「염동 수색」을 5번 쓴다',achF(5)],
+ daniel:['해부학 교실','급소를 파악해 둔 실험체를 3명 처치한다',m=>(m.ac.anatKill||0)>=3],
+ jenny:['원 테이크','우승한다',(m,o)=>achW(o)],
+ camilo:['정열의 무대','정신 80 이상으로 우승한다',(m,o)=>achW(o)&&m.san>=80],
+ chloe:['니나와 함께','전투 스킬을 10번 쓴다',achS(10)],
+ johann:['신의 가호','동맹 2명 이상과 함께 마지막까지 살아남는다',(m,o)=>achW(o)&&allies().length>=2],
+ bianca:['밤의 여왕','밤에 5명을 처치한다',m=>(m.ac.nightKill||0)>=5],
+ celine:['폭탄마','「폭탄 제조」를 5번 한다',achF(5)],
+ echion:['완성된 병기','무기를 전설 등급까지 올리고 우승한다',(m,o)=>achW(o)&&m.wg>=4],
+ mai:['오트쿠튀르','방어구를 전설 등급까지 올린다',m=>m.ag>=4],
+ aiden:['전장의 감','전투 스킬을 10번 쓴다',achS(10)],
+ laura:['괴도','「소매치기」를 6번 한다',achF(6)],
+ tia:['아틀리에','「그림 그리기」를 5번 한다',achF(5)],
+ felix:['히어로','3명 이상 살려 보낸다',m=>m.st.spare>=3],
+ elena:['빙판의 여왕','전투 스킬을 8번 쓴다',achS(8)],
+ priya:['치유의 노래','「치유의 노래」를 6번 부른다',achF(6)],
+ adina:['별의 인도','「점괘」를 5번 본다',achF(5)],
+ markus:['듬직한 무게감','매그너스와 동맹을 맺은 채 3번째 페이즈를 넘긴다',(m,o)=>m.allyIds.has('magnus')&&o.phase>=3],
+ karla:['작살 낚시꾼','「작살 낚시」를 6번 한다',achF(6)],
+ estelle:['불길 너머로','아드리아나를 처치한다',m=>m.killedIds.has('adriana')],
+ piolo:['끊어 치기','적의 기술을 5번 끊는다',m=>(m.ac.cut||0)>=5],
+ martina:['특종','촬영을 100%까지 끝낸다',m=>m.film>=100],
+ haze:['암거래상','「암거래」를 5번 한다',achF(5)],
+ isaac:['누명','「누명 씌우기」를 4번 쓴다',achF(4)],
+ tazia:['그림자 일격','먼저 덮친 교전에서 5명을 처치한다',m=>(m.ac.ambKill||0)>=5],
+ irem:['아홉 개의 목숨','「고양이 변신」을 5번 쓴다',achF(5)],
+ theodore:['저격수의 인내','전투 스킬을 8번 쓴다',achS(8)],
+ lyanh:['보이지 않는 칼','먼저 덮친 교전에서 4명을 처치한다',m=>(m.ac.ambKill||0)>=4],
+ vanya:['나비의 날갯짓','「나비 치유」를 6번 쓴다',achF(6)],
+ debimarlene:['쌍둥이 연계','「쌍둥이 연계」를 5번 쓴다',achF(5)],
+ arda:['고고학자','「유물 발굴」을 6번 한다',achF(6)],
+ abigail:['공간 도약','「공간 이동」을 6번 쓴다',achF(6)],
+ alonso:['자기장','전투 스킬을 8번 쓴다',achS(8)],
+ leni:['좋은 꿈','정신 70 이상으로 우승한다',(m,o)=>achW(o)&&m.san>=70],
+ tsubame:['분신 탈출','교전에서 4번 도주에 성공한다',m=>(m.ac.flee||0)>=4],
+ kenneth:['벌목꾼','「벌목」을 6번 한다',achF(6)],
+ katja:['원거리 저격','먼저 덮친 교전에서 5명을 처치한다',m=>(m.ac.ambKill||0)>=5],
+ charlotte:['축복받은 손','한 명도 죽이지 않고 우승한다',(m,o)=>achW(o)&&m.kills===0],
+ darko:['동네 깡패','「위협」을 5번 쓴다',achF(5)],
+ lenore:['불협화음','전투 스킬을 8번 쓴다',achS(8)],
+ garnet:['고통의 연결','체력 20 이하까지 몰렸다가 우승한다',(m,o)=>achW(o)&&(m.ac.minHp??100)<=20],
+ yumin:['부적술사','「부적술」을 5번 쓴다',achF(5)],
+ hisui:['거합 일섬','전투 스킬을 8번 쓴다',achS(8)],
+ justyna:['정의 구현','악행이 쌓인 실험체를 3명 처치한다',m=>(m.ac.villKill||0)>=3],
+ istvan:['선택의 대가','적의 기술을 4번 끊는다',m=>(m.ac.cut||0)>=4],
+ niah:['콤보 마스터','전투 스킬을 10번 쓴다',achS(10)],
+ xuelin:['침술','전투 스킬을 8번 쓴다',achS(8)],
+ henry:['계산된 움직임','적의 큰 공격을 방어로 4번 받아 낸다',m=>(m.ac.read||0)>=4],
+ blair:['VF 사냥꾼','VF 실험체를 처치한다',m=>!!m.vfKill],
+ mirka:['구역의 보스','「구역 장악」을 5번 쓴다',achF(5)],
+ fenrir:['사슬을 끊고','체력 20 이하까지 몰렸다가 우승한다',(m,o)=>achW(o)&&(m.ac.minHp??100)<=20],
+ coraline:['관찰 일지','「관찰 일지」를 5번 쓴다',achF(5)],
+ bihyung:['빙의','전투 스킬을 8번 쓴다',achS(8)],
+ cliver:['원념의 계승자','우승한다',(m,o)=>achW(o)],
+ lucia:['총사와 기사','세레스와 함께 우승한다',(m,o)=>achW(o)&&m.allyIds.has('seres')],
+ seres:['맹세를 지킨 검','루치아와 함께 우승한다',(m,o)=>achW(o)&&m.allyIds.has('lucia')],
+ jp:['해커','연구소 시스템을 장악해 우승한다',(m,o)=>achW(o)&&o.kind==='hack'],
+ rosalio:['클러치 히터','전투 스킬을 10번 쓴다',achS(10)],
+};
+const ACH_G=[
+ ['firstwin','첫 우승','어떤 실험체로든 우승한다',(m,o)=>achW(o)],
+ ['pacifist','손에 피 한 방울','한 명도 죽이지 않고 우승한다',(m,o)=>achW(o)&&m.kills===0],
+ ['massacre','학살자','한 판에 10명 이상 처치한다',m=>m.kills>=10],
+ ['reader','수읽기','한 판에 적의 큰 공격을 방어로 6번 받아 낸다',m=>(m.ac.read||0)>=6],
+ ['cutter','맥 끊기','한 판에 적의 기술을 4번 끊는다',m=>(m.ac.cut||0)>=4],
+ ['survivor','벼랑 끝','체력 10 이하까지 몰렸다가 우승한다',(m,o)=>achW(o)&&(m.ac.minHp??100)<=10],
+ ['end20','수집가','엔딩을 20개 모은다',()=>loadEndings().length>=20],
+ ['end40','기록 보관인','엔딩을 40개 모은다',()=>loadEndings().length>=40],
+ ['wins5','베테랑','서로 다른 실험체 5명으로 우승한다',()=>Object.keys(loadWins()).length>=5],
+ ['wins15','루미아의 전설','서로 다른 실험체 15명으로 우승한다',()=>Object.keys(loadWins()).length>=15],
+];
+const ACH_KEY='lumia_ach_v1',WIN_KEY='lumia_wins_v1';
+function loadAch(){try{return new Set(JSON.parse(localStorage.getItem(ACH_KEY)||'[]'))}catch(e){return new Set()}}
+function saveAch(s){try{localStorage.setItem(ACH_KEY,JSON.stringify([...s]))}catch(e){}}
+function loadWins(){try{return JSON.parse(localStorage.getItem(WIN_KEY)||'{}')}catch(e){return{}}}
+function achTotal(){return ACH_G.length+Object.keys(ACH_C).length}
+function achEval(){
+  if(G.achNew)return G.achNew;
+  const m=G.me,o=G.over;m.ac=m.ac||{};achTick();
+  if(achW(o)){try{const w=loadWins();w[m.p.id]=(w[m.p.id]||0)+1;localStorage.setItem(WIN_KEY,JSON.stringify(w))}catch(e){}}
+  const got=loadAch(),nw=[];
+  const c=ACH_C[m.p.id];if(c&&!got.has('c:'+m.p.id)){try{if(c[2](m,o)){got.add('c:'+m.p.id);nw.push(`${m.p.n} · ${c[0]}`)}}catch(e){}}
+  for(const g of ACH_G){if(got.has('g:'+g[0]))continue;try{if(g[3](m,o)){got.add('g:'+g[0]);nw.push(g[1])}}catch(e){}}
+  saveAch(got);G.achNew=nw;return nw;
+}
+
+/* ---------- first-run tips ---------- */
+const TIPS=[
+ ['start',()=>G.choices<=1,'장면마다 하나를 고릅니다. 체력·정신·포만감이 바닥나지 않게 관리하세요. 아래 「가방」에서 음식과 붕대를 바로 쓸 수 있습니다.'],
+ ['fight',()=>G.fight,'적의 다음 행동이 카드 아래에 ▸로 흐릿하게 보입니다. 큰 공격 자세라면 「방어」로 받아 내 반격을 노리고, 웅크린 상대에겐 공격이 잘 먹히지 않으니 그 틈에 먹거나 붕대를 감으세요.'],
+ ['fskill',()=>G.fight&&G.fight.foes.some(f=>f.intent==='skill'),'적이 기술을 준비할 때 공격해서 맞히면 일정 확률로 끊을 수 있습니다.'],
+ ['fflee',()=>G.fight&&G.fight.foes.some(f=>f.intent==='flee'),'도망칠 틈을 엿보는 적은 이번 턴에 공격하지 않으면 달아납니다. 끝을 내려면 지금 쳐야 합니다.'],
+ ['field',()=>!G.fight&&G.choices>=3&&G.me.fcd<=0,'상단의 「필드 스킬」은 지금 장면을 넘기지 않고 쓸 수 있습니다. 실험체마다 패시브·필드·전투 스킬이 하나의 플레이 컨셉으로 이어집니다.'],
+ ['hp',()=>G.me.hp<50,'체력이 낮으면 동료조차 배신을 고민합니다. 휴식 장면, 음식, 붕대로 체력을 회복하세요.'],
+ ['san',()=>G.me.san<45,'정신이 40 아래로 내려가면 환각과 붕괴 장면이 나옵니다. 휴식 장면이나 성향에 맞는 행동이 정신을 회복시킵니다.'],
+ ['full',()=>G.me.full<35,'포만감이 바닥나면 체력이 깎입니다. 음식은 등급마다 회복량이 다르고, 먹은 뒤에는 잠시 재사용 대기가 있습니다.'],
+ ['inj',()=>Object.keys(G.me.inj||{}).length>0,'부상은 오래갑니다. 골절은 부목, 화상과 감염은 약초로 가방에서 치료할 수 있습니다.'],
+ ['zone',()=>G.next.includes(G.me.area),'지금 있는 곳이 곧 금지구역이 됩니다. 다음 페이즈 전에 벗어나세요. 「지도」에서 안전한 구역을 확인할 수 있습니다.'],
+ ['ally',()=>allies().length>0,'동료는 든든하지만, 우호도가 낮거나 내 체력이 낮을 때 등을 돌릴 수 있습니다. 「생존자」 탭에서 우호도를 확인하세요.'],
+ ['rumor',()=>G.card&&G.card.tag==='소문','소문이 늘 사실인 건 아닙니다. 함정일 수도 있습니다.'],
+ ['night',()=>night()&&G.choices>=4,'밤에는 짐승과 기습이 늘어납니다. 잠들 곳을 신중히 고르세요.'],
+ ['align',()=>G.choices>=8,'실험체마다 성향이 있습니다. 악 성향은 오래 싸우지 않으면 정신이 깎이고, 선 성향은 사람을 해칠수록 정신이 깎입니다. 프로필에서 확인하세요.'],
+ ['bounty',()=>G.rep&&G.rep.bounty,'현상금이 붙었습니다. 호전적인 실험체들이 당신을 찾아옵니다.'],
+];
+
 /* ===================== UI ===================== */
 const app=document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -5757,11 +5961,11 @@ let curPid=null;
 const playable=()=>PROF.filter(p=>!p.hiddenChar||hidUnlocked(p));
 
 
-const PATCH=[["v2.9.4", "2026.10.29", [["난이도", ["적 실험체들이 훨씬 빠르게 강해집니다. 장비 성장 속도가 크게 올랐고, 시간이 지날수록 더 가파르게 빨라집니다.", "적 실험체의 무기 숙련이 페이즈와 처치 수에 따라 더 빠르게 오릅니다.", "페이즈가 진행될수록 적 실험체의 공격력 상승 폭이 커졌습니다.", "플레이어가 주는 피해가 전체적으로 30% 감소합니다.", "플레이어가 받는 전투 피해가 전체적으로 20% 증가합니다."]], ["쇼이치", ["패시브 이름이 「다섯 번째 패」에서 「부당거래」로 변경되었습니다. 효과는 같습니다.", "전투 스킬 이름이 「부당거래」에서 「표리」로 변경되었습니다."]]]], ["v2.9.3", "2026.10.29", [["밸런스", ["암살자의 밤 기습(잠든 실험체 습격) 피해가 하향되었습니다.", "암살자의 선공 피해가 소폭 하향되었습니다.", "암살자는 이제 낮에 모든 피해가 25% 감소합니다. (기존: 낮의 정면 교전에서만 15% 감소)"]], ["쇼이치", ["패시브가 「다섯 번째 패」로 변경되었습니다. 공격 다섯 번마다 한 번은 반드시 치명타가 터지며, 이 치명타의 피해는 125%입니다.", "전투 스킬 이름이 「부당거래」로 변경되었습니다."]]]], ["v2.9.2", "2026.10.29", [["성향", ["선·중립 성향 실험체가 악행을 많이 쌓은 상대를 처치하면 정신력 감소가 줄어듭니다. 악행은 처치 수, 악 성향 여부, 플레이어를 배신하거나 물건을 훔친 기록 등으로 쌓이며, 매우 심한 악당을 처치하면 정신력이 전혀 깎이지 않습니다."]]]], ["v2.9.1", "2026.10.29", [["조우", ["실험체와 마주치는 모든 인카운터(가위바위보, 거래, 대화, 공연, 치료 제안 등)에서 '무시하고 공격한다'를 선택할 수 있습니다. 호의적으로 다가온 상대를 공격하면 그 실험체가 이를 기억하고 악명이 오릅니다."]]]], ["v2.9", "2026.10.29", [["플레이 컨셉과 고유 패시브", ["모든 실험체에게 플레이 컨셉이 생겼습니다. 패시브, 필드 스킬, 전투 스킬이 하나의 컨셉으로 이어지도록 설계되었으며, 프로필 상단에서 확인할 수 있습니다.", "패시브가 없던 실험체 전원에게 고유 패시브가 추가되었습니다. (예: 재키 「피 냄새」 처치할 때마다 피해 증가 스택, 매그너스 「가속」 이동 직후 첫 공격 강화와 돌진 반동 무효, 크레이버 「원념 축적」 처치할 때마다 영구 피해 증가)", "일부 스킬이 패시브와 연계되도록 조정되었습니다. (유키 일도양단, 아델라 체크메이트, 아디나 별자리 점괘, 다니엘 완벽한 컷, 바바라 자동 포탑, 로지 잠입)"]], ["실험체 조정", ["루크의 성향이 '악'으로 변경되었습니다. 청부업자 출신이라는 설정에 맞춰, 처치해도 악명이 오르지 않고 목격자도 남지 않습니다.", "에이든이 '냉철' 성향으로 분류되었습니다."]], ["인카운터 대규모 추가", ["일반·밈·식량·회복·휴식·회상·밤·야생·기록·재난 인카운터와 실험체 카메오 인카운터 등 900여 종이 추가되었습니다. (총 약 1,170종)", "특정 실험체로 플레이할 때만 나타나는 전용 인카운터와, 특정 실험체로만 고를 수 있는 특별 선택지(★ 표시)가 추가되었습니다.", "이렘으로 고양이 관련 인카운터를 만나면 고양이로 변해 특별한 상호작용을 할 수 있습니다."]]]], ["v2.8", "2026.10.29", [["플레이어 배신 인카운터", ["동맹 중일 때 플레이어가 동료를 배신할 수 있는 인카운터 7종이 추가되었습니다. (잠든 동료, 전리품 분배, 미끼, 동료 팔아넘기기, 독 넣기, 금지구역 지름길, 쓰러진 동료)", "배신에 실패하거나 살아남은 동료는 이를 기억하고 복수하러 찾아옵니다."]], ["성향 추가: 냉철", ["레녹스(마피아 출신), 테오도르(참전용사 출신), 에이든, 알렉스, 로지, 타지아, 카티야, 히스이에게 '냉철' 성향이 부여되었습니다.", "냉철: 정신력이 오르내리는 폭이 작고, 시간이 지나도 정신력이 저절로 깎이지 않습니다.", "레녹스와 테오도르의 소개 문구에 경력이 반영되었습니다."]], ["스킬 변경", ["나딘 필드 스킬이 「야생동물 찾기」로 변경되었습니다. 짐승을 찾아 안전하게 사냥합니다.", "나딘 전투 스킬이 「사냥 본능」으로 변경되었습니다. 사냥한 야생동물 한 마리당 피해가 15% 증가합니다. (최대 +150%)", "버니스 필드 스킬이 「사냥꾼의 덫」으로 변경되었습니다.", "다니엘 필드 스킬이 「해부학적 관찰」로 변경되었습니다. 근처 실험체의 급소를 파악해, 그 실험체와 싸울 때 40% 확률로 치명타를 주고 마주치면 먼저 움직일 가능성이 높아집니다.", "아이작 필드 스킬이 「누명 씌우기」로 변경되었습니다. 근처의 가장 강한 실험체에게 누명을 씌워 주변 실험체들이 그를 공격하게 만듭니다.", "아이작 전투 스킬이 「과잉 진압」으로 변경되었습니다. 상대를 기절시키고 3라운드 동안 받는 피해 +50% 표식을 남기며, 약해진 상대의 소지품을 압수합니다."]], ["치명타", ["로살리오를 제외한 모든 치명타 피해 배율이 1.5배로 통일되었습니다. 로살리오는 1.8배를 유지합니다."]]]], ["v2.7.1", "2026.10.28", [["실험체 조정", ["다니엘의 필드 스킬이 「몸단장」에서 「완벽한 가면」으로 변경되었습니다. 근처 실험체에게 다정한 사람인 척 접근해 호감을 크게 올리고, 자리가 있으면 동료로 끌어들입니다.", "가면을 쓴 동료를 「먼저 등을 찌른다」로 공격하면 피해가 2.2배가 되며, 배신으로 기록되지 않아 평판과 다른 실험체의 기억에 남지 않습니다."]]]], ["v2.7", "2026.10.28", [["성향 시스템", ["모든 실험체에게 성향(선·중립·악·전투광·사이코패스)이 부여되었습니다. 성향은 실험체 프로필에서 확인할 수 있습니다.", "선: 사람을 죽이면 정신력이 크게 깎이고, 상대를 살려 보내면 회복됩니다. 동료를 배신하면 정신력이 무너지며, 동료와 함께 있으면 조금씩 안정됩니다.", "중립: 기존과 같이 사람을 죽이면 정신력이 깎입니다.", "악 (재키, 아드리아나, 아이솔, 아이작 등): 사람을 죽이면 오히려 정신력이 크게 회복됩니다. 오랫동안 싸우지 못하면 정신력이 깎이고, 상대를 살려 보내면 짜증이 납니다.", "전투광 (현우, 니키, 리 다이린, 로살리오 등): 교전 중 매 라운드 정신력이 회복되며, 오랫동안 싸우지 못하면 정신력이 깎입니다.", "사이코패스 (다니엘): 아무것도 느끼지 않아 정신력이 깎이지 않으며, 정신 붕괴를 겪지 않습니다."]]]], ["v2.6", "2026.10.28", [["전투 스킬 개편", ["모든 실험체의 전투 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종, 로살리오의 「클러치 히터」는 유지)", "연타, 흡혈, 표식, 지연 폭발, 포탑, 회피, 혼란, 반사, 봉인, 즉시 마무리, 수면 등 실험체 설정에 맞춘 효과가 적용됩니다.", "예시: 아야 「연속 사격」은 세 발을 연달아 쏘고, 테오도르 「정밀 저격」은 한 라운드 조준한 뒤 300% 피해를 주며, 레니 「꿈의 가호」는 적을 두 라운드 동안 잠재우고, 비형 「빙의」는 상대가 자기 몸을 공격하게 만듭니다.", "각 실험체의 전투 스킬 효과는 프로필에서 확인할 수 있습니다."]], ["밸런스", ["전투 스킬 개편에 맞춰 근접 전사와 탱커의 공격력·방어력이 상향되었습니다.", "상대 실험체의 공격력이 소폭 하향되었습니다."]]]], ["v2.5", "2026.10.28", [["신규 히든 실험체: 로살리오", ["윌리엄의 동생이자 승부조작으로 야구계에서 퇴출된 전직 야구선수 로살리오가 히든 실험체로 추가되었습니다.", "고유 특성 「홈런」: 공격이 15% 확률로 치명타가 되어 피해 180%를 줍니다.", "전투 스킬 「클러치 히터」: 잃은 체력이 많을수록 치명타 확률이 오릅니다.", "필드 스킬 「일광욕」: 낮의 야외에서 정신력과 체력을 회복합니다. 흐리거나 어두우면 불평만 늘어놓습니다.", "해금 조건: 윌리엄으로 우승하거나, 방망이를 든 실험체로 두 번 우승하면 정체가 드러납니다. 윌리엄으로 플레이하다 보면 섬에서 마주칠 수도 있습니다.", "로살리오로 플레이하면 반드시 윌리엄과 마주치며, 형제의 선택에 따라 전용 엔딩 2종이 열립니다. 혜진·실비아와는 사이가 좋고, 제니·쇼우와는 사이가 나쁩니다.", "엔딩이 총 59종으로 늘었습니다."]]]], ["v2.4.1", "2026.10.28", [["불살 루트", ["불살은 이제 선택 화면의 모드가 아니라 플레이로 여는 루트입니다. 아직 아무도 죽이지 않았다면 교전에서 「제압만 한다」를 고를 수 있으며, 제압된 상대는 숨이 붙은 채 달아납니다.", "한 명도 죽이지 않고 상대를 살려 보내며 우승하면 '불살' 엔딩을 볼 수 있습니다. 살려 보낸 상대가 다시 나타나는 만큼 일반 플레이보다 어렵습니다."]], ["무기 수정", ["바바라 권총, 이바 투척(야구공), 이안 단검(식칼), 다르코 방망이(단봉), 이슈트반 창, 니아 권총, 슈린 레이피어(바늘), 미르카 망치, 르노어 기타, 헨리 암기로 수정되었습니다.", "알렉스가 양손검·권총·암기·톤파 네 가지 무기를 번갈아 사용합니다. 공격할 때마다 쥔 무기의 특성이 적용됩니다.", "기타의 첫 등급 무기 이름이 '보급형 기타'로 수정되었습니다.", "이슈트반의 역할군이 근접 전사로 변경되었습니다."]], ["실험체 조정", ["클로에가 원거리 딜러로 변경되었습니다. 암살자에게 강하고, 다른 원거리 딜러에게는 약합니다.", "제니에게 고유 특성 「스턴트 대역」이 추가되었습니다. 게임당 한 번, 죽음에 이르는 피해를 받으면 체력 1로 버티고 즉시 그 자리를 빠져나갑니다."]]]], ["v2.4", "2026.10.28", [["실험체 정보 수정", ["일부 실험체의 소개 문구가 실제 설정과 다르던 문제를 수정했습니다. (테오도르, 레녹스, 이안, 레니, 샬럿, 가넷, 르노어, 유민, 유스티나, 니아, 코렐라인, 알론소, 이바, 얀, 이슈트반, 크레이버, 루치아 등)", "이안의 무기가 쌍검으로, 역할군이 근접 전사로 변경되었습니다.", "실험체 프로필의 '전투력' 표기가 '플레이 난이도(쉬움·보통·어려움)'로 바뀌었습니다.", "니아, 유스티나, 르노어의 필드 스킬 이름과 효과가 설정에 맞게 변경되었습니다."]], ["관계 시스템", ["마커스와 매그너스가 같은 게임에 있으면 무슨 일이 있어도 한 팀으로 움직입니다. 둘 중 한 명과 동맹 중일 때 다른 한 명을 받아들일 수 없으면, 동료가 그쪽으로 떠납니다.", "마커스·매그너스로 플레이하면 상대가 찾아와 합류하며, 절대 배신하지 않습니다.", "루치아·세레스로 플레이하면 상대가 찾아와 합류하며, 두 사람은 어떤 상황에서도 서로를 해치지 않습니다.", "쇼이치로 플레이하면 알렉스가 동맹을 제안해 옵니다. 다만 믿을 수 있는 상대는 아닙니다.", "실험체 관계를 활용한 신규 인카운터 20종 이상이 추가되었습니다. (마커스와 매그너스의 수상한 관계, 쇼우의 미슐랭 도전 등)"]], ["배신과 기억", ["동료의 배신이 신뢰도, 성격, 이해관계, 플레이어에 대한 두려움을 함께 따져 결정됩니다. 체력이 30 미만으로 떨어지면 배신하지 않는 일부 실험체를 제외한 거의 모든 동료가 등을 돌립니다.", "3인 동맹에서 두 동료가 몰래 손잡고 플레이어를 노릴 수 있습니다.", "동료가 자원을 훔쳐 달아날 수 있습니다. 아이솔은 자주, 라우라는 아주 자주 그렇습니다.", "동료의 성향과 맞지 않는 선택을 하면 관계가 나빠지고, 맞는 선택을 하면 좋아집니다.", "실험체가 플레이어의 행동을 기억합니다. 치료해 주거나 음식을 나눈 상대는 먼저 말을 걸고 궁지에 몰렸을 때 도와주며, 배신당한 상대는 적대적으로 나옵니다. 시체를 뒤지는 장면을 본 실험체는 플레이어를 경계합니다.", "플레이어의 행동에 따라 평판이 쌓입니다. 악명이 높아지면 현상금이 걸려 사냥꾼들이 몰려들고 동맹 제안이 줄어들며, 선행을 쌓으면 도우려는 실험체가 생깁니다."]], ["정보와 소문", ["실험체를 만났을 때 정확한 강함 대신 장비 상태, 전투 흔적, 부상 정도 같은 단서만 보입니다.", "교전 중 상대의 체력 수치가 보이지 않으며, '숨을 헐떡이고 있다'처럼 상태로만 표시됩니다.", "다른 실험체나 낙서, 무전을 통해 다른 구역의 소문을 들을 수 있습니다. 소문은 틀리거나, 누군가 함정을 위해 퍼뜨린 거짓일 수 있습니다."]], ["생존", ["음식이 체력 회복의 중심이 됩니다. 식량·주전부리·음식·특제 요리로 회복량이 나뉘며, 2턴에 한 번만 먹을 수 있습니다. 교전 중에도 먹을 수 있습니다.", "상대 실험체도 음식을 모으고 교전 중에 먹어 회복합니다. 후반으로 갈수록 음식을 충분히 준비해야 합니다.", "출혈 외에 골절, 화상, 뇌진탕, 감염 부상이 추가되었습니다. 부목과 약초로 치료할 수 있습니다.", "가방에서 제작 목표(무기·방어구)를 설정하면, 이동할 때 필요한 재료가 있는 구역이 선택지에 반드시 포함됩니다.", "회복·보급처럼 좋아 보이는 상황이 다른 실험체가 꾸민 함정일 수 있습니다.", "정신력을 회복할 수 있는 인카운터가 추가되었습니다."]], ["무기 특성", ["무기 종류마다 고유 특성이 생겼습니다. 총기는 강하지만 탄약을 쓰고 총성이 주변 실험체를 불러들이며, 탄약이 떨어지면 피해가 크게 줄어듭니다. 탄약은 화약과 금속으로 만들 수 있습니다.", "둔기는 상대를 휘청이게 하고, 날붙이는 출혈을 남기며, 활·석궁은 조용하고 첫 공격이 강합니다. 그 밖의 무기 특성은 프로필에서 확인할 수 있습니다."]], ["불살 모드", ["불살 루트가 추가되었습니다. (v2.4.1에서 개편)", "신규 엔딩 5종이 추가되었습니다. (총 57종)"]], ["밸런스", ["상대 실험체들이 전반적으로 더 호전적으로 바뀌었습니다.", "실험체가 줄어드는 속도가 느려져 후반까지 더 많은 실험체가 살아남습니다.", "역할군별 공격력과 방어력이 조정되었습니다. 암살자는 하향, 술사·근접 전사·서포터는 상향되었습니다.", "붕대의 체력 회복량이 줄었습니다. 대신 출혈은 그대로 멈춥니다."]]]], ["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 진행 중인 상황이 넘어가지 않습니다. 스킬 효과가 적용된 뒤 같은 상황에서 계속 선택할 수 있습니다. (이동하거나 새로운 조우가 발생하는 스킬은 제외)", "필드 스킬 사용은 시간을 소모하지 않습니다.", "모든 필드 스킬의 재사용 대기 시간이 약 2배로 늘어났습니다. (대부분 12~16턴)"]], ["버그 수정", ["마지막 실험체를 처치해 최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다. 이제 최후의 1인이 되는 즉시 실험이 종료됩니다."]], ["밸런스", ["필드 스킬 변경과 버그 수정에 따라 상대 실험체의 공격력이 소폭 상향되었습니다."]]]], ["v2.2", "2026.10.28", [["역할군 패시브", ["실험체별 패시브가 역할군 패시브로 통합되었습니다. 같은 역할군의 실험체는 같은 전투 패시브를 가집니다.", "탱커 「불굴」: 받는 피해 -10%, 체력 30% 이하에서 추가로 -15%. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 +25%, 처치 시 체력 15 회복.", "원거리 딜러 「선제 사격」: 먼저 칠 때 피해 +35%, 교전 첫 라운드 피해 +30%.", "레인저 「야생 감각」: 교전 첫 라운드 피해 +15%, 안전한 사냥, 재료 획득량 증가.", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 상대에게 피해 +20%. 낮의 정면 교전에서는 피해 -15%.", "마법사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 +15%, 정신력 감소 -25%.", "서포터 「돌봄」: 회복량 +35%, 정신력 감소 -40%, 교전 중 매 라운드 체력 2 회복.", "에키온의 무기 진화, 마르티나의 촬영, JP의 해킹은 '고유 특성'으로 그대로 유지됩니다."]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종)", "예시: 혜진 「수호 부적」은 치명상을 한 번 버티게 하고, 로지 「사보타주」는 상대의 무기 등급을 떨어뜨리며, 아이작 「투항 권고」는 상대를 동료로 끌어들입니다.", "필드 스킬별 재사용 대기 시간이 개별 조정되었습니다. 실험체 선택 화면의 프로필에서 상세 효과를 확인할 수 있습니다."]], ["전투 밸런스", ["교전 중 역할군 전용 행동(도발하며 버틴다, 돌진한다 등)이 삭제되고 역할군 패시브로 대체되었습니다.", "'방어하며 빈틈을 노린다'를 연속으로 선택하면 방어 효율이 점점 떨어집니다.", "피해를 거의 주지 않는 라운드에서는 숙련도 경험치를 적게 얻습니다.", "원거리 딜러 공격력 소폭 상향, 받는 피해 소폭 감소.", "근접 전사 공격력과 방어력 소폭 상향.", "암살자 공격력 소폭 하향."]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 동작하지 않던 문제를 수정했습니다."]]]], ["v2.1", "2026.10.28", [["지도 개편", ["루미아 섬 지도가 실제 지형에 맞게 새로 그려졌습니다. 일부 구역의 위치와 구역 간 이동 경로가 변경됩니다.", "신규 구역 '주유소'가 추가되었습니다. 주유소에서만 발생하는 전용 이벤트가 준비되어 있습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]]], ["v2.0", "2026.10.28", [["연구소 봉쇄와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄되어 진입할 수 없습니다.", "마지막 날에는 무작위로 선정된 구역 하나만 최종 안전지대로 지정되며, 나머지 구역은 모두 폐쇄됩니다."]], ["신규 히든 실험체 JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 시스템 암호 코드를 완성해 봉쇄된 연구소를 열 수 있습니다.", "연구소 중앙 컴퓨터에 암호 코드를 입력하면 '해킹 승리'로 실험을 끝낼 수 있습니다.", "연구소가 열리면 모든 실험체가 침입자를 막기 위해 연구소로 모여듭니다.", "엔딩 5개를 수집하면 해금됩니다."]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 새로운 무기로 교체됩니다.", "에키온의 VF 의수는 제작할 수 없는 대신 무기 숙련도에 따라 진화합니다. 진화 방향은 직접 선택할 수 있습니다.", "역할군 상성이 추가되었습니다. 상성이 유리하면 피해량이 증가하고, 불리하면 감소합니다.", "모든 실험체에게 고유 패시브와 필드 스킬이 추가되었습니다. 필드 스킬은 전투 외 상황에서 사용할 수 있으며 재사용 대기시간이 있습니다.", "역할군별 전용 행동이 추가되었습니다. 암살자는 밤에 잠든 실험체를 기습할 수 있지만, 정면 교전에서는 약해집니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재합니다. 우호도는 직접 표시되지 않으며, 대화와 행동을 통해 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다. 조우 시 상대의 성장 상태(도태·평범·성장·괴물)와 처치 수를 확인할 수 있습니다.", "우호적인 실험체와 식량, 재료, 붕대 등을 교환할 수 있습니다."]], ["밸런스 조정", ["동맹이 하향되었습니다. 동료의 피해량이 감소하며, 페이즈마다 식량을 나눠야 합니다.", "동료와 함께 도주할 경우 동료가 남겨질 수 있습니다. 살아남은 동료는 이후 적으로 돌아올 수 있습니다.", "정신력이 더 쉽게 감소합니다. 정신력이 40 미만이면 다양한 정신 붕괴 이벤트가 발생하며, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다.", "전반적인 난이도가 재조정되었습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다. 일부 엔딩은 특정 실험체로만 볼 수 있습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다. 스토리에서의 선택에 따라 결말이 달라집니다.", "지도 탭에서 섬 전체 지도를 확인할 수 있습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 식량이 음수가 되던 문제를 수정했습니다."]]]], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "조건을 만족해야만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]]], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["같은 선택이라도 결과가 달라질 수 있습니다. 대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 대폭 늘어났습니다. 실험체 전용 이벤트도 추가되었습니다.", "식량 획득과 체력 회복 관련 이벤트가 추가되었습니다."]]]], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다. 사냥과 교전으로 숙련도를 올릴 수 있으며, 숙련도가 오르면 피해량이 증가합니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 동일한 체력으로 시작하며, 시간이 지날수록 강해집니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]]], ["v1.0", "2026.10.27", [["정식 오픈", ["루미아 섬 생존 일지가 공개되었습니다. 24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]]]];
+const PATCH=[["v2.10", "2026.10.29", [["적 의도 예고", ["교전 중 적의 다음 행동이 카드 아래에 흐릿하게 표시됩니다. (큰 공격 · 방어 자세 · 기술 준비 · 도주 기회 · 평범한 공격)", "큰 공격을 준비하는 적은 피해가 크게 늘어납니다. 대신 「방어」로 받아 내면 피해를 크게 줄이고 높은 확률로 받아칩니다.", "방어 자세를 잡은 적에게는 공격이 잘 들어가지 않고, 적의 공격도 약해집니다. 먹거나 붕대를 감기 좋은 순간입니다.", "기술을 준비하는 적을 그 턴에 공격으로 맞히면 일정 확률로 기술을 끊습니다.", "도망칠 틈을 엿보는 적은 그 턴에 공격하지 않으면 달아납니다.", "정신이 낮을수록 적의 의도를 잘못 읽는 일이 잦아집니다. 냉철 성향은 덜 헷갈립니다."]], ["인카운터", ["보기 드물던 인카운터(거래, 이동, 생존, 회상, 기록, 소리, 목격 등)가 더 자주 등장합니다.", "보급 상자 투하 빈도와 실험체끼리 싸우는 장면을 목격할 확률이 올랐습니다."]], ["엔딩 도감", ["아직 보지 못한 엔딩에 단서가 표시됩니다."]], ["결과 카드", ["판이 끝나면 「결과 카드 만들기」로 실험체, 순위, 엔딩, 처치 수, 등급, 마지막 기록을 담은 이미지를 만들 수 있습니다. 저장하거나 바로 공유할 수 있습니다."]], ["도전과제", ["도전과제가 추가되었습니다. 공통 과제 10개와 실험체마다 플레이 컨셉을 살린 전용 과제가 하나씩 있습니다.", "첫 화면의 「도전과제」에서 진행 상황과 실험체별 우승 횟수를 확인할 수 있습니다."]], ["처음 하는 분을 위한 팁", ["상황에 맞춰 한 줄 팁이 한 번씩 표시됩니다. (교전, 낮은 체력·정신·포만감, 부상, 금지구역, 동료, 소문, 밤, 성향, 현상금 등)", "팁은 「팁 끄기」로 언제든 끌 수 있습니다."]]]], ["v2.9.4", "2026.10.29", [["난이도", ["적 실험체들이 훨씬 빠르게 강해집니다. 장비 성장 속도가 크게 올랐고, 시간이 지날수록 더 가파르게 빨라집니다.", "적 실험체의 무기 숙련이 페이즈와 처치 수에 따라 더 빠르게 오릅니다.", "페이즈가 진행될수록 적 실험체의 공격력 상승 폭이 커졌습니다.", "플레이어가 주는 피해가 전체적으로 30% 감소합니다.", "플레이어가 받는 전투 피해가 전체적으로 20% 증가합니다."]], ["쇼이치", ["패시브 이름이 「다섯 번째 패」에서 「부당거래」로 변경되었습니다. 효과는 같습니다.", "전투 스킬 이름이 「부당거래」에서 「표리」로 변경되었습니다."]]]], ["v2.9.3", "2026.10.29", [["밸런스", ["암살자의 밤 기습(잠든 실험체 습격) 피해가 하향되었습니다.", "암살자의 선공 피해가 소폭 하향되었습니다.", "암살자는 이제 낮에 모든 피해가 25% 감소합니다. (기존: 낮의 정면 교전에서만 15% 감소)"]], ["쇼이치", ["패시브가 「다섯 번째 패」로 변경되었습니다. 공격 다섯 번마다 한 번은 반드시 치명타가 터지며, 이 치명타의 피해는 125%입니다.", "전투 스킬 이름이 「부당거래」로 변경되었습니다."]]]], ["v2.9.2", "2026.10.29", [["성향", ["선·중립 성향 실험체가 악행을 많이 쌓은 상대를 처치하면 정신력 감소가 줄어듭니다. 악행은 처치 수, 악 성향 여부, 플레이어를 배신하거나 물건을 훔친 기록 등으로 쌓이며, 매우 심한 악당을 처치하면 정신력이 전혀 깎이지 않습니다."]]]], ["v2.9.1", "2026.10.29", [["조우", ["실험체와 마주치는 모든 인카운터(가위바위보, 거래, 대화, 공연, 치료 제안 등)에서 '무시하고 공격한다'를 선택할 수 있습니다. 호의적으로 다가온 상대를 공격하면 그 실험체가 이를 기억하고 악명이 오릅니다."]]]], ["v2.9", "2026.10.29", [["플레이 컨셉과 고유 패시브", ["모든 실험체에게 플레이 컨셉이 생겼습니다. 패시브, 필드 스킬, 전투 스킬이 하나의 컨셉으로 이어지도록 설계되었으며, 프로필 상단에서 확인할 수 있습니다.", "패시브가 없던 실험체 전원에게 고유 패시브가 추가되었습니다. (예: 재키 「피 냄새」 처치할 때마다 피해 증가 스택, 매그너스 「가속」 이동 직후 첫 공격 강화와 돌진 반동 무효, 크레이버 「원념 축적」 처치할 때마다 영구 피해 증가)", "일부 스킬이 패시브와 연계되도록 조정되었습니다. (유키 일도양단, 아델라 체크메이트, 아디나 별자리 점괘, 다니엘 완벽한 컷, 바바라 자동 포탑, 로지 잠입)"]], ["실험체 조정", ["루크의 성향이 '악'으로 변경되었습니다. 청부업자 출신이라는 설정에 맞춰, 처치해도 악명이 오르지 않고 목격자도 남지 않습니다.", "에이든이 '냉철' 성향으로 분류되었습니다."]], ["인카운터 대규모 추가", ["일반·밈·식량·회복·휴식·회상·밤·야생·기록·재난 인카운터와 실험체 카메오 인카운터 등 900여 종이 추가되었습니다. (총 약 1,170종)", "특정 실험체로 플레이할 때만 나타나는 전용 인카운터와, 특정 실험체로만 고를 수 있는 특별 선택지(★ 표시)가 추가되었습니다.", "이렘으로 고양이 관련 인카운터를 만나면 고양이로 변해 특별한 상호작용을 할 수 있습니다."]]]], ["v2.8", "2026.10.29", [["플레이어 배신 인카운터", ["동맹 중일 때 플레이어가 동료를 배신할 수 있는 인카운터 7종이 추가되었습니다. (잠든 동료, 전리품 분배, 미끼, 동료 팔아넘기기, 독 넣기, 금지구역 지름길, 쓰러진 동료)", "배신에 실패하거나 살아남은 동료는 이를 기억하고 복수하러 찾아옵니다."]], ["성향 추가: 냉철", ["레녹스(마피아 출신), 테오도르(참전용사 출신), 에이든, 알렉스, 로지, 타지아, 카티야, 히스이에게 '냉철' 성향이 부여되었습니다.", "냉철: 정신력이 오르내리는 폭이 작고, 시간이 지나도 정신력이 저절로 깎이지 않습니다.", "레녹스와 테오도르의 소개 문구에 경력이 반영되었습니다."]], ["스킬 변경", ["나딘 필드 스킬이 「야생동물 찾기」로 변경되었습니다. 짐승을 찾아 안전하게 사냥합니다.", "나딘 전투 스킬이 「사냥 본능」으로 변경되었습니다. 사냥한 야생동물 한 마리당 피해가 15% 증가합니다. (최대 +150%)", "버니스 필드 스킬이 「사냥꾼의 덫」으로 변경되었습니다.", "다니엘 필드 스킬이 「해부학적 관찰」로 변경되었습니다. 근처 실험체의 급소를 파악해, 그 실험체와 싸울 때 40% 확률로 치명타를 주고 마주치면 먼저 움직일 가능성이 높아집니다.", "아이작 필드 스킬이 「누명 씌우기」로 변경되었습니다. 근처의 가장 강한 실험체에게 누명을 씌워 주변 실험체들이 그를 공격하게 만듭니다.", "아이작 전투 스킬이 「과잉 진압」으로 변경되었습니다. 상대를 기절시키고 3라운드 동안 받는 피해 +50% 표식을 남기며, 약해진 상대의 소지품을 압수합니다."]], ["치명타", ["로살리오를 제외한 모든 치명타 피해 배율이 1.5배로 통일되었습니다. 로살리오는 1.8배를 유지합니다."]]]], ["v2.7.1", "2026.10.28", [["실험체 조정", ["다니엘의 필드 스킬이 「몸단장」에서 「완벽한 가면」으로 변경되었습니다. 근처 실험체에게 다정한 사람인 척 접근해 호감을 크게 올리고, 자리가 있으면 동료로 끌어들입니다.", "가면을 쓴 동료를 「먼저 등을 찌른다」로 공격하면 피해가 2.2배가 되며, 배신으로 기록되지 않아 평판과 다른 실험체의 기억에 남지 않습니다."]]]], ["v2.7", "2026.10.28", [["성향 시스템", ["모든 실험체에게 성향(선·중립·악·전투광·사이코패스)이 부여되었습니다. 성향은 실험체 프로필에서 확인할 수 있습니다.", "선: 사람을 죽이면 정신력이 크게 깎이고, 상대를 살려 보내면 회복됩니다. 동료를 배신하면 정신력이 무너지며, 동료와 함께 있으면 조금씩 안정됩니다.", "중립: 기존과 같이 사람을 죽이면 정신력이 깎입니다.", "악 (재키, 아드리아나, 아이솔, 아이작 등): 사람을 죽이면 오히려 정신력이 크게 회복됩니다. 오랫동안 싸우지 못하면 정신력이 깎이고, 상대를 살려 보내면 짜증이 납니다.", "전투광 (현우, 니키, 리 다이린, 로살리오 등): 교전 중 매 라운드 정신력이 회복되며, 오랫동안 싸우지 못하면 정신력이 깎입니다.", "사이코패스 (다니엘): 아무것도 느끼지 않아 정신력이 깎이지 않으며, 정신 붕괴를 겪지 않습니다."]]]], ["v2.6", "2026.10.28", [["전투 스킬 개편", ["모든 실험체의 전투 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종, 로살리오의 「클러치 히터」는 유지)", "연타, 흡혈, 표식, 지연 폭발, 포탑, 회피, 혼란, 반사, 봉인, 즉시 마무리, 수면 등 실험체 설정에 맞춘 효과가 적용됩니다.", "예시: 아야 「연속 사격」은 세 발을 연달아 쏘고, 테오도르 「정밀 저격」은 한 라운드 조준한 뒤 300% 피해를 주며, 레니 「꿈의 가호」는 적을 두 라운드 동안 잠재우고, 비형 「빙의」는 상대가 자기 몸을 공격하게 만듭니다.", "각 실험체의 전투 스킬 효과는 프로필에서 확인할 수 있습니다."]], ["밸런스", ["전투 스킬 개편에 맞춰 근접 전사와 탱커의 공격력·방어력이 상향되었습니다.", "상대 실험체의 공격력이 소폭 하향되었습니다."]]]], ["v2.5", "2026.10.28", [["신규 히든 실험체: 로살리오", ["윌리엄의 동생이자 승부조작으로 야구계에서 퇴출된 전직 야구선수 로살리오가 히든 실험체로 추가되었습니다.", "고유 특성 「홈런」: 공격이 15% 확률로 치명타가 되어 피해 180%를 줍니다.", "전투 스킬 「클러치 히터」: 잃은 체력이 많을수록 치명타 확률이 오릅니다.", "필드 스킬 「일광욕」: 낮의 야외에서 정신력과 체력을 회복합니다. 흐리거나 어두우면 불평만 늘어놓습니다.", "해금 조건: 윌리엄으로 우승하거나, 방망이를 든 실험체로 두 번 우승하면 정체가 드러납니다. 윌리엄으로 플레이하다 보면 섬에서 마주칠 수도 있습니다.", "로살리오로 플레이하면 반드시 윌리엄과 마주치며, 형제의 선택에 따라 전용 엔딩 2종이 열립니다. 혜진·실비아와는 사이가 좋고, 제니·쇼우와는 사이가 나쁩니다.", "엔딩이 총 59종으로 늘었습니다."]]]], ["v2.4.1", "2026.10.28", [["불살 루트", ["불살은 이제 선택 화면의 모드가 아니라 플레이로 여는 루트입니다. 아직 아무도 죽이지 않았다면 교전에서 「제압만 한다」를 고를 수 있으며, 제압된 상대는 숨이 붙은 채 달아납니다.", "한 명도 죽이지 않고 상대를 살려 보내며 우승하면 '불살' 엔딩을 볼 수 있습니다. 살려 보낸 상대가 다시 나타나는 만큼 일반 플레이보다 어렵습니다."]], ["무기 수정", ["바바라 권총, 이바 투척(야구공), 이안 단검(식칼), 다르코 방망이(단봉), 이슈트반 창, 니아 권총, 슈린 레이피어(바늘), 미르카 망치, 르노어 기타, 헨리 암기로 수정되었습니다.", "알렉스가 양손검·권총·암기·톤파 네 가지 무기를 번갈아 사용합니다. 공격할 때마다 쥔 무기의 특성이 적용됩니다.", "기타의 첫 등급 무기 이름이 '보급형 기타'로 수정되었습니다.", "이슈트반의 역할군이 근접 전사로 변경되었습니다."]], ["실험체 조정", ["클로에가 원거리 딜러로 변경되었습니다. 암살자에게 강하고, 다른 원거리 딜러에게는 약합니다.", "제니에게 고유 특성 「스턴트 대역」이 추가되었습니다. 게임당 한 번, 죽음에 이르는 피해를 받으면 체력 1로 버티고 즉시 그 자리를 빠져나갑니다."]]]], ["v2.4", "2026.10.28", [["실험체 정보 수정", ["일부 실험체의 소개 문구가 실제 설정과 다르던 문제를 수정했습니다. (테오도르, 레녹스, 이안, 레니, 샬럿, 가넷, 르노어, 유민, 유스티나, 니아, 코렐라인, 알론소, 이바, 얀, 이슈트반, 크레이버, 루치아 등)", "이안의 무기가 쌍검으로, 역할군이 근접 전사로 변경되었습니다.", "실험체 프로필의 '전투력' 표기가 '플레이 난이도(쉬움·보통·어려움)'로 바뀌었습니다.", "니아, 유스티나, 르노어의 필드 스킬 이름과 효과가 설정에 맞게 변경되었습니다."]], ["관계 시스템", ["마커스와 매그너스가 같은 게임에 있으면 무슨 일이 있어도 한 팀으로 움직입니다. 둘 중 한 명과 동맹 중일 때 다른 한 명을 받아들일 수 없으면, 동료가 그쪽으로 떠납니다.", "마커스·매그너스로 플레이하면 상대가 찾아와 합류하며, 절대 배신하지 않습니다.", "루치아·세레스로 플레이하면 상대가 찾아와 합류하며, 두 사람은 어떤 상황에서도 서로를 해치지 않습니다.", "쇼이치로 플레이하면 알렉스가 동맹을 제안해 옵니다. 다만 믿을 수 있는 상대는 아닙니다.", "실험체 관계를 활용한 신규 인카운터 20종 이상이 추가되었습니다. (마커스와 매그너스의 수상한 관계, 쇼우의 미슐랭 도전 등)"]], ["배신과 기억", ["동료의 배신이 신뢰도, 성격, 이해관계, 플레이어에 대한 두려움을 함께 따져 결정됩니다. 체력이 30 미만으로 떨어지면 배신하지 않는 일부 실험체를 제외한 거의 모든 동료가 등을 돌립니다.", "3인 동맹에서 두 동료가 몰래 손잡고 플레이어를 노릴 수 있습니다.", "동료가 자원을 훔쳐 달아날 수 있습니다. 아이솔은 자주, 라우라는 아주 자주 그렇습니다.", "동료의 성향과 맞지 않는 선택을 하면 관계가 나빠지고, 맞는 선택을 하면 좋아집니다.", "실험체가 플레이어의 행동을 기억합니다. 치료해 주거나 음식을 나눈 상대는 먼저 말을 걸고 궁지에 몰렸을 때 도와주며, 배신당한 상대는 적대적으로 나옵니다. 시체를 뒤지는 장면을 본 실험체는 플레이어를 경계합니다.", "플레이어의 행동에 따라 평판이 쌓입니다. 악명이 높아지면 현상금이 걸려 사냥꾼들이 몰려들고 동맹 제안이 줄어들며, 선행을 쌓으면 도우려는 실험체가 생깁니다."]], ["정보와 소문", ["실험체를 만났을 때 정확한 강함 대신 장비 상태, 전투 흔적, 부상 정도 같은 단서만 보입니다.", "교전 중 상대의 체력 수치가 보이지 않으며, '숨을 헐떡이고 있다'처럼 상태로만 표시됩니다.", "다른 실험체나 낙서, 무전을 통해 다른 구역의 소문을 들을 수 있습니다. 소문은 틀리거나, 누군가 함정을 위해 퍼뜨린 거짓일 수 있습니다."]], ["생존", ["음식이 체력 회복의 중심이 됩니다. 식량·주전부리·음식·특제 요리로 회복량이 나뉘며, 2턴에 한 번만 먹을 수 있습니다. 교전 중에도 먹을 수 있습니다.", "상대 실험체도 음식을 모으고 교전 중에 먹어 회복합니다. 후반으로 갈수록 음식을 충분히 준비해야 합니다.", "출혈 외에 골절, 화상, 뇌진탕, 감염 부상이 추가되었습니다. 부목과 약초로 치료할 수 있습니다.", "가방에서 제작 목표(무기·방어구)를 설정하면, 이동할 때 필요한 재료가 있는 구역이 선택지에 반드시 포함됩니다.", "회복·보급처럼 좋아 보이는 상황이 다른 실험체가 꾸민 함정일 수 있습니다.", "정신력을 회복할 수 있는 인카운터가 추가되었습니다."]], ["무기 특성", ["무기 종류마다 고유 특성이 생겼습니다. 총기는 강하지만 탄약을 쓰고 총성이 주변 실험체를 불러들이며, 탄약이 떨어지면 피해가 크게 줄어듭니다. 탄약은 화약과 금속으로 만들 수 있습니다.", "둔기는 상대를 휘청이게 하고, 날붙이는 출혈을 남기며, 활·석궁은 조용하고 첫 공격이 강합니다. 그 밖의 무기 특성은 프로필에서 확인할 수 있습니다."]], ["불살 모드", ["불살 루트가 추가되었습니다. (v2.4.1에서 개편)", "신규 엔딩 5종이 추가되었습니다. (총 57종)"]], ["밸런스", ["상대 실험체들이 전반적으로 더 호전적으로 바뀌었습니다.", "실험체가 줄어드는 속도가 느려져 후반까지 더 많은 실험체가 살아남습니다.", "역할군별 공격력과 방어력이 조정되었습니다. 암살자는 하향, 술사·근접 전사·서포터는 상향되었습니다.", "붕대의 체력 회복량이 줄었습니다. 대신 출혈은 그대로 멈춥니다."]]]], ["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 진행 중인 상황이 넘어가지 않습니다. 스킬 효과가 적용된 뒤 같은 상황에서 계속 선택할 수 있습니다. (이동하거나 새로운 조우가 발생하는 스킬은 제외)", "필드 스킬 사용은 시간을 소모하지 않습니다.", "모든 필드 스킬의 재사용 대기 시간이 약 2배로 늘어났습니다. (대부분 12~16턴)"]], ["버그 수정", ["마지막 실험체를 처치해 최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다. 이제 최후의 1인이 되는 즉시 실험이 종료됩니다."]], ["밸런스", ["필드 스킬 변경과 버그 수정에 따라 상대 실험체의 공격력이 소폭 상향되었습니다."]]]], ["v2.2", "2026.10.28", [["역할군 패시브", ["실험체별 패시브가 역할군 패시브로 통합되었습니다. 같은 역할군의 실험체는 같은 전투 패시브를 가집니다.", "탱커 「불굴」: 받는 피해 -10%, 체력 30% 이하에서 추가로 -15%. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 +25%, 처치 시 체력 15 회복.", "원거리 딜러 「선제 사격」: 먼저 칠 때 피해 +35%, 교전 첫 라운드 피해 +30%.", "레인저 「야생 감각」: 교전 첫 라운드 피해 +15%, 안전한 사냥, 재료 획득량 증가.", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 상대에게 피해 +20%. 낮의 정면 교전에서는 피해 -15%.", "마법사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 +15%, 정신력 감소 -25%.", "서포터 「돌봄」: 회복량 +35%, 정신력 감소 -40%, 교전 중 매 라운드 체력 2 회복.", "에키온의 무기 진화, 마르티나의 촬영, JP의 해킹은 '고유 특성'으로 그대로 유지됩니다."]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종)", "예시: 혜진 「수호 부적」은 치명상을 한 번 버티게 하고, 로지 「사보타주」는 상대의 무기 등급을 떨어뜨리며, 아이작 「투항 권고」는 상대를 동료로 끌어들입니다.", "필드 스킬별 재사용 대기 시간이 개별 조정되었습니다. 실험체 선택 화면의 프로필에서 상세 효과를 확인할 수 있습니다."]], ["전투 밸런스", ["교전 중 역할군 전용 행동(도발하며 버틴다, 돌진한다 등)이 삭제되고 역할군 패시브로 대체되었습니다.", "'방어하며 빈틈을 노린다'를 연속으로 선택하면 방어 효율이 점점 떨어집니다.", "피해를 거의 주지 않는 라운드에서는 숙련도 경험치를 적게 얻습니다.", "원거리 딜러 공격력 소폭 상향, 받는 피해 소폭 감소.", "근접 전사 공격력과 방어력 소폭 상향.", "암살자 공격력 소폭 하향."]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 동작하지 않던 문제를 수정했습니다."]]]], ["v2.1", "2026.10.28", [["지도 개편", ["루미아 섬 지도가 실제 지형에 맞게 새로 그려졌습니다. 일부 구역의 위치와 구역 간 이동 경로가 변경됩니다.", "신규 구역 '주유소'가 추가되었습니다. 주유소에서만 발생하는 전용 이벤트가 준비되어 있습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]]], ["v2.0", "2026.10.28", [["연구소 봉쇄와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄되어 진입할 수 없습니다.", "마지막 날에는 무작위로 선정된 구역 하나만 최종 안전지대로 지정되며, 나머지 구역은 모두 폐쇄됩니다."]], ["신규 히든 실험체 JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 시스템 암호 코드를 완성해 봉쇄된 연구소를 열 수 있습니다.", "연구소 중앙 컴퓨터에 암호 코드를 입력하면 '해킹 승리'로 실험을 끝낼 수 있습니다.", "연구소가 열리면 모든 실험체가 침입자를 막기 위해 연구소로 모여듭니다.", "엔딩 5개를 수집하면 해금됩니다."]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 새로운 무기로 교체됩니다.", "에키온의 VF 의수는 제작할 수 없는 대신 무기 숙련도에 따라 진화합니다. 진화 방향은 직접 선택할 수 있습니다.", "역할군 상성이 추가되었습니다. 상성이 유리하면 피해량이 증가하고, 불리하면 감소합니다.", "모든 실험체에게 고유 패시브와 필드 스킬이 추가되었습니다. 필드 스킬은 전투 외 상황에서 사용할 수 있으며 재사용 대기시간이 있습니다.", "역할군별 전용 행동이 추가되었습니다. 암살자는 밤에 잠든 실험체를 기습할 수 있지만, 정면 교전에서는 약해집니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재합니다. 우호도는 직접 표시되지 않으며, 대화와 행동을 통해 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다. 조우 시 상대의 성장 상태(도태·평범·성장·괴물)와 처치 수를 확인할 수 있습니다.", "우호적인 실험체와 식량, 재료, 붕대 등을 교환할 수 있습니다."]], ["밸런스 조정", ["동맹이 하향되었습니다. 동료의 피해량이 감소하며, 페이즈마다 식량을 나눠야 합니다.", "동료와 함께 도주할 경우 동료가 남겨질 수 있습니다. 살아남은 동료는 이후 적으로 돌아올 수 있습니다.", "정신력이 더 쉽게 감소합니다. 정신력이 40 미만이면 다양한 정신 붕괴 이벤트가 발생하며, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다.", "전반적인 난이도가 재조정되었습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다. 일부 엔딩은 특정 실험체로만 볼 수 있습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다. 스토리에서의 선택에 따라 결말이 달라집니다.", "지도 탭에서 섬 전체 지도를 확인할 수 있습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 식량이 음수가 되던 문제를 수정했습니다."]]]], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "조건을 만족해야만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]]], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["같은 선택이라도 결과가 달라질 수 있습니다. 대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 대폭 늘어났습니다. 실험체 전용 이벤트도 추가되었습니다.", "식량 획득과 체력 회복 관련 이벤트가 추가되었습니다."]]]], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다. 사냥과 교전으로 숙련도를 올릴 수 있으며, 숙련도가 오르면 피해량이 증가합니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 동일한 체력으로 시작하며, 시간이 지날수록 강해집니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]]], ["v1.0", "2026.10.27", [["정식 오픈", ["루미아 섬 생존 일지가 공개되었습니다. 24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]]]];
 function patchSheet(){openSheet(`<h4>패치 노트</h4>${PATCH.map(([v,d,secs],i)=>`<section class="pn"><div class="pn-h"><b>${v}</b><span class="muted">${d}</span>${i===0?'<span class="badge gold">최신</span>':''}</div>${secs.map(([t,l])=>`<h5>${esc(t)}</h5><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</section>`).join('')}`)}
 
 /* ---------- select ---------- */
-function selectScreen(){
+function selectScreenBase(){
   const got=loadEndings().length;
   app.innerHTML=`<div class="wrap sel">
     <header class="hero">
@@ -5847,7 +6051,7 @@ function hud(){
   <div class="chips"><span class="chip">무기 <b class="g${m.wg}">${esc(myWname())}</b></span><span class="chip">방어구 <b class="g${m.ag}">${GR[m.ag]}</b></span><span class="chip">숙련 <b>${MG[m.ml]}</b></span><span class="chip">처치 <b>${m.kills}</b></span>${WT_GUN.includes(m.p.w)?`<span class="chip">탄약 <b>${m.ammo}</b></span>`:''}${G.goal?`<span class="chip">목표 <b>${GOALN[G.goal]}</b></span>`:''}${extra.join('')}${al.map(a=>`<span class="chip ally">동맹 ${esc(nm(a))} <b>${Math.max(0,Math.round(a.hp))}</b></span>`).join('')}</div>`;
 }
 const LINE_CLS={'crit-bad':'crit-bad','crit-good':'crit-good','crit-win':'crit-win',pick:'pick',news:'news',warn:'warn',bad:'bad',good:'good',phase:'phase',dead:'dead',win:'win'};
-function render(){
+function renderBase(){
   hud();
   const S=document.getElementById('stage');
   if(G.mode==='over'){S.innerHTML=endCard();bindEnd();scrollTo({top:0,behavior:RM()?'auto':'smooth'});return}
@@ -5937,7 +6141,7 @@ function sheetBody(k){
 }
 
 /* ---------- end ---------- */
-function endCard(){
+function endCardBase(){
   const o=G.over,m=G.me,E=getEnding(),S=scoreRun();
   return `<section class="end ${o.win?'w':''}">
     <div class="eyebrow">${o.win?'Experiment complete':'Subject terminated'}</div>
@@ -5958,11 +6162,122 @@ function endCard(){
     <button class="copy" id="cp">결과 복사</button><div class="copied" id="cpm"></div>
   </section>`;
 }
-function bindEnd(){
+function bindEndBase(){
   document.getElementById('again').onclick=()=>start(curPid);
   document.getElementById('pickagain').onclick=()=>{selectScreen();scrollTo(0,0)};
   document.getElementById('cp').onclick=()=>{const o=G.over,m=G.me,E=getEnding(),S=scoreRun();const txt=`[루미아 섬 생존 일지]\n${m.p.n} · ${o.win?'1위':o.rank+'위'} · 엔딩 #${String(E.no).padStart(2,'0')} ${E.title}\n연구 등급 ${S.grade} · ${S.total.toLocaleString()}점 · 히든 ${m.st.hidden.length}/${HIDDEN_TOTAL}\n${phaseName(o.phase)} · 선택 ${G.choices} · 처치 ${m.kills}\n${E.text}`;const el=document.getElementById('cpm');
     try{navigator.clipboard.writeText(txt).then(()=>el.textContent='복사했습니다.',()=>el.textContent=txt)}catch(e){el.textContent=txt}};
+}
+
+
+/* ===================== V2.10 UI · TIPS, GALLERY HINTS, ACHIEVEMENTS, RESULT CARD ===================== */
+/* ---------- tips ---------- */
+const TIP_KEY='lumia_tips_v1';
+function tipsOff(){try{return localStorage.getItem(TIP_KEY+'_off')==='1'}catch(e){return false}}
+function loadTips(){try{return new Set(JSON.parse(localStorage.getItem(TIP_KEY)||'[]'))}catch(e){return new Set()}}
+function saveTips(s){try{localStorage.setItem(TIP_KEY,JSON.stringify([...s]))}catch(e){}}
+function showTip(){
+  if(!G||G.mode!=='card'||G.over||tipsOff())return;
+  let t=null;
+  if(G.tipShown&&G.tipShown.card===G.card)t=TIPS.find(x=>x[0]===G.tipShown.id);
+  else{const seen=loadTips();t=TIPS.find(([id,c])=>{try{return!seen.has(id)&&c()}catch(e){return false}});if(!t)return;seen.add(t[0]);saveTips(seen);G.tipShown={card:G.card,id:t[0]}}
+  if(!t)return;
+  const S=document.getElementById('stage');if(!S)return;
+  S.insertAdjacentHTML('afterbegin',`<aside class="tip" role="note"><b>TIP</b><span>${esc(t[2])}</span><button id="tipoff" type="button">팁 끄기</button></aside>`);
+  document.getElementById('tipoff').onclick=()=>{try{localStorage.setItem(TIP_KEY+'_off','1')}catch(e){}const a=S.querySelector('.tip');if(a)a.remove()};
+}
+function render(){renderBase();try{showTip()}catch(e){}}
+
+/* ---------- ending hints ---------- */
+const END_HINT={
+ 1:'특별한 조건 없이 마지막 한 명이 된다.',2:'회상 속에서 복수의 길을 고르며 우승한다.',3:'회상 속에서 구원의 길을 고르며 우승한다.',4:'회상 속에서 어떤 길도 붙잡지 않은 채 우승한다.',
+ 5:'8명 이상을 쓰러뜨리고 우승한다.',6:'거의 싸우지 않고 그림자 속에서 우승한다.',7:'동료를 두 번 이상 배신하고 우승한다.',8:'누군가의 희생 끝에 우승한다.',
+ 9:'세 명 이상을 살려 보내고 우승한다.',10:'정신이 무너지기 직전인 채로 우승한다.',11:'싸움 말고 섬을 떠날 다른 길이 있다.',12:'연구소의 시스템을 손에 넣는다.',
+ 13:'연구소를 장악하기 전에, 그곳의 주인부터 쓰러뜨린다.',14:'출구가 있다는 이야기를 끝까지 믿어 본다.',15:'길을 건널 땐 조심하자.',16:'닭들에게 인정받는다.',
+ 17:'나쟈의 제안에서 힘을 택한다.',18:'나쟈의 제안에서 진실을 택한다.',19:'이전 실험의 흔적을 끝까지 따라간다.',
+ 20:'세레스로, 루치아와 함께 우승한다.',21:'루치아로, 세레스와 함께 우승한다.',22:'아야로, 섬의 악당을 심판하고 우승한다.',23:'재키로, 피를 충분히 보고 우승한다.',
+ 24:'에스텔로, 불을 지르는 자를 막고 우승한다.',25:'블레어로, VF 실험체를 사냥하고 우승한다.',26:'펜리르로, 복수의 길을 걸으며 우승한다.',27:'에키온으로, 의수를 끝까지 완성하고 우승한다.',
+ 28:'마르티나로, 촬영을 끝까지 마치고 우승한다.',29:'시우카이로, 요리를 여러 번 하고 우승한다.',30:'미르카로, 구원의 길을 걸으며 우승한다.',31:'클리버로 우승하거나, 원념을 짊어진 채 우승한다.',
+ 32:'첫날을 넘기지 못한다.',33:'교전 중에 쓰러진다.',34:'믿었던 동료의 손에 쓰러진다.',35:'버리고 떠났던 동료에게 쓰러진다.',36:'금지구역에서 빠져나오지 못한다.',
+ 37:'굶주림을 이기지 못한다.',38:'피가 멎지 않는다.',39:'누군가의 덫에 걸린다.',40:'야생동물에게 당한다.',41:'닭에게 진다.',42:'정신이 완전히 무너진다.',
+ 43:'연구소의 주인에게 쓰러진다.',44:'섬을 떠도는 거대한 괴수에게 당한다.',45:'섬의 재난에 휩쓸린다.',46:'먹지 말아야 할 것을 먹거나, 독에 당한다.',47:'아무도 예상 못 한 어이없는 사고.',
+ 48:'마지막 두 명에서 무릎을 꿇는다.',49:'섬을 빠져나가려다 실패한다.',50:'JP로, 연구소 문 앞까지 간다.',51:'VF의 힘이 폭주한다.',52:'그 밖의 이름 없는 죽음.',
+ 53:'현상금이 붙은 채로 우승한다.',54:'많은 이를 살려 보내 좋은 평판을 쌓고, 거의 죽이지 않은 채 우승한다.',55:'한 명도 죽이지 않고, 누군가를 제압만 해 보낸 뒤 우승한다.',
+ 56:'각별한 짝과 끝까지 함께한다.',57:'마커스와 매그너스가 끝까지 한 팀으로 남는다.',58:'로살리오로, 형과의 악연을 끝내고 우승한다.',59:'로살리오로, 형과 손을 잡은 채 우승한다.',
+};
+function gallerySheet(){
+  const got=new Set(loadEndings());
+  const rg=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);const tiers=[[[...rg(1,19),53,54,55],'우승 엔딩'],[[...rg(20,31),56,57,58,59],'실험체 엔딩'],[rg(32,52),'사망 엔딩']];
+  openSheet(`<h4>엔딩 도감 · ${got.size}/59</h4><p class="muted">아직 보지 못한 엔딩에는 단서가 적혀 있다.</p>${tiers.map(([L,t])=>`<h4>${t}</h4><ul class="gal">${L.map(n=>`<li class="${got.has(n)?'on':''}"><span>#${String(n).padStart(2,'0')}</span><b>${got.has(n)?esc(ENDINGS[n]):'???'}</b>${got.has(n)?'':`<small class="hint">${esc(END_HINT[n]||'')}</small>`}</li>`).join('')}</ul>`).join('')}`);
+}
+
+/* ---------- achievements ---------- */
+function achSheet(){
+  const got=loadAch(),wins=loadWins();const n=got.size;
+  const row=(on,name,d,sub)=>`<li class="${on?'on':''}"><b>${on?'✓ ':''}${esc(name)}</b><span>${esc(d)}</span>${sub?`<small>${esc(sub)}</small>`:''}</li>`;
+  const chars=PROF.filter(p=>ACH_C[p.id]);
+  openSheet(`<h4>도전과제 · ${n}/${achTotal()}</h4><p class="muted">한 판 안에서 달성해야 한다. 실험체 과제는 그 실험체의 플레이 컨셉을 끝까지 밀어붙이면 열린다.</p>
+  <h4>공통</h4><ul class="ach">${ACH_G.map(g=>row(got.has('g:'+g[0]),g[1],g[2])).join('')}</ul>
+  <h4>실험체</h4><ul class="ach">${chars.map(p=>{const lock=p.hiddenChar&&!hidUnlocked(p);const a=ACH_C[p.id];return lock?row(false,'???','히든 실험체'):row(got.has('c:'+p.id),`${p.n} · ${a[0]}`,a[1],wins[p.id]?`우승 ${wins[p.id]}회`:'')}).join('')}</ul>`);
+}
+function selectScreen(){
+  selectScreenBase();
+  const acts=document.querySelector('.hero-acts');if(!acts)return;
+  acts.insertAdjacentHTML('beforeend',`<button class="btn-sub" id="achb">도전과제 ${loadAch().size}/${achTotal()}</button>`);
+  document.getElementById('achb').onclick=()=>achSheet();
+}
+
+/* ---------- end card + result card ---------- */
+function endCard(){
+  getEnding();const nw=achEval();const h=endCardBase();
+  const add=(nw.length?`<div class="achnew">${nw.map(x=>`<p class="crit-win">도전과제 달성 · ${esc(x)}</p>`).join('')}</div>`:'')+`<button class="copy rc" id="rcard" type="button">결과 카드 만들기</button>`;
+  return h.replace('<div class="acts">',add+'<div class="acts">');
+}
+function bindEnd(){bindEndBase();const b=document.getElementById('rcard');if(b)b.onclick=()=>resultCard()}
+function wrapLines(ctx,text,maxW,maxLines){
+  const out=[];let line='';
+  for(const ch of String(text)){if(ch==='\n'){out.push(line);line='';continue}const t=line+ch;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=ch.trim()?ch:''}else line=t}
+  if(line)out.push(line);
+  if(out.length>maxLines){const k=out.slice(0,maxLines);k[maxLines-1]=k[maxLines-1].replace(/.{0,2}$/,'…');return k}
+  return out;
+}
+async function drawResult(){
+  const o=G.over,m=G.me,E=getEnding(),S=scoreRun(),nw=G.achNew||[];
+  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch(e){}
+  const Wd=1080,Ht=1350,cv=document.createElement('canvas');cv.width=Wd;cv.height=Ht;const c=cv.getContext('2d');
+  const BG='#0b0f16',PANEL='#121925',LINE='#243145',FG='#dce4ee',DIM='#8291a5',CY='#62d3e4',GOLD='#f2b233',RED='#ff5a6e';
+  const D='"Do Hyeon","Noto Sans KR",sans-serif',B='"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif',M='"IBM Plex Mono",ui-monospace,monospace';
+  c.fillStyle=BG;c.fillRect(0,0,Wd,Ht);
+  const acc=o.win?GOLD:RED;
+  c.fillStyle=acc;c.fillRect(0,0,Wd,10);
+  c.strokeStyle=LINE;c.lineWidth=2;c.strokeRect(40,50,Wd-80,Ht-100);
+  const X=90;let y=130;
+  c.textBaseline='alphabetic';
+  c.fillStyle=CY;c.font=`600 26px ${M}`;c.fillText('LUMIA ISLAND · SURVIVAL LOG',X,y);
+  c.fillStyle=DIM;c.textAlign='right';c.fillText(o.win?'EXPERIMENT COMPLETE':'SUBJECT TERMINATED',Wd-X,y);c.textAlign='left';
+  y+=130;c.fillStyle=FG;c.font=`110px ${D}`;c.fillText(m.p.n,X,y);
+  y+=70;c.fillStyle=acc;c.font=`700 40px ${B}`;const rk=o.win?'1위 · 우승':`${o.rank}위 · 탈락`;c.fillText(rk,X,y);const rw=c.measureText(rk).width;
+  c.fillStyle=DIM;c.font=`400 32px ${B}`;c.fillText(`  ·  ${ROLE[m.p.role].n} · ${phaseName(o.phase)}`,X+rw,y);
+  y+=60;c.strokeStyle=LINE;c.beginPath();c.moveTo(X,y);c.lineTo(Wd-X,y);c.stroke();
+  y+=70;c.fillStyle=acc;c.font=`600 30px ${M}`;c.fillText(`ENDING #${String(E.no).padStart(2,'0')}`,X,y);
+  y+=84;c.fillStyle=FG;c.font=`76px ${D}`;c.fillText(E.title,X,y);
+  y+=60;c.fillStyle=DIM;c.font=`400 32px ${B}`;for(const l of wrapLines(c,E.text,Wd-2*X,4)){c.fillText(l,X,y);y+=48}
+  y+=30;
+  const stats=[['처치',String(m.kills)],['선택',String(G.choices)],['연구 등급',S.grade],['실험 점수',S.total.toLocaleString()]];
+  const cw=(Wd-2*X-30)/2,chh=130;
+  stats.forEach(([k,v],i)=>{const cx=X+(i%2)*(cw+30),cy=y+Math.floor(i/2)*(chh+24);c.fillStyle=PANEL;c.fillRect(cx,cy,cw,chh);c.strokeStyle=LINE;c.strokeRect(cx,cy,cw,chh);c.fillStyle=DIM;c.font=`500 26px ${B}`;c.fillText(k,cx+28,cy+46);c.fillStyle=i===2?GOLD:FG;c.font=`58px ${D}`;c.fillText(v,cx+28,cy+108)});
+  y+=2*(chh+24)+40;
+  if(o.text){c.fillStyle=DIM;c.font=`500 26px ${B}`;c.fillText('마지막 기록',X,y);y+=46;c.fillStyle=FG;c.font=`400 32px ${B}`;for(const l of wrapLines(c,o.text,Wd-2*X,2)){c.fillText(l,X,y);y+=46}y+=14}
+  if(nw.length&&y<Ht-200){c.fillStyle=GOLD;c.font=`700 30px ${B}`;for(const a of nw.slice(0,2)){c.fillText(`도전과제 달성 · ${a}`,X,y);y+=46}}
+  c.fillStyle=DIM;c.font=`400 24px ${M}`;c.fillText('spaiky1342.github.io/lumia-survival',X,Ht-90);
+  c.textAlign='right';c.fillText((d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`)(new Date()),Wd-X,Ht-90);c.textAlign='left';
+  return cv;
+}
+async function resultCard(){
+  const cv=await drawResult();const url=cv.toDataURL('image/png');const fn=`lumia_${G.me.p.id}_ending${getEnding().no}.png`;
+  openSheet(`<h4>결과 카드</h4><img class="rcimg" src="${url}" alt="${esc(G.me.p.n)}의 생존 결과 카드"><div class="rcacts"><a class="btn-main" href="${url}" download="${fn}">이미지 저장</a><button class="btn-sub" id="rcshare" type="button">공유</button></div><p class="muted" id="rcmsg"></p>`);
+  const sb=document.getElementById('rcshare');
+  sb.onclick=()=>{cv.toBlob(async b=>{const msg=document.getElementById('rcmsg');try{const f=new File([b],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'루미아 섬 생존 일지'})}else msg.textContent='이 브라우저에서는 바로 공유할 수 없습니다. 이미지를 저장해서 올려 주세요.'}catch(e){if(e&&e.name!=='AbortError')msg.textContent='공유하지 못했습니다. 이미지를 저장해서 올려 주세요.'}},'image/png')};
 }
 selectScreen();
 
