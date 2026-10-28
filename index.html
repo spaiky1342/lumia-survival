@@ -220,6 +220,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 .legend{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--dim)}
 .legend li{display:flex;align-items:center;gap:5px}.lg{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--panel2);border:1px solid var(--dim);font-style:normal}
 .lg.cur{background:var(--cyan)}.lg.z{background:var(--red)}.lg.nx{border-color:var(--amber);border-width:2px}.lg.safe{background:color-mix(in srgb,var(--cyan) 45%,var(--panel2));border-color:var(--cyan)}.lg.gold{background:var(--gold)}.lg.red{background:var(--red);border-radius:2px}.lg.cyan{background:var(--cyan);border-radius:2px}.lg.cnt{background:none;border:0;color:var(--amber);font-family:var(--mono);font-size:11px;width:auto;height:auto}
+.pn{border-top:1px solid var(--line);padding-top:10px}.pn-h{display:flex;gap:8px;align-items:baseline}.pn-h b{font-family:var(--mono);color:var(--cyan)}.pn ul{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;font-size:14px}
 .acts{display:flex;gap:8px}
 .acts button,.copy{flex:1;padding:12px;border-radius:5px;border:1px solid var(--line);background:var(--panel2);font-weight:700}
 .acts .again{background:var(--cyan);color:#06131a;border-color:var(--cyan)}
@@ -3243,6 +3244,17 @@ const RM=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
 let curPid=null;
 const playable=()=>PROF.filter(p=>!p.hiddenChar||jpUnlocked());
 
+
+const PATCH=[
+ ['v2.1','10월 28일',['지도를 실제 루미아 섬 지형에 맞게 다시 그렸다. 구역 위치와 이동 경로가 바뀌었다.','주유소 구역과 주유소 전용 장면을 추가했다.','연구소를 지도 가운데 붉은 구역으로 표시한다.']],
+ ['v2.0','10월 28일',['연구소가 기본적으로 봉쇄된다. 마지막 날엔 무작위 구역 하나만 최종 안전지대로 남는다.','히든 실험체 JP 추가. 보안 노드를 해킹해 연구소를 열고, 시스템 암호 코드로 해킹 승리를 노린다.','연구소에 미스터 메이지 등장. 보스에 감마 추가.','무기 이름을 실제 아이템명으로 표시한다. 에키온의 VF 의수는 숙련도에 따라 진화한다.','역할군 상성 추가. 유리하면 피해 1.25배, 불리하면 0.8배.','모든 실험체에 패시브와 필드 스킬을 추가했다. 역할군 전용 선택지도 생겼다. 암살자는 밤에 잠든 실험체를 습격할 수 있다.','숨은 우호도 시스템 추가. 실험체마다 성장 속도가 다르고, 조우하면 도태·평범·성장·괴물 등급이 보인다.','동맹 하향. 동료 피해 감소, 식량 분배 필요, 도주 시 동료가 남겨질 수 있고 살아남으면 복수하러 온다.','우호적인 실험체와 물물교환이 가능하다.','정신력 40 미만에서 붕괴 이벤트 발생. 0이 되면 금지구역으로 걸어 들어간다.','엔딩 52종과 엔딩 도감, 캐릭터별 3단계 스토리 분기 추가.','지도 탭에 그림 지도 추가.','식량 획득량 감소. 숙련 플레이 기준 우승률 약 12.5%로 조정.','버그 수정: 가방과 선택지에서 동시에 먹으면 식량이 음수가 되던 문제.']],
+ ['v1.4','10월 28일',['결과 화면에 실험 점수와 연구 등급(D-~S+) 추가.','히든 인카운터 6종 추가.','제4의 벽을 깨는 장면의 등장 확률을 줄였다.']],
+ ['v1.3','10월 28일',['같은 선택이라도 결과가 갈린다. 대실패, 일이 꼬였다, 운이 따랐다, 대성공.','인카운터를 약 180종으로 늘렸다. 밈 인카운터, 실험체 전용 인카운터 추가.','식량·회복 인카운터 추가.']],
+ ['v1.2','10월 28일',['무기와 숙련도(D~S+), 역할군별 피해, 캐릭터별 전투 스킬 추가.','플레이어와 실험체 모두 체력 100으로 시작하고, 실험체는 시간이 지날수록 강해진다.','선택지의 예상 결과 표시를 없앴다. 기습 인카운터 추가.']],
+ ['v1.0','10월 27일',['서울 2033 스타일의 장면 카드형 텍스트 어드벤처로 첫 공개.','하드코어 난이도: 배고픔, 출혈, 정신 소모, 정찰 없음.']],
+];
+function patchSheet(){openSheet(`<h4>패치 노트</h4>${PATCH.map(([v,d,l],i)=>`<section class="pn"><div class="pn-h"><b>${v}</b><span class="muted">${d}</span>${i===0?'<span class="badge gold">최신</span>':''}</div><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section>`).join('')}`)}
+
 /* ---------- select ---------- */
 function selectScreen(){
   const got=loadEndings().length;
@@ -3251,7 +3263,7 @@ function selectScreen(){
       <div class="eyebrow">Lumia Island · Hardcore · ${PROF.filter(p=>!p.hiddenChar).length} subjects</div>
       <h1>루미아 섬<br><em>생존 일지</em></h1>
       <p>텍스트 어드벤처입니다. 매 턴 장면이 하나씩 무작위로 펼쳐지고, 그 안에서 어떻게 할지 고릅니다. 24명 중 최후의 1인이 되면 섬을 나갈 수 있습니다. 섬 한가운데 연구소는 봉쇄돼 있고, 마지막 날엔 단 한 구역만 안전지대로 남습니다. 배고픔, 출혈, 정신 소모가 매 턴 쌓이고, 동료는 언제든 등을 돌립니다. 우승까지 보통 100번 안팎을 고르게 됩니다.</p>
-      <div class="hero-acts"><button class="btn-main" id="rand">무작위 실험체로 참가</button><button class="btn-sub" id="gal">엔딩 도감 ${got}/52</button></div>
+      <div class="hero-acts"><button class="btn-main" id="rand">무작위 실험체로 참가</button><button class="btn-sub" id="gal">엔딩 도감 ${got}/52</button><button class="btn-sub" id="pn">패치 노트 ${PATCH[0][0]}</button></div>
     </header>
     <div class="search"><input id="q" type="search" placeholder="실험체 이름 검색" autocomplete="off" aria-label="실험체 이름 검색"></div>
     <ul class="roster" id="roster"></ul>
@@ -3265,6 +3277,7 @@ function selectScreen(){
   document.getElementById('roster').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.id)profileSheet(b.dataset.id,true)};
   document.getElementById('rand').onclick=()=>start(pick(PROF.filter(p=>!p.hiddenChar)).id);
   document.getElementById('gal').onclick=()=>gallerySheet();
+  document.getElementById('pn').onclick=()=>patchSheet();
 }
 function gallerySheet(){
   const got=new Set(loadEndings());
