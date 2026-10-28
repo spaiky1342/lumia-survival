@@ -211,6 +211,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-o
 .mapwrap .node.labopen>circle:first-child{fill:color-mix(in srgb,var(--violet) 45%,var(--panel2));stroke:var(--violet)}
 .mapwrap .node.cur>circle:first-child{fill:var(--cyan);stroke:var(--fg)}
 .mapwrap .ring{fill:none!important;stroke:var(--cyan)!important;stroke-width:.5!important;opacity:.8}
+.mapwrap .labzone{fill:color-mix(in srgb,var(--red) 22%,transparent);stroke:color-mix(in srgb,var(--red) 55%,var(--line));stroke-width:.5}
+.mapwrap .lbl.dim{fill:var(--dim)}
 .mapwrap .lock{fill:none;stroke:var(--fg);stroke-width:.35}
 .mapwrap .lbl{font-size:3.1px;fill:var(--fg);text-anchor:middle;font-family:var(--body);paint-order:stroke;stroke:var(--bg);stroke-width:.8px}
 .mapwrap .cnt{font-size:2.8px;fill:var(--amber);font-family:var(--mono);font-weight:700}
@@ -236,14 +238,14 @@ function wpick(arr,wf){const w=arr.map(wf);const t=w.reduce((a,b)=>a+b,0);if(t<=
 function J(w,p){const c=w.charCodeAt(w.length-1);const k=c>=0xac00&&c<=0xd7a3?(c-0xac00)%28:0;const P={'이':['이','가'],'을':['을','를'],'은':['은','는'],'과':['과','와'],'으로':['으로','로']}[p];if(p==='으로'&&k===8)return w+'로';return w+(k?P[0]:P[1])}
 
 /* ===== world ===== */
-const AREAS=['항구','창고','연못','병원','학교','고급 주택가','양궁장','골목길','숲','성당','모래사장','호텔','절','공장','소방서','경찰서','개울','묘지','연구소'];
+const AREAS=['항구','창고','연못','병원','학교','고급 주택가','양궁장','골목길','숲','성당','모래사장','호텔','절','공장','소방서','경찰서','개울','묘지','주유소','연구소'];
 const LAB='연구소';
-const ADJ0={'항구':['창고','개울','소방서'],'창고':['공장','개울','학교'],'연못':['병원','절','숲','묘지'],'병원':['묘지','성당','숲'],'학교':['소방서','양궁장','호텔','연구소'],'고급 주택가':['골목길','양궁장','성당'],'양궁장':['골목길','호텔'],'골목길':['경찰서'],'숲':['절','모래사장','연구소'],'성당':['묘지','경찰서'],'모래사장':['호텔','절'],'호텔':['연구소'],'공장':['묘지','소방서'],'소방서':['경찰서'],'경찰서':['연구소'],'개울':['묘지']};
+const ADJ0={'주유소':['골목길','양궁장','학교'],'골목길':['경찰서'],'절':['경찰서','개울'],'양궁장':['학교','호텔'],'경찰서':['소방서','개울'],'학교':['소방서','호텔','연구소'],'소방서':['연구소','연못'],'개울':['연못','병원'],'호텔':['모래사장'],'연구소':['연못','숲'],'연못':['묘지','병원'],'병원':['묘지','공장'],'모래사장':['숲','고급 주택가'],'숲':['성당','고급 주택가','묘지'],'묘지':['성당','공장'],'성당':['고급 주택가','창고','항구'],'고급 주택가':['창고'],'공장':['항구'],'창고':['항구']};
 const ADJ={};AREAS.forEach(a=>ADJ[a]=new Set());for(const a in ADJ0)for(const b of ADJ0[a]){ADJ[a].add(b);ADJ[b].add(a)}
 for(const a in ADJ)ADJ[a]=[...ADJ[a]];
 const DIST={};(()=>{const q=[LAB];DIST[LAB]=0;while(q.length){const a=q.shift();for(const b of ADJ[a])if(DIST[b]==null){DIST[b]=DIST[a]+1;q.push(b)}}})();
 const MATN={metal:'금속',cloth:'천',herb:'약초',powder:'화약',food:'식량',leather:'가죽'};
-const AREA_MATS={'항구':['metal','food'],'창고':['metal','powder'],'연못':['herb','food'],'병원':['cloth','herb'],'학교':['cloth','metal'],'고급 주택가':['cloth','food'],'양궁장':['metal','cloth'],'골목길':['metal','cloth'],'숲':['herb','food'],'성당':['cloth','herb'],'모래사장':['food','metal'],'호텔':['cloth','food'],'절':['herb','food'],'공장':['metal','powder'],'소방서':['metal','powder'],'경찰서':['powder','metal'],'개울':['food','herb'],'묘지':['cloth','powder'],'연구소':['metal','powder']};
+const AREA_MATS={'주유소':['powder','food'],'항구':['metal','food'],'창고':['metal','powder'],'연못':['herb','food'],'병원':['cloth','herb'],'학교':['cloth','metal'],'고급 주택가':['cloth','food'],'양궁장':['metal','cloth'],'골목길':['metal','cloth'],'숲':['herb','food'],'성당':['cloth','herb'],'모래사장':['food','metal'],'호텔':['cloth','food'],'절':['herb','food'],'공장':['metal','powder'],'소방서':['metal','powder'],'경찰서':['powder','metal'],'개울':['food','herb'],'묘지':['cloth','powder'],'연구소':['metal','powder']};
 const WILD=new Set(['연못','숲','모래사장','절','개울','묘지','양궁장','항구','공장']);
 const GATHER_T={metal:['녹슨 철판을 뜯어냈다','공구함에서 쇠붙이를 챙겼다','버려진 자전거에서 부품을 떼어냈다','철제 선반을 분해했다'],cloth:['커튼을 찢어 천을 챙겼다','옷장에서 쓸 만한 옷감을 찾았다','시트를 길게 잘라 챙겼다'],herb:['물가에서 약초를 뜯었다','이름 모를 풀을 조심스럽게 캤다','쑥 비슷한 풀을 한 움큼 뜯었다'],powder:['탄약 상자에서 화약을 긁어모았다','폭죽을 분해해 화약을 얻었다','공업용 화약 봉투를 찾았다'],food:['통조림을 찾았다','감자와 빵을 챙겼다','물병과 비상식량을 찾았다','덫에 걸린 생선을 건졌다']};
 const GR=['일반','고급','희귀','영웅','전설'];
@@ -639,7 +641,7 @@ function pay(r){for(const[k,v]of Object.entries(r.cost))G.me.inv[k]-=v;if(r.sp){
 
 
 /* ===================== RANDOM ENCOUNTER ENGINE ===================== */
-const INDOOR=new Set(['학교','병원','호텔','고급 주택가','경찰서','소방서','창고','공장','성당','연구소']);
+const INDOOR=new Set(['주유소','학교','병원','호텔','고급 주택가','경찰서','소방서','창고','공장','성당','연구소']);
 const WATER=new Set(['항구','모래사장','개울','연못']);
 const odds=p=>p>=.75?'성공률 높음':p>=.5?'해볼 만함':p>=.3?'위험':'무모함';
 const gainText=o=>Object.entries(o).filter(([,v])=>v).map(([k,v])=>`${MATN[k]||k} ${v>0?'+':''}${v}`).join(', ');
@@ -1842,6 +1844,11 @@ SCENES.push(
    {l:'"항구 지하 수문"을 기억한다',f:()=>{G.me.hint=true;gainXp(3);log('무슨 뜻인지는 모르지만 기억해 둔다.')}},
    {l:'내 이름을 남긴다',f:()=>{san(6);log(`"${G.me.p.n} 여기 다녀감." 다음 실험체가 읽을 것이다.`)}},
    {l:'"도망쳐" 아래에 "어디로?"라고 적는다',f:()=>{san(-3);log('대답은 없었다.')}},
+ ]})},
+ {id:'gasstation',w:1.2,c:a=>a==='주유소',make:a=>({tag:'탐색',title:'주유소',text:'녹슨 주유기 사이로 기름 냄새가 진동한다. 편의점 유리는 깨졌고, 정비소 셔터는 반쯤 올라가 있다. 불씨 하나면 이 일대가 통째로 날아갈 것이다.',opts:[
+   {l:'편의점을 턴다',f:()=>log(`털린 진열대 밑에서 건졌다. (${gain({food:1,cloth:1})})`)},
+   {l:'정비소에서 연료와 공구를 챙긴다',f:()=>log(`(${gain({powder:2,metal:1})})`)},
+   {l:'주유기에 불을 붙여 함정을 만든다',...req(inv('powder')>=1,'화약 1 필요'),f:()=>{G.me.inv.powder--;const ns=nearNpcs();ns.forEach(n=>{n.hp-=30;aff(n,-25)});G.me.exposed=2;log(ns.length?`폭발이 일대를 집어삼켰다. ${names(ns.slice(0,3))} 쪽에서 비명이 들렸다.`:'거대한 불기둥이 솟았다. 섬 전체가 봤을 것이다.','warn')}},
  ]})},
 /* ---------- subjects ---------- */
  {id:'barbara_inv',w:.9,...subj('barbara',(n,g,a)=>({tag:'조우',title:'발명품 시연',text:'바바라가 고철로 만든 무언가를 들고 서 있다. 눈이 반짝인다. "봐! 내 발명품이야! 대단하지? 대단하다고 말해!"',opts:[
@@ -3346,7 +3353,7 @@ function render(){
 }
 
 /* ---------- island map ---------- */
-const MAPXY={"항구":[58,88],"창고":[49,66],"개울":[36,85],"소방서":[77,65],"공장":[62,75],"학교":[64,37],"연못":[12,48],"병원":[31,48],"절":[8,24],"숲":[26,30],"묘지":[32,65],"성당":[56,52],"양궁장":[71,15],"호텔":[50,16],"연구소":[48,39],"고급 주택가":[81,34],"골목길":[92,22],"경찰서":[78,47],"모래사장":[28,10]};
+const MAPXY={"주유소":[37,8],"골목길":[57,8],"절":[82,22],"양궁장":[24,26],"경찰서":[63,26],"학교":[33,35],"소방서":[53,36],"개울":[80,39],"호텔":[15,43],"연구소":[45,48],"연못":[63,46],"병원":[88,55],"모래사장":[16,57],"숲":[39,60],"묘지":[66,59],"성당":[50,70],"고급 주택가":[27,72],"공장":[86,76],"창고":[40,83],"항구":[60,85]};
 function mapSVG(){
   const m=G.me,W=100,H=100,P=a=>MAPXY[a];
   const roads=[];const seenE=new Set();for(const a of AREAS)for(const b of ADJ[a]){const k=[a,b].sort().join('|');if(seenE.has(k))continue;seenE.add(k);const[x1,y1]=P(a),[x2,y2]=P(b);const closed=(a===LAB||b===LAB)&&!G.labOpen;roads.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="road ${closed?'closed':''}"/>`)}
@@ -3357,7 +3364,7 @@ function mapSVG(){
     return`<g class="${cls.join(' ')}"><circle cx="${x}" cy="${y}" r="${a===LAB?4.4:3.2}"/>${a===m.area?`<circle cx="${x}" cy="${y}" r="5.6" class="ring"/>`:''}${a===LAB&&!G.labOpen?`<path d="M${x-1.4} ${y-.2}h2.8v2.2h-2.8z M${x-.9} ${y-.2}v-1a.9.9 0 0 1 1.8 0v1" class="lock"/>`:''}${marks.join('')}<text x="${x}" y="${y-5.2}" class="lbl">${esc(a)}${D&&a!==G.finalArea&&a===m.area?` · ${D[a]??'?'}칸`:''}</text></g>`}).join('');
   return`<div class="mapwrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="루미아 섬 지도">
     <path class="sea" d="M0 0H100V100H0Z"/>
-    <path class="island" d="M14 6 C34 0,62 2,80 6 C96 9,100 22,97 36 C95 50,90 60,86 72 C82 84,70 96,52 96 C36 96,24 94,18 84 C10 72,4 62,3 46 C2 30,4 12,14 6Z"/>
+    <path class="island" d="M30 2 L70 2 L78 10 L92 14 L96 30 L95 48 L97 62 L94 80 L80 88 L70 92 L64 95 L52 93 L44 92 L30 88 L18 82 L10 70 L6 54 L4 40 L8 26 L16 14 Z"/><path class="island" d="M68 90 L80 88 L86 94 L76 99 L68 96 Z"/><text x="80" y="95" class="lbl dim">???</text><path class="labzone" d="M45 39 L55 48 L45 57 L35 48 Z"/>
     ${roads.join('')}${nodes}
   </svg>
   <ul class="legend"><li><i class="lg cur"></i>현재 위치</li><li><i class="lg z"></i>금지구역</li><li><i class="lg nx"></i>곧 금지</li><li><i class="lg safe"></i>최종 안전지대</li><li><i class="lg gold"></i>특수 재료·보급</li><li><i class="lg red"></i>보스</li><li><i class="lg cnt">2</i>목격된 실험체</li>${m.p.id==='jp'?'<li><i class="lg cyan"></i>보안 노드</li>':''}</ul></div>`;
