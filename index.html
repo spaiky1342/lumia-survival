@@ -249,7 +249,7 @@ const WILD=new Set(['연못','숲','모래사장','절','개울','묘지','양�
 const GATHER_T={metal:['녹슨 철판을 뜯어냈다','공구함에서 쇠붙이를 챙겼다','버려진 자전거에서 부품을 떼어냈다','철제 선반을 분해했다'],cloth:['커튼을 찢어 천을 챙겼다','옷장에서 쓸 만한 옷감을 찾았다','시트를 길게 잘라 챙겼다'],herb:['물가에서 약초를 뜯었다','이름 모를 풀을 조심스럽게 캤다','쑥 비슷한 풀을 한 움큼 뜯었다'],powder:['탄약 상자에서 화약을 긁어모았다','폭죽을 분해해 화약을 얻었다','공업용 화약 봉투를 찾았다'],food:['통조림을 찾았다','감자와 빵을 챙겼다','물병과 비상식량을 찾았다','덫에 걸린 생선을 건졌다']};
 const GR=['일반','고급','희귀','영웅','전설'];
 const SPW=['운석','미스릴','포스 코어','VF 혈액 샘플'], SPA=['생명의 나무','미스릴','VF 혈액 샘플'];
-const TPP=10,ZT=3, FINAL=9, TARGET=[21,18,15,12,10,8,6,4,2];
+const TPP=10,ZT=3, FINAL=9, TARGET=[22,20,18,15,13,10,8,6,3];
 const BOSSES={2:{name:'알파',pow:50,hp:150,drop:'미스릴'},4:{name:'감마',pow:58,hp:175,drop:'미스릴'},5:{name:'오메가',pow:66,hp:200,drop:'포스 코어'},7:{name:'위클라인',pow:80,hp:260,drop:'VF 혈액 샘플'}};
 const IDLE={farm:'개입하지 않으면 조용히 재료를 모으며 장비를 맞춘다',hunt:'개입하지 않으면 다른 실험체를 찾아 섬을 헤집고 다닌다',camp:'개입하지 않으면 한 지역에 자리를 잡고 좀처럼 움직이지 않는다',roam:'개입하지 않으면 정처 없이 섬을 떠돈다',trap:'개입하지 않으면 덫을 깔아 두고 걸려들길 기다린다',heal:'개입하지 않으면 다친 실험체를 찾아 돌본다',stalk:'개입하지 않으면 강한 상대 뒤를 밟다가 약해진 틈을 노린다'};
 const MOVEP={roam:.5,hunt:.45,farm:.3,camp:.12,trap:.2,heal:.35,stalk:.4};
@@ -349,7 +349,7 @@ lucia|루치아|총기 명가 페란테가의 딸. 동화 속 총사를 꿈꾼�
 seres|세레스|루치아를 감시하러 갔다가 그를 지키기로 맹세한 아글라이아의 실험체. 절제되고 충성스럽다.|.5|.2|.1|고급 주택가,호텔|roam|4|lucia||`;
 const PROF=RAW.trim().split('\n').map(l=>{const[id,n,d,agg,ally,bt,h,idle,pow,bonds,hates,tags]=l.split('|');return{id,n,d,agg:+agg,ally:+ally,bt:+bt,haunt:h.split(','),idle,pow:+pow,bonds:bonds?bonds.split(','):[],hates:hates?hates.split(','):[],tags:tags?tags.split(','):[]}});
 const BY=Object.fromEntries(PROF.map(p=>[p.id,p]));
-const ROLE={gun:{n:'원거리 딜러',atk:1.35,def:1,perk:'총·저격·투척으로 강하게 때린다. 대신 맞으면 아프다.'},assassin:{n:'암살자',atk:1.15,def:1,perk:'기습을 잘 피하고 먼저 칠 때 피해가 크다.'},bruiser:{n:'근접 전사',atk:1.15,def:.85,perk:'받는 피해가 적고 출혈에 강하다.'},tank:{n:'탱커',atk:.85,def:.75,perk:'최대 체력 +20. 받는 피해가 크게 줄고 출혈에 강하다.'},mage:{n:'술사',atk:1.15,def:1,perk:'정신 소모가 적고 스킬을 더 자주 쓴다.'},support:{n:'서포터',atk:.7,def:.95,perk:'회복 효과 +50%, 정신 소모 절반, 동맹을 맺기 쉽다, 굶주림에 강하다.'},ranger:{n:'사냥꾼',atk:1.15,def:1,perk:'사냥이 안전하고 전리품과 숙련도를 더 얻는다.'}};
+const ROLE={gun:{n:'원거리 딜러',atk:1.35,def:1,perk:'총·저격·투척으로 강하게 때린다. 대신 맞으면 아프다.'},assassin:{n:'암살자',atk:1.08,def:1,perk:'기습을 잘 피하고 먼저 칠 때 피해가 크다.'},bruiser:{n:'근접 전사',atk:1.22,def:.82,perk:'받는 피해가 적고 출혈에 강하다.'},tank:{n:'탱커',atk:.85,def:.75,perk:'최대 체력 +20. 받는 피해가 크게 줄고 출혈에 강하다.'},mage:{n:'술사',atk:1.32,def:.92,perk:'정신 소모가 적고 스킬을 더 자주 쓴다.'},support:{n:'서포터',atk:.82,def:.88,perk:'회복 효과 +50%, 정신 소모 절반, 동맹을 맺기 쉽다, 굶주림에 강하다.'},ranger:{n:'사냥꾼',atk:1.15,def:1,perk:'사냥이 안전하고 전리품과 숙련도를 더 얻는다.'}};
 const SKT={burst:'강한 일격',multi:'모든 적을 휩쓰는 광역기',stun:'상대를 제압해 반격을 끊는다',heal:'싸움 중 체력을 회복한다',shield:'단단히 버티며 반격한다',drain:'때린 만큼 체력을 빼앗는다',execute:'약해진 상대를 끝장낸다',trap:'출혈을 남기는 함정',escape:'반드시 빠져나간다'};
 const MG=['D','D+','C','C+','B','B+','A','A+','S','S+'];
 `jackie|단검|assassin|피의 축제|drain
@@ -501,7 +501,7 @@ const dead=()=>!!G.over;
 /* ===== damage / death ===== */
 function die(kind,text){if(G.over)return;G.me.hp=Math.min(G.me.hp,0);G.over={win:false,kind,text,rank:alive().length+1,phase:G.phase};G.mode='over';log(text,'dead')}
 function win(text){if(G.over)return;G.over={win:true,kind:'win',text,rank:1,phase:G.phase};G.mode='over';log(text,'win')}
-function hurt(d,kind,text){G.me.hp-=d;if(G.me.hp<=0&&G.me.charmSave){G.me.charmSave=false;G.me.hp=1;log('품속의 부적이 타올랐다. 숨이 붙어 있다. (체력 1)','crit-win');return false}if(G.me.hp<=0){die(kind,text);return true}if(d>=22&&!G.me.bleed&&ch(['tank','bruiser'].includes(G.me.p.role)?.12:.3)){G.me.bleed=true;log('상처가 깊다. 피가 멈추지 않는다. (출혈: 매 턴 체력 감소, 붕대로 멈춘다)','bad')}return false}
+function hurt(d,kind,text){G.me.hp-=d;if(G.me.hp<=0&&G.me.charmSave){G.me.charmSave=false;G.me.hp=1;log('품속의 부적이 타올랐다. 숨이 붙어 있다. (체력 1)','crit-win');return false}if(G.me.hp<=0){die(kind,text);return true}if(d>=22&&!G.me.bleed&&ch(['tank','bruiser'].includes(G.me.p.role)?.12:.3)){G.me.bleed=true;log('상처가 깊다. 피가 멈추지 않는다. (출혈: 매 턴 체력 감소, 붕대로 멈춘다)','bad')}if(typeof injuryRoll==='function')injuryRoll(d,kind);return false}
 function san(v){const m=G.me;const r=m.p.role;if(v<0)v*=r==='support'?.5:r==='mage'?.7:1;else if(r==='support')v*=1.3;m.san=clamp(m.san+v,0,100)}
 function heal(v){const m=G.me;if(m.p.role==='support')v=Math.round(v*1.5);m.hp=clamp(m.hp+v,0,m.max)}
 function kill(n,how,byName){
@@ -578,10 +578,10 @@ function npcStep(){
     }
     if(n.area!==prevArea){
       const mem=G.npcs.filter(x=>x.alive&&x.team===n.c.id&&x!==n);mem.forEach(x=>x.area=n.area);
-      if(G.ptraps[n.area]&&ch(.45)){G.ptraps[n.area]--;const d=ri(35,60);n.hp-=d;log(`[덫] ${n.area}에 설치한 덫이 작동했다. ${J(nm(n),'이')} 걸렸다.`,'good');if(n.hp<=0){G.me.kills++;G.me.killed.push(nm(n));kill(n,`처치: ${G.me.p.n}의 덫 · ${n.area}`,'me')}}
+      if(G.ptraps[n.area]&&ch(.45)){G.ptraps[n.area]--;const d=ri(35,60);n.hp-=d;log(`[덫] ${n.area}에 설치한 덫이 작동했다. ${J(nm(n),'이')} 걸렸다.`,'good');if(n.hp<=0){if(G.pacifist){n.hp=1}else{G.me.kills++;G.me.killed.push(nm(n));kill(n,`처치: ${G.me.p.n}의 덫 · ${n.area}`,'me')}}}
     }
     if(!n.alive)continue;
-    if(G.zones.has(n.area)&&ch(.35)){kill(n,`${n.area} 금지구역 탈출 실패`,null);continue}
+    if(G.zones.has(n.area)&&ch(.2)){kill(n,`${n.area} 금지구역 탈출 실패`,null);continue}
     if(n.c.tags.includes('trapper')&&ch(.22))G.ntraps[n.area]=n.c.id;
     if(G.specials[n.area]&&ch(.3)){delete G.specials[n.area];n.g=Math.min(4,n.g+1)}
     if(G.drop===n.area&&ch(.35)){G.drop=null;n.g=Math.min(4,n.g+1)}
@@ -600,7 +600,7 @@ function npcStep(){
     const [A,B]=shuffle(gs);
     if(A.some(x=>B.some(y=>bonded(x.c,y.c)))&&A.length+B.length<=3){merge(A,B);continue}
     const hate=A.some(x=>B.some(y=>hatesP(x.c,y.c)));
-    const f=Math.max(leader(A).c.agg,leader(B).c.agg)*.32*(.7+G.phase*.09)+(hate?.6:0)+(G.phase>=FINAL?.3:0);
+    const f=Math.max(leader(A).c.agg,leader(B).c.agg)*.27*(.7+G.phase*.09)+(hate?.6:0)+(G.phase>=FINAL?.3:0);
     if(ch(f))npcBattle(A,B);
     else if(A.length+B.length<=3&&ch(Math.min(leader(A).c.ally,leader(B).c.ally)*.18))merge(A,B);
   }
@@ -614,7 +614,7 @@ function npcBattle(A,B){
   const[W,L]=pa>=pb?[A,B]:[B,A];const k=leader(W);
   for(const n of L){
     if(!n.alive)continue;
-    if(ch(.72)){k.kills++;if(ch(.4))k.g=Math.min(4,k.g+1);kill(n,`처치: ${nm(k)} · ${n.area}`,nm(k))}
+    if(ch(.6)){k.kills++;if(ch(.4))k.g=Math.min(4,k.g+1);kill(n,`처치: ${nm(k)} · ${n.area}`,nm(k))}
     else{n.hp=Math.max(8,n.hp-45);n.team=null;n.area=pick(ADJ[n.area].filter(a=>!G.zones.has(a)))||n.area}
   }
   W.forEach(n=>n.hp=Math.max(6,n.hp-ri(10,40)));
@@ -1083,7 +1083,7 @@ function npcCardBase(g,force){
   const me=G.me,L=leader(g),c=L.c,N=names(g);const a=me.area;
   g.forEach(n=>{n.seen={area:n.area,phase:G.phase};n.area=a});
   const st=force||stanceOf(g);me.ambush=false;
-  const look=`[${wnameOf(L)} · ${ROLE[c.role].n} · ${tierName(L)}] ${c.d} ${tierText(L)} ${powLabel(g)}.${affHint(L)}`;
+  const look=`[${L.c.w} · ${ROLE[c.role].n}] ${c.d} ${threatText(g)}${affHint(L)}`;
   const tagT={tag:'조우',title:N};
   const atk=(t)=>({...tagT,tag:'기습',cls:'bad',text:t+` ${look}`,opts:[
     {l:'맞받아친다',f:()=>startFight(g,'foe')},
@@ -1139,7 +1139,7 @@ function propose(g){
   else if(ch(c.agg*.6)){log(`"순진하긴." ${J(names(g),'이')} 공격해 왔다.`,'bad');startFight(g,'foe')}
   else{log(`${J(names(g),'은')} 거절하고 자리를 떴다.`);g.forEach(n=>n.area=pick(ADJ[n.area]))}
 }
-function bondLine(c,P){
+function bondLineBase(c,P){
   return({'seres>lucia':'"아가씨." 세레스가 검을 거두고 한쪽 무릎을 꿇었다. "늦어서 죄송합니다. 이제부터는 제가 지키겠습니다."','lucia>seres':'"세레스? 정말 너야? 살아 있었구나!" 루치아가 총을 내던지고 달려왔다.','jenny>fiora':'제니가 머리를 쓸어 넘기며 다가왔다. "피오라잖아. 이런 데서 만나다니, 운명인가 봐."','fiora>jenny':'피오라가 레이피어를 거뒀다. "제니, 다치진 않았어? 내 뒤에 있어."'})[c.id+'>'+P.id]||`${J(c.n,'이')} 당신을 알아보고 곧장 다가왔다.`;
 }
 function hateLine(c,P){
@@ -2227,7 +2227,7 @@ function rollTwist(o,tag){
   const random=/\bch\(|rnd\(\)/.test(src);
   const flow=TW_FLOW.test(src);
   const cost=!!o.req||/inv\.\w+--|it\.\w+--|-=\d/.test(src);
-  let luck=(hasP('lucky')?.06:0)+(G.me.fortune?.12:0)+(G.me.charm?.03:0)-(G.me.cursed?.03:0)+(G.me.san<30?-.04:0);
+  let luck=(hasP('lucky')?.06:0)+(G.me.fortune?.12:0)+(G.me.charm?.03:0)-(G.me.cursed?.03:0)+(G.me.san<30?-.04:0)-(G.me.inj&&G.me.inj.concussion?.05:0);
   if(G.me.bigLuck){G.me.bigLuck=false;luck+=.18}if(G.me.fortuneN>0){G.me.fortuneN--;luck+=.1}
   if(G.me.fortune){G.me.fortune=false}
   const r=rnd();
@@ -2487,7 +2487,7 @@ function heal(v){const m=G.me;if(v>0&&m.bless>0){m.bless--;v*=2}if(m.p.role==='s
 function initRun(pid){
   newGame(pid);
   const me=G.me;
-  Object.assign(me,{st:{hunt:0,boss:0,jack:0,fail:0,spare:0,hidden:[]},bleed:false,full:62,san:80,moved:0,exposed:0,stealth:false,fcd:0,film:0,cooked:0,killedIds:new Set(),allyIds:new Set(),arc:{r:0,s:0,n:0},arcStage:0,frag:0,code:false,fort:0,focus:false,rageNext:false,rageNow:false,cat:0,raidPhase:-1,_wg:0});
+  Object.assign(me,{st:{hunt:0,boss:0,jack:0,fail:0,spare:0,hidden:[]},bleed:false,full:62,san:80,moved:0,exposed:0,stealth:false,fcd:0,film:0,cooked:0,killedIds:new Set(),allyIds:new Set(),arc:{r:0,s:0,n:0},arcStage:0,frag:0,code:false,fort:0,focus:false,rageNext:false,rageNow:false,cat:0,raidPhase:-1,_wg:0});if(typeof initExtra==='function')initExtra();
   G.queue=[];G.chain=null;G.mode='card';G.result=null;G.seenScenes={};G.labOpen=false;G.mage=null;G.finalArea=null;G.nodes=shuffle(NODE_POOL).slice(0,5);G.hacked=new Set();G.ending=null;
   G.npcs.forEach(n=>{n.aff=Math.round((n.c.ally-.5)*40+ri(-10,10));n.talent=pick([.55,.7,.85,1,1,1,1.15,1.3,1.5,1.75])});
   G.baseCard=openingCard();G.card=decorate(G.baseCard);G.cardMark=G.log.length;
@@ -2514,7 +2514,7 @@ function phaseUpkeep(){
 function tick(){
   const me=G.me,ph=G.phase;
   if(!others().length&&!allies().length&&!G.fight){finalCard();return}
-  G.tick++;me.moved++;if(me.fcd>0)me.fcd--;if(me.regen>0){me.regen--;heal(6)}if(me.turf>0)me.turf--;if(me.bleedImm===G.phase)me.bleed=false;
+  G.tick++;me.moved++;if(me.fcd>0)me.fcd--;if(me.regen>0){me.regen--;heal(6)}tickExtra();if(G.over)return;if(me.turf>0)me.turf--;if(me.bleedImm===G.phase)me.bleed=false;
   npcStep();
   if(!others().length&&!allies().length&&!G.fight){finalCard();return}
   if(G.labOpen&&G.mage)for(const n of others())if(n.area===LAB&&!n.busy&&ch(.12))kill(n,'미스터 메이지에게 당함 · 연구소',null);
@@ -2545,7 +2545,7 @@ function tick(){
   if(me.exposed>0){me.exposed--;if(ch(hasP('hacker')?.35:.5))pullNpc('아글라이아 드론이 당신의 위치를 방송했다. 누군가 오고 있다.')}
   if(me.san<=0)return die('mad','머릿속 목소리가 가라고 하는 쪽으로 걸었다. 손목 장치가 비명을 지를 때까지 멈추지 않았다. 금지구역 한가운데에서 섬광이 터졌다.');
   const k=others().length;
-  if(me.noBetray!==G.phase)for(const a of allies()){if(bonded(a.c,me.p))continue;const p=a.c.bt*.025*(k<=6?2.5:1)*(k<=3?2:1)*(me.hp<40?2:1)*(me.san<30?1.4:1)*Math.max(.15,1-(a.aff||0)/90);if(ch(p)){queue(()=>betrayCard(a));break}}
+  betrayCheck();
   if(!others().length&&!G.finalQ){G.finalQ=1;queue(()=>finalCard())}
 }
 
@@ -2571,7 +2571,9 @@ function pickOpt(o){
   G.choices++;log(o.l,'pick');
   const tag=G.card&&G.card.tag;
   if(tag==='목격'&&hasP('film'))G.me.film=Math.min(100,G.me.film+20);
+  const bt0=G.me.betrayer;if(allies().length)socialReact(o);
   {const tw=o.noTwist?{mode:'normal'}:rollTwist(o,tag);if(tw.mode==='normal')o.f();else applyTwist(tw,tag,o)}
+  if(G.me.betrayer>bt0)onPlayerBetray();
   if(!G.over&&!G.fight&&!G.chain&&G.card&&!['교전','기습','방송','경고','진화'].includes(tag)&&ch((.02+G.phase*.007)*(hasP('stealth')||hasP('hacker')?.6:1))){
     const c=npcsAdj().concat(others().filter(n=>n.area===G.me.area)).filter(n=>!n.busy&&n.c.agg>=.5&&!bonded(n.c,G.me.p)&&(n.aff||0)<30);
     if(c.length){const n=pick(c);log('그 순간, 등 뒤에서 발소리가 빠르게 다가왔다!','bad');chain(()=>ambushCard(n))}
@@ -2616,7 +2618,7 @@ function raid(t){const me=G.me;me.raidPhase=G.phase;const n=pick(t);const g=G.np
 function roleEncounterOpt(g,tag){
   const me=G.me,r=me.p.role,L=leader(g),t=tierName(L);
   if(tag==='기습'){if(r==='gun'||r==='ranger')return{l:'[원딜] 뒤로 빠지며 쏜다',role:1,noTwist:1,f:()=>{log('거리를 벌리며 방아쇠를 당겼다.');startFight(g,null)}};if(r==='tank')return{l:'[탱커] 몸으로 받아낸다',role:1,noTwist:1,f:()=>{me.fort=Math.max(me.fort,2);startFight(g,'foe',[],.5)}};return null}
-  if(r==='support')return{l:'[서포터] 상처를 봐 주겠다고 한다',role:1,noTwist:1,f:()=>{if((L.aff||0)<-30||(L.hostile&&ch(.6))){log(`${J(nm(L),'이')} 내민 손을 쳐 냈다.`,'bad');startFight(g,'foe')}else{g.forEach(n=>{aff(n,22);n.hp=Math.min(npcMax(n),n.hp+20)});log(`${names(g)}의 상처를 소독하고 붕대를 감아 줬다. 표정이 누그러졌다.`,'good');if(canJoin(g)&&ch(.3+(L.aff||0)/200))joinMe(g);else{log(`"…고마워." ${J(names(g),'이')} 조용히 물러났다.`);g.forEach(n=>n.area=pick(ADJ[n.area].filter(passable)))}}}};
+  if(r==='support')return{l:'[서포터] 상처를 봐 주겠다고 한다',role:1,noTwist:1,f:()=>{if((L.aff||0)<-30||(L.hostile&&ch(.6))){log(`${J(nm(L),'이')} 내민 손을 쳐 냈다.`,'bad');startFight(g,'foe')}else{g.forEach(n=>{aff(n,22);n.hp=Math.min(npcMax(n),n.hp+20);MEM(n).healed=1});G.rep.hon+=2;log(`${names(g)}의 상처를 소독하고 붕대를 감아 줬다. 표정이 누그러졌다.`,'good');if(canJoin(g)&&ch(.3+(L.aff||0)/200))joinMe(g);else{log(`"…고마워." ${J(names(g),'이')} 조용히 물러났다.`);g.forEach(n=>n.area=pick(ADJ[n.area].filter(passable)))}}}};
   if(r==='gun'||r==='ranger')return{l:'[원딜] 거리를 두고 먼저 쏜다',role:1,noTwist:1,f:()=>startFight(g,'me',[],.95)};
   if(r==='bruiser')return{l:'[근딜] 정면으로 들이받는다',role:1,noTwist:1,f:()=>startFight(g,'me',[],1.15)};
   if(r==='tank')return{l:'[탱커] 버티고 서서 노려본다',role:1,noTwist:1,f:()=>{if((t==='도태'||t==='평범')&&ch(.6)){log(`${J(names(g),'이')} 눈을 피하더니 물러났다.`);g.forEach(n=>n.area=pick(ADJ[n.area].filter(passable)))}else{log('상대도 물러설 생각이 없다.','warn');me.fort=Math.max(me.fort,2);startFight(g,'foe',[],.4)}}};
@@ -2747,6 +2749,7 @@ function move(a){
   if(G.zones.has(a)&&!G.zones.has(me.area))me.zt=Math.max(me.zt,2);me.area=a;me.moved=0;allies().forEach(x=>x.area=a);
   log(`${J(a,'으로')} 이동했다.${G.zones.has(a)?' 이곳은 금지구역이다!':''}${a===LAB?' 차가운 형광등 불빛. 서버 소음이 들린다.':''}`);
   if(G.ntraps[a]&&!me.scouted.has(a)&&me.trapImm!==G.phase&&ch(.45)){const o=BY[G.ntraps[a]];delete G.ntraps[a];const d=ri(16,30);san(-5);if(hurt(d,'trap',`${o.n}의 덫을 밟고 쓰러졌다.`))return;log(`발밑에서 딸깍 소리가 났다. ${o.n}의 덫이다! (체력 -${d})`,'bad')}
+  if(!G.over)onArrive(a);
 }
 function bestMoves(){
   const me=G.me;const D=G.finalArea?distMap(G.finalArea):null;
@@ -2761,7 +2764,7 @@ function bestMoves(){
 }
 function jpPull(a){const me=G.me;const D=distMap(LAB);const d=D[a]??9;if(G.labOpen&&me.code)return -d*6;if(!G.labOpen&&me.code&&G.phase>=6)return -d*4;if(G.nodesKnown){const left=G.nodes.filter(x=>!G.hacked.has(x));if(left.length){const best=Math.min(...left.map(x=>distMap(x)[a]??9));return -best*2}}return 0}
 function travelCard(final){
-  const me=G.me;const mv=bestMoves().slice(0,final?4:3);
+  const me=G.me;const mv=goalInject(bestMoves().slice(0,final?4:3),final);
   const rum=others().filter(n=>n.seen&&n.seen.phase>=G.phase-1).slice(0,2);
   const D=G.finalArea?distMap(G.finalArea):{};
   const text=final?`모든 길이 ${J(G.finalArea,'으로')} 이어진다. 등 뒤에서 금지구역 경보가 차례로 울린다. 안전지대까지 ${D[me.area]??'?'}구역.`
@@ -2781,7 +2784,7 @@ function announceNext(first){
 
 /* ---------- social ---------- */
 function joinMe(g){g.forEach(n=>{n.team='me';n.area=G.me.area;n.hostile=false;n.wasAlly=true;n.abandoned=false;aff(n,10);G.me.allyIds.add(n.c.id);if(!G.me.allyHist.includes(nm(n)))G.me.allyHist.push(nm(n))});log(`${J(names(g),'과')} 동맹을 맺었다. 동료가 생기면 식량도 나눠야 한다.`,'good')}
-function stanceOf(g){
+function stanceOfBase(g){
   const me=G.me,L=leader(g),c=L.c,P=me.p,A=L.aff||0;
   if(g.some(n=>n.vendetta===P.n))return'vendetta';
   if(g.some(n=>bonded(n.c,P)))return'bond';
@@ -2795,7 +2798,7 @@ function stanceOf(g){
   if(A<=-40&&ch(.7))return'attack';
   if(G.phase>=FINAL)return ch(.75-A/250)?'attack':'standoff';
   const boost=tierName(L)==='괴물'?.15:0;
-  if(ch(Math.max(0,c.agg*(.06+G.phase*.055)+(me.hp<40?.1:0)+boost-A/220)))return'attack';
+  if(ch(Math.max(0,c.agg*(.1+G.phase*.065)+(me.hp<40?.1:0)+boost-A/220)))return'attack';
   if(canJoin(g)&&ch(Math.max(0,c.ally*(.8-G.phase*.07)+A/180)))return'offer';
   if(c.idle==='heal'&&me.hp<65&&ch(.6))return'heal';
   if(['camp','farm','trap'].includes(c.idle)&&ch(.7))return c.idle;
@@ -2810,7 +2813,7 @@ function propose(g){
   else if(ch(c.agg*.6)){aff(L,-6);log(`"순진하긴." ${J(names(g),'이')} 공격해 왔다.`,'bad');startFight(g,'foe')}
   else{aff(L,-3);log(`${J(names(g),'은')} 거절하고 자리를 떴다.`);g.forEach(n=>n.area=pick(ADJ[n.area].filter(passable)))}
 }
-function npcCard(g,force){
+function npcCardV2(g,force){
   g=g.filter(n=>n.alive);if(!g.length)return null;
   const me=G.me;
   if(me.cat>0&&!g.some(n=>bonded(n.c,me.p))&&force!=='attack'){me.cat--;g.forEach(n=>n.seen={area:n.area,phase:G.phase});return{tag:'조우',title:names(g),text:`${J(names(g),'이')} 바로 옆을 지나간다. 고양이 한 마리에게 관심을 두는 실험체는 없다.`,opts:[{l:'꼬리를 세우고 지나간다',f:()=>log('아무도 눈치채지 못했다.')}]}}
@@ -2837,7 +2840,7 @@ function benchCard(){
   return{tag:'제작',title:'작업대',text:`${G.me.area} 한쪽에 공구가 널린 작업대가 있다. 지금 가진 재료로 만들 수 있는 게 있다.`,
     opts:[...ok.slice(0,4).map(r=>({l:r.l,d:costText(r),noTwist:/암호 코드/.test(r.l)?1:0,f:()=>{if(!canPay(r)){log('재료가 모자란다. 그새 써 버렸다.');return}pay(r);r.f()}})),{l:'만들지 않고 떠난다',f:()=>log('작업대를 뒤로했다.')}]};
 }
-function recipes(){
+function recipesBase(){
   const m=G.me,R=[];
   const wc=[{metal:1},{metal:2},{metal:2,powder:1},{metal:2}];
   const ac=[{cloth:1},{cloth:1,leather:1},{cloth:2,leather:1},{cloth:1}];
@@ -2861,11 +2864,12 @@ function atkOf(s){
     a*=1+Math.min(3,m.arc?m.arc.r:0)*.05;
     const F=G.fight;if(m.p.role==='assassin'&&F&&F.opener!=='me'&&!night())a*=.85;
     if(m.rageNow)a*=1.25;
+    if(m.inj&&m.inj.fracture)a*=.85;
     if(F&&F.nf&&F.nf.mult&&(!F.nf.multRounds||F.round<=F.nf.multRounds))a*=F.nf.mult;
     if(F&&F.round<=1){if(m.p.role==='gun')a*=1.3;else if(m.p.role==='ranger')a*=1.15}
     return a}
   if(s.kind==='boss')return s.b.pow*.42;
-  const n=s.n||s;return (n.cursedUntil>=G.phase?.75:1)*.78*(13+n.g*6)*ROLE[n.c.role].atk*(1+mLvlNpc(n)*.07)*(.6+G.phase*.038)*(n.c.tags.includes('night')&&night()?1.15:1)*(1+(n.kills||0)*.04);
+  const n=s.n||s;return (n.cursedUntil>=G.phase?.75:1)*.7*(13+n.g*6)*ROLE[n.c.role].atk*(1+mLvlNpc(n)*.07)*(.6+G.phase*.038)*(n.c.tags.includes('night')&&night()?1.15:1)*(1+(n.kills||0)*.04);
 }
 function dmgTo(t,raw){
   const v=.85+rnd()*.3;
@@ -2885,11 +2889,11 @@ function startFight(foes,first,friends=[],mult=1){
   chain(()=>fightCard());
 }
 const ROLE_ACT={tank:['도발하며 버틴다','taunt'],bruiser:['돌진한다','charge'],gun:['거리를 벌리며 쏜다','kite'],ranger:['거리를 벌리며 쏜다','kite'],assassin:['급소를 노린다','vital'],mage:['주문을 집중한다','channel'],support:['응급 처치','patch']};
-function fightCard(){
+function fightCardBase(){
   const F=G.fight;if(!F)return null;const me=G.me;
   const up=F.foes.filter(foeUp);const t=up[0];
   if(!t){endFight('win');return null}
-  const lines=up.map(f=>`${foeName(f)}${f.kind==='npc'?` [${wnameOf(f.n)} · ${tierName(f.n)} · ${ctrLabel(me.p.role,f.n.c.role)||'상성 보통'}]`:''} ${Math.max(0,Math.round(foeHp(f)))}/${foeMax(f)}`).join('\n');
+  const lines=up.map(f=>`${foeName(f)}${f.kind==='npc'?` [${f.n.c.w} · ${ctrLabel(me.p.role,f.n.c.role)||'상성 보통'}]`:''} · ${hpDesc(f,F)}`).join('\n');
   const desc=t.kind==='boss'?`${J(t.b.name,'이')} 거칠게 숨을 몰아쉰다.`:foeHp(t)<=foeMax(t)*.3?`${J(foeName(t),'이')} 비틀거린다.`:pick([`${J(foeName(t),'이')} 거리를 재며 돌고 있다.`,`${foeName(t)}의 ${J(wnameOf(t.n),'이')} 다시 이쪽을 향한다.`,`숨이 턱까지 찬다. ${J(foeName(t),'은')} 아직 버티고 있다.`]);
   const sk=me.p.sk;
   const o=[{l:`${J(myWname(),'으로')} 공격한다`,f:()=>fightRound('atk')}];
@@ -2908,8 +2912,9 @@ function dmgFoe(f,d,by){
     if(f.b.isMage){G.mage=null;me.mageKilled=true;log('미스터 메이지가 무너졌다. 연구소가 조용해졌다.','win');gainXp(40);me.st.boss++;return}
     const s=f.b.drop;me.sp[s]=(me.sp[s]||0)+1;log(`${J(f.b.name,'을')} 쓰러뜨렸다! ${J(s,'을')} 얻었다.`,'win');log(`[방송] ${f.b.name} 처치 · ${me.p.n}`,'news');G.boss=null;me.st.boss++;if(by==='me')gainXp(25)}return}
   const n=f.n;n.hp-=d;
+  if(n.hp<=0&&by==='me'&&G.pacifist){n.hp=1;f.gone=true;n.busy=false;n.spared=true;n.hostile=false;n.team=null;aff(n,20);me.st.spare++;if(G.phase>=FINAL){kill(n,`항복 · 아글라이아 처분 · ${me.area}`,null);log(`${J(nm(n),'이')} 무릎을 꿇었다. 손목 장치가 차갑게 울렸다. 당신의 손으로 한 일은 아니다.`,'warn')}else{const to=ADJ[me.area].filter(passable);if(to.length)n.area=pick(to);log(`${J(nm(n),'이')} 쓰러졌다. 숨통을 끊지 않고 물러섰다. 상대는 비틀거리며 달아났다.`)}return}
   if(n.hp<=0){n.busy=false;
-    if(by==='me'){me.kills++;me.killed.push(nm(n));me.killedIds.add(n.c.id);if(n.c.tags.includes('vf'))me.vfKill=true;san(me.berserk?0:-7);kill(n,`처치: ${me.p.n} · ${me.area}`,me.p.n);gainXp(15);if(hasP('bloodthirst')){heal(15);log('피 냄새에 몸이 달아오른다. (체력 +15)','good')}loot(n)}
+    if(by==='me'){me.kills++;me.killed.push(nm(n));me.killedIds.add(n.c.id);if(n.c.tags.includes('vf'))me.vfKill=true;san(me.berserk?0:-7);kill(n,`처치: ${me.p.n} · ${me.area}`,me.p.n);gainXp(15);if(hasP('bloodthirst')){heal(15);log('피 냄새에 몸이 달아오른다. (체력 +15)','good')}loot(n);lootWitness(n)}
     else{by.kills++;kill(n,`처치: ${nm(by)} · ${n.area}`,nm(by))}
     f.gone=true;return}
   if(n.hp<foeMax(f)*(G.phase<5?.5:.35)&&ch(.25+.5*(1-n.c.agg)-G.phase*.02)&&G.phase<FINAL&&!n.duel&&!(n.labRush&&G.labOpen)&&!(G.fight&&G.fight.nf&&G.fight.nf.noFlee)){f.gone=true;n.busy=false;n.hostile=true;n.team=null;n.area=pick(ADJ[n.area].filter(passable));log(`${J(nm(n),'이')} 피를 흘리며 달아났다.`)}
@@ -2934,15 +2939,16 @@ function fightRound(act){
     if(me.p.id==='echion'&&me.vfBranch==='sidewinder'&&me.wg>=2)mult*=1.35;
     if(me.p.role==='mage')mult*=1.15;
   }
+  if(act==='eat'){eatInFight();mult=0;guard=.85}
   if(act==='def'){F.defStreak=(F.defStreak||0)+1;guard=Math.min(.85,.45+(F.defStreak-1)*.2);mult=0;if(F.nf.peekaboo){guard=.25;counterP=Math.max(counterP,.5)}if(F.defStreak>=3)log('버티기만 해서는 상대가 지치지 않는다.','warn')}else F.defStreak=0;
-  if(act==='band'){me.it.bandage--;heal(20);me.bleed=false;mult=0;guard=.8;log('싸움 도중 붕대를 감았다. 피가 멎었다.')}
+  if(act==='band'){me.it.bandage--;heal(12);me.bleed=false;mult=0;guard=.8;log('싸움 도중 붕대를 감았다. 피가 멎었다.')}
   if(act==='trap'){me.it.trap--;mult=0;const d=dmgTo(t,atkOf('me')*2.2*(hasP('trapper')?1.5:1));log(`덫이 터졌다! ${foeName(t)}에게 피해 ${d}`,'good');dmgFoe(t,d,'me')}
   if(act==='finish')mult=1.6;
   if(act==='spare'){me.st.spare++;t.n.spared=true;aff(t.n,35);t.n.hostile=false;t.n.team=null;t.n.busy=false;t.gone=true;t.n.area=pick(ADJ[me.area].filter(passable));san(6);log(`무기를 거뒀다. ${J(nm(t.n),'은')} 놀란 얼굴로 달아났다.`);return endFight('win')}
   if(act==='flee'){
     const nf=F.foes.filter(foeUp).length;
     const sure=F.nf.fleeSure;F.nf.fleeSure=false;
-    if(sure||ch(clamp((F.nf.fleeBonus||0)+.5-G.phase*.015-(nf-1)*.1+(F.fleeTry||0)*.15+(me.p.role==='assassin'?.12:0)+(hasP('evasive')?.08:0)+(me.wg-1)*.03-(F.foes.some(f=>f.kind==='boss'&&f.b.isMage)?.15:0),.12,.85))){
+    if(sure||ch(clamp((F.nf.fleeBonus||0)-(me.inj&&me.inj.fracture?.15:0)+.5-G.phase*.015-(nf-1)*.1+(F.fleeTry||0)*.15+(me.p.role==='assassin'?.06:0)+(hasP('evasive')?.08:0)+(me.wg-1)*.03-(F.foes.some(f=>f.kind==='boss'&&f.b.isMage)?.15:0),.12,.85))){
       const ok=ADJ[me.area].filter(a=>!G.zones.has(a)&&passable(a));log(ok.length?'등을 돌려 달렸다.':'연막 속으로 몸을 던져 거리를 벌렸다.');
       abandonCheck(F.foes.filter(f=>f.kind==='npc'&&foeUp(f)).map(f=>f.n));
       F.foes.forEach(f=>{if(f.kind==='npc'&&foeUp(f)&&!ok.length)f.n.area=pick(ADJ[me.area].filter(passable))});endFight('fled');if(ok.length)move(pick(ok));return}
@@ -2953,7 +2959,7 @@ function fightRound(act){
     const targets=aoe?F.foes.filter(foeUp):[t];
     if(F.nf.aoeOnce&&act==='atk'){F.nf.aoeOnce=false;aoe=true;log('둘이 동시에 파고들었다!','good')}
     if(F.nf.iai&&act==='atk'){F.nf.iai=false;if(foeHp(t)<=foeMax(t)*.5){mult*=2.5;log('거합 일섬!','crit-good')}}
-    for(const x of targets){let d=Math.round(myHit(x)*mult*stunPen*myRoleMult(x,F));if(F.nf.crit&&F.round<=3&&ch(F.nf.crit)){d=Math.round(d*1.8);log('치명타!','crit-good')}if(F.nf.poison){x.dot=Math.max(x.dot||0,F.nf.poison);F.nf.poison=0;log(`${J(foeName(x),'이')} 독에 물들었다.`,'good')}const rem=Math.round(foeHp(x)-d);log(`${foeName(x)}에게 피해 ${d}`+(rem>0?` (남은 ${rem})`:''));dmgFoe(x,d,'me');
+    for(const x of targets){let d=Math.round(myHit(x)*mult*stunPen*myRoleMult(x,F));if(F.nf.crit&&F.round<=3&&ch(F.nf.crit)){d=Math.round(d*1.8);log('치명타!','crit-good')}if(F.nf.poison){x.dot=Math.max(x.dot||0,F.nf.poison);F.nf.poison=0;log(`${J(foeName(x),'이')} 독에 물들었다.`,'good')}const rem=Math.round(foeHp(x)-d);d=Math.round(d*wTraitMult(x,F));log(`${foeName(x)}에게 피해 ${d}`);dmgFoe(x,d,'me');wTraitAfter(x,d,F);
       if((skill&&me.p.sk.t==='drain')||(me.p.id==='echion'&&me.vfBranch==='mamba'&&me.wg>=2))heal(Math.round(d*(skill&&me.p.sk.t==='drain'?.5:.25)))}
     if(F.nf.finisher){const tf=F.foes.find(foeUp);if(tf&&tf.kind==='npc'&&foeHp(tf)<=foeMax(tf)*.25){log(`찌르기 한 번. ${J(foeName(tf),'이')} 무너졌다.`,'crit-good');dmgFoe(tf,Math.ceil(foeHp(tf)),'me')}}
     gainXp(mult>=.9?4:1);
@@ -2970,6 +2976,7 @@ function fightRound(act){
   for(const f of F.foes.filter(foeUp)){
     if(f.stunned){f.stunned=false;log(`${J(foeName(f),'이')} 제압당해 반격하지 못했다.`,'good');continue}
     let k=1;
+    if(f.kind==='npc'&&npcEat(f))continue;
     if(f.kind==='npc'){f.cd=(f.cd||0)-1;if(f.cd<=0&&ch(f.n.c.role==='mage'?.5:.35)){if(F.nf.interrupt>0){F.nf.interrupt--;log(`${J(foeName(f),'이')} 기술을 쓰려는 순간 손목을 쳐 냈다!`,'good');k=1}else k=npcSkill(f,F);if(!foeUp(f)||k===0)continue}}
     if(f.kind==='boss'&&f.b.isMage&&ch(.3)){k=1.6;log('미스터 메이지의 손에서 푸른 번개가 쏟아진다!','bad')}
     const fs=F.friends.filter(x=>x.alive);
@@ -3001,7 +3008,7 @@ function nfGuard(F,f,first){const N=F.nf||{};let k=1;
   return k}
 
 /* ===================== V2 · DRAW, BREAKDOWN, BARTER, STORY, ENDINGS ===================== */
-function drawCard(){
+function drawCardBase(){
   const me=G.me,a=me.area;
   if(G.zones.has(a))return zoneCard();
   if(G.phase>=FINAL&&G.finalArea&&a!==G.finalArea&&a!==LAB)return travelCard(true);
@@ -3021,7 +3028,7 @@ function drawCard(){
   if(gs.length>=2)add((G.phase>=FINAL?12:4)*enc,()=>witnessCard(gs[0],gs[1]));
   if(gs.length)add((G.phase>=FINAL?30:7)*enc,()=>npcCard(gs[0]));
   if(npcsAdj().some(n=>n.c.idle==='stalk'))add(1.2,()=>stalkerCard());
-  {const amb=npcsAdj().concat(others().filter(n=>n.area===a)).filter(n=>!n.busy&&n.c.agg>=.45&&!bonded(n.c,me.p)&&(n.aff||0)<30);if(amb.length)add(.7*(.15+G.phase*.1+(night()?.3:0)+(me.hp<50?.15:0))*enc*(hasP('stealth')?.5:1)*(me.noAmb===G.phase?0:1)*(hasP('hacker')?.7:1),()=>ambushCard(pick(amb)))}
+  {const amb=npcsAdj().concat(others().filter(n=>n.area===a)).filter(n=>!n.busy&&n.c.agg>=.45&&!bonded(n.c,me.p)&&(n.aff||0)<30);if(amb.length)add(.9*(.15+G.phase*.1+(night()?.3:0)+(me.hp<50?.15:0))*enc*(hasP('stealth')?.5:1)*(me.noAmb===G.phase?0:1)*(hasP('hacker')?.7:1),()=>ambushCard(pick(amb)))}
   add(1.4+me.moved*.9+(G.next.includes(a)?6:0),()=>travelCard());
   if(G.drop===a)add(8,()=>dropCard());
   if(G.specials[a])add(8,()=>specialCard());
@@ -3046,7 +3053,7 @@ function breakdownCard(){
   const me=G.me,sev=me.san<20;const al=allies();
   const L=[
     ()=>al.length?{tag:'붕괴',title:'의심',cls:'bad',text:`${nm(al[0])}의 눈빛이 이상하다. 아까부터 당신 가방만 쳐다본다. 식량을 훔쳐 가는 게 틀림없다. 아니, 그럴 리가. 아니, 틀림없다.`,opts:[
-      {l:'따진다',f:()=>{aff(al[0],-25);if(ch(.3)){log(`"미쳤어?" ${J(nm(al[0]),'이')} 무기를 들었다.`,'bad');al[0].team=null;al[0].hostile=true;al[0].betrayedMe=true;startFight([al[0]],null)}else log(`${J(nm(al[0]),'이')} 어이없다는 얼굴로 당신을 봤다. 관계에 금이 갔다.`,'bad')}},
+      {l:'따진다',f:()=>{aff(al[0],-25);if(ch(.3)&&!bonded(al[0].c,me.p)){log(`"미쳤어?" ${J(nm(al[0]),'이')} 무기를 들었다.`,'bad');al[0].team=null;al[0].hostile=true;al[0].betrayedMe=true;startFight([al[0]],null)}else log(`${J(nm(al[0]),'이')} 어이없다는 얼굴로 당신을 봤다. 관계에 금이 갔다.`,'bad')}},
       {l:'몰래 감시한다',f:()=>{san(-4);log('밤새 지켜봤다. 아무 일도 없었다. 그게 더 무섭다.')}},
       {l:'식량을 전부 먹어 치운다',f:()=>{const n=me.inv.food;full(n*18);me.inv.food=0;log(`뺏기기 전에 다 먹었다. (식량 -${n})`,'bad')}},
     ]}:{tag:'붕괴',title:'숫자',cls:'bad',text:'가방 속 식량을 세고 또 센다. 분명 하나가 모자랐다. 아니, 다시 세어 보자. 처음부터.',opts:[
@@ -3210,7 +3217,7 @@ const END_TXT={
  51:p=>`몸 안의 VF가 폭주했다. 빛이 꺼진 자리에 아무것도 남지 않았다.`,
  52:p=>`실험체 번호만 남았다.`,
 };
-function decideEnding(){
+function decideEndingBase(){
   const o=G.over,m=G.me,p=m.p,k=o.kind;
   if(o.win){
     if(k==='hack')return m.mageKilled?13:12;
@@ -3339,7 +3346,7 @@ const FIELDS={
  isaac:[14,'투항 권고: 근처 실험체 하나를 동료로 끌어들인다. 거부하면 교전',()=>{const ns=near().filter(n=>!n.team||n.team==='me'?n.team!=='me':false);const n=weakest(ns);if(!n){log('검문할 상대가 없다.');return}const p=tierName(n)==='도태'?.75:tierName(n)==='평범'?.5:.25;if(canJoin([n])&&ch(p+(n.aff||0)/200)){if(n.area!==G.me.area)n.area=G.me.area;joinMe([n]);log(`"무기 내려놔." ${J(nm(n),'은')} 순순히 따랐다.`,'good')}else{const g=npcHere(n);log(`${J(nm(n),'이')} 배지를 비웃으며 무기를 뽑았다.`,'bad');startFight(g,'foe')}}],
  tazia:[14,'독 바르기: 다음 교전 첫 공격에 맞은 상대가 매 라운드 피해 6을 입는다',()=>{nf({poison:6});log('칼날에 독을 얇게 펴 발랐다.')}],
  irem:[14,'고양이 변신: 다음 조우 두 번을 고양이인 척 피한다',()=>{G.me.cat=2;log('고양이가 됐다.')}],
- theodore:[14,'원거리 저격: 근처 실험체 하나에게 미리 피해 25',()=>{const n=strongest(near());if(!n){log('조준경에 아무도 없다.');return}n.hp-=25;aff(n,-20);G.me.exposed=1;log(`조준경 너머 ${nm(n)}에게 명중. (피해 25)`,'good');if(n.hp<=0){G.me.kills++;G.me.killed.push(nm(n));G.me.killedIds.add(n.c.id);kill(n,`처치: ${G.me.p.n}의 저격 · ${n.area}`,G.me.p.n);san(-7)}}],
+ theodore:[14,'원거리 저격: 근처 실험체 하나에게 미리 피해 25',()=>{const n=strongest(near());if(!n){log('조준경에 아무도 없다.');return}n.hp-=25;aff(n,-20);G.me.exposed=1;log(`조준경 너머 ${nm(n)}에게 명중. (피해 25)`,'good');if(n.hp<=0&&G.pacifist){n.hp=1;log(`${J(nm(n),'이')} 쓰러졌지만 숨은 붙어 있다.`)}else if(n.hp<=0){G.me.kills++;G.me.killed.push(nm(n));G.me.killedIds.add(n.c.id);kill(n,`처치: ${G.me.p.n}의 저격 · ${n.area}`,G.me.p.n);san(-7)}}],
  lyanh:[16,'은신: 이번 페이즈 동안 기습을 당하지 않는다',()=>{G.me.noAmb=G.phase;log('그림자 속으로 녹아들었다.')}],
  vanya:[14,'나비 치유: 체력 +12, 이후 3턴 동안 매 턴 체력 +6',()=>{heal(12);G.me.regen=3;log('나비들이 상처 위에 내려앉았다.')}],
  debimarlene:[14,'쌍둥이 연계: 다음 교전 첫 공격이 모든 상대를 휩쓴다',()=>{nf({aoeOnce:true});log('"언니, 이번엔 내가 먼저!" "순서 지켜."')}],
@@ -3378,6 +3385,687 @@ function useField(){
   if(F)F[2]();else{const o=loot2();log(`(${gain(o)})`)}
 }
 
+/* ===================== V2.4 · LORE, PAIRS, SOCIAL AI, SURVIVAL ===================== */
+const MEM=n=>n.mem||(n.mem={});
+const npcById=id=>G.npcs.find(n=>n.c.id===id&&n.alive);
+const isMe=id=>G.me&&G.me.p.id===id;
+
+/* ---------- lore fixes ---------- */
+const DESC={
+ theodore:'백발백중의 저격수. 고도의 집중력으로 단 한 발에 모든 것을 건다. "뒤는 제가 맡겠습니다."',
+ lenox:'낚시를 즐기는 느긋한 여인. 범상치 않은 차림으로 갈고리 달린 채찍을 다룬다. "낚시 좋지 않아? 마음이 차분해진다고."',
+ lyanh:'사악한 무언가에 씐 여인. 혼자 있어도 혼자가 아니다. "나는 혼자가 아니에요. …불행히도."',
+ leni:'겉으로는 또래와 다를 바 없어 보이는 소녀. "장난감보다 먼저 망가지면 안 돼, 알겠지?"',
+ charlotte:'상처를 치유하는 빛을 지닌 실험체. "제 빛이… 당신의 희망이 될 수 있기를."',
+ garnet:'잔혹한 실험 끝에 VF 능력을 각성한 실험체. "고통만이 우릴 이어줄 수 있어."',
+ lenore:'뛰어난 실력의 바이올리니스트. "네 선율을… 들려주겠니?"',
+ yumin:'세상을 떠돌며 도사를 자칭하는 자유로운 술사. "바람 따라, 구름 따라. 한 번 가볼까!"',
+ justyna:'정의의 히어로를 꿈꾸는 활기찬 실험체. "걱정하지 마! 내가 왔어!"',
+ niah:'게임을 진심으로 좋아하고 즐기는 소녀 게이머. "게임, 할래?"',
+ coraline:'세상을 오직 흑과 백으로만 나누어 보는 실험체. "흑과 백, 넌 어느 쪽일까?"',
+ alonso:'기이한 가면을 쓰고 호탕하게 떠드는 거한. "온통 폐품투성이구만. 나까지 포함해서!"',
+ eva:'그저 평범하게 살고 싶었던 VF 능력자. "그냥 평범한 삶을 살고 싶었어. 그게 이렇게 어려운 줄 몰랐는걸."',
+ jan:'유머러스한 말솜씨와 꾸준한 선행으로 팬들에게 사랑받는 격투가. "제대로 붙어볼까!"',
+ istvan:'오로지 자신의 연구를 위해 섬으로 돌아온 전직 연구원. "선택에 상응하는 결과를."',
+ cliver:'여러 사람의 원한과 미련이 깃든 권총 그 자체. 혼란 속에서 이 총을 쥔 자는 많은 피를 보게 된다.',
+ lucia:'총기 명가 페란테가의 딸. 가문의 권력 다툼에 지쳐, 유모가 읽어 주던 정의로운 총사 동화를 마음에 품고 산다.',
+ emma:'관객의 박수를 사랑하는 밝은 마술사. 카드 한 장으로 사람을 웃게 만든다.',
+ mirka:'자기 사람을 끔찍이 챙기는 싸움꾼. 한번 정한 구역은 절대 내주지 않는다.',
+ fenrir:'늑대처럼 사나운 실험체. 몸에 감긴 사슬을 끊고 자유를 원한다.',
+ daniel:'지독한 완벽주의자. 사소한 흐트러짐도 참지 못한다.',
+ markus:'묵직한 거한. 말수는 적지만 매그너스와는 말없이도 통하는 사이다.',
+ magnus:'폭주족 출신의 거한. 거칠지만 자기 사람은 끝까지 챙긴다. 마커스와는 묘하게 죽이 잘 맞는다.',
+ bihyung:'얽매이는 것을 싫어하는 자유분방한 소녀. 정체를 알 수 없는 힘을 다룬다.',
+};
+Object.entries(DESC).forEach(([id,d])=>{if(BY[id])BY[id].d=d});
+if(BY.lyanh){Object.assign(BY.lyanh,{w:'쌍검',role:'bruiser'});const r=ROLE_PAS.bruiser;BY.lyanh.pas={n:r[0],t:'role_bruiser',d:r[1]}}
+const ACTN={niah:'게임 공략',justyna:'히어로 등장',lenore:'불협화음'};
+Object.entries(ACTN).forEach(([id,n])=>{if(BY[id]&&BY[id].act)BY[id].act.n=n});
+FIELDS.niah=[12,'게임 공략: 숙련 경험치 +8. 다음 교전에서 상대의 정확한 체력이 보인다',()=>{gainXp(8);nf({revealHp:true});log('"이 보스, 패턴 다 외웠어." 머릿속에 공략집이 펼쳐졌다.')}];
+FIELDS.justyna[1]='히어로 등장: 다음 세 번의 선택에 행운이 따른다';
+FIELDS.lenore[1]='불협화음: 근처에서 가장 강한 실험체의 공격력을 2페이즈 동안 25% 낮춘다';
+Object.entries(FIELDS).forEach(([id,[cd,desc]])=>{const p=BY[id];if(p&&p.act){p.act.cd=cd;p.act.desc=desc}});
+// Markus & Magnus are inseparable
+['markus','magnus'].forEach((a,i,arr)=>{const b=arr[1-i];if(BY[a]&&!BY[a].bonds.includes(b))BY[a].bonds.push(b)});
+
+/* ---------- play difficulty ---------- */
+const DIFF_EASY='jackie hyunwoo magnus nadine aya hart xiukai sissela zahir eleven william nicky cathy luke sua rio markus estelle priya charlotte kenneth garnet darko isaac leni johann alonso mirka seres'.split(' ');
+const DIFF_HARD='fiora yuki laura rozzi camilo shoichi tazia eva echion hyejin tsubame isol daniel celine lenox bernice alex leon debimarlene adela irem theodore mai chiara hisui lyanh katja martina jp cliver bihyung abigail blair henry nathapon'.split(' ');
+PROF.forEach(p=>p.diff=DIFF_HARD.includes(p.id)?3:DIFF_EASY.includes(p.id)?1:2);
+const DIFFN=['','쉬움','보통','어려움'];
+const diffText=p=>`난이도 ${'★'.repeat(p.diff)}${'☆'.repeat(3-p.diff)} ${DIFFN[p.diff]}`;
+
+/* ---------- weapon traits ---------- */
+const WT_GUN=['권총','돌격소총','저격총'],WT_BOW=['활','석궁'],WT_BLUNT=['방망이','망치','글러브','톤파','쌍절곤'],WT_BLADE=['단검','쌍검','양손검','레이피어','도끼','창'],WT_THROW=['투척','암기'];
+function wTraitText(w){
+  if(WT_GUN.includes(w))return'총기: 피해 +15%. 쏠 때마다 탄약을 쓰고 총성이 주변 실험체를 불러들인다. 탄약이 떨어지면 개머리판으로 휘둘러 피해가 크게 준다.';
+  if(WT_BOW.includes(w))return'활·석궁: 소리가 거의 나지 않는다. 교전 첫 라운드 피해 +15%.';
+  if(WT_BLUNT.includes(w))return'둔기: 맞힐 때 12% 확률로 상대를 휘청이게 해 반격을 끊는다.';
+  if(WT_BLADE.includes(w))return'날붙이: 맞힐 때 15% 확률로 상대에게 출혈(매 라운드 피해 4)을 남긴다.';
+  if(WT_THROW.includes(w))return'투척: 15% 확률로 한 번 더 던져 추가 피해를 준다.';
+  if(w==='아르카나')return'아르카나: 방어구를 일부 꿰뚫어 피해 +8%.';
+  if(w==='기타')return'기타: 싸우는 동안 매 라운드 정신력이 1 회복된다.';
+  if(w==='카메라')return'카메라: 플래시 덕분에 상대 공격을 12% 확률로 피한다.';
+  if(w==='VF 의수')return'VF 의수: 준 피해의 10%만큼 체력을 흡수한다.';
+  return'';
+}
+function wTraitMult(x,F){
+  const me=G.me,w=me.p.w;let k=1;
+  if(WT_GUN.includes(w)){const use=w==='돌격소총'?2:1;if(me.ammo>=use){me.ammo-=use;k*=1.15;me.gunNoise=2;if(me.ammo<use)log('마지막 탄창이 비었다.','warn')}else{k*=.55;if(!F.noAmmoLog){F.noAmmoLog=1;log('탄이 없다. 총을 거꾸로 쥐고 개머리판으로 휘둘렀다.','bad')}}}
+  if(WT_BOW.includes(w)&&F.round<=1)k*=1.15;
+  if(w==='아르카나')k*=1.08;
+  return k;
+}
+function wTraitAfter(x,d,F){
+  const me=G.me,w=me.p.w;if(!foeUp(x))return;
+  if(WT_BLUNT.includes(w)&&ch(.12)){x.stunned=true;log(`${J(foeName(x),'이')} 휘청거렸다.`,'good')}
+  if(WT_BLADE.includes(w)&&ch(.15)){x.dot=Math.max(x.dot||0,4);log(`${foeName(x)}의 상처가 벌어졌다.`,'good')}
+  if(WT_THROW.includes(w)&&ch(.15)){const e=Math.round(d*.5);log(`한 번 더 던졌다! (피해 ${e})`,'good');dmgFoe(x,e,'me')}
+  if(w==='VF 의수')heal(Math.round(d*.1));
+  if(w==='기타')san(1);
+}
+
+/* ---------- hidden HP & vague threat ---------- */
+function hpDesc(f,F){
+  if(F&&F.nf&&F.nf.revealHp)return`체력 ${Math.max(0,Math.round(foeHp(f)))}/${foeMax(f)}`;
+  const r=foeHp(f)/foeMax(f);
+  return r>.85?'멀쩡해 보인다':r>.6?'가볍게 다쳤다':r>.4?'숨을 헐떡이고 있다':r>.2?'비틀거리며 피를 흘린다':'쓰러지기 직전이다';
+}
+function threatText(g){
+  const L=leader(g),t=tierName(L),k=L.kills||0,hurtN=L.hp<npcMax(L)*.5;const s=[];
+  s.push(L.g<=0?'무기가 형편없다.':L.g===1?'무기는 평범해 보인다.':L.g===2?'무기가 잘 손질되어 있다.':'무기가 상당히 잘 관리되어 있다.');
+  if(k>=3)s.push('온몸에 전투의 흔적이 남아 있다.');else if(k>=1)s.push('옷에 남의 피가 튀어 있다.');
+  if(t==='괴물')s.push('평범한 실험체와는 비교하기 어려울 정도로 강해 보인다.');
+  if(hurtN)s.push(t==='괴물'||t==='성장'?'상당한 부상을 입었지만, 여전히 위협적이다.':'부상이 깊어 보인다.');
+  if(g.length>1)s.push(`일행이 ${g.length}명이다.`);
+  if(L.food>=2&&ch(.5))s.push('가방이 불룩하다. 먹을 걸 꽤 챙긴 모양이다.');
+  if(MEM(L).sawLoot)s.push('당신이 시체를 뒤지던 모습을 본 눈빛이다.');
+  return s.join(' ');
+}
+
+/* ---------- run extras ---------- */
+let PACIFIST=false;
+function initExtra(){
+  const me=G.me;
+  Object.assign(me.it,{snack:0,feast:0,splint:0});
+  me.eatCd=0;me.inj={};me.ammo=WT_GUN.includes(me.p.w)?(me.p.w==='돌격소총'?30:16):0;me.gunNoise=0;
+  G.rep={inf:0,hon:0,bounty:false,helpers:false};G.rumors=[];G.pacifist=PACIFIST;G.goal=null;G.flags={};
+  G.npcs.forEach(n=>{n.mem={};n.food=ch(.4)?1:0});
+}
+function tickExtra(){
+  const me=G.me;
+  if(me.eatCd>0)me.eatCd--;
+  // injuries
+  const I=me.inj;
+  for(const k in I){if(I[k]>0){I[k]--;if(I[k]===0){delete I[k];log(`${INJN[k]} 증상이 가라앉았다.`,'good')}}}
+  if(I.burn){me.hp-=1;san(-.5);if(me.hp<=0)return die('bleed','화상이 온몸으로 번졌다.')}
+  if(I.infection&&G.tick%3===0){if(hurt(2,'bleed','상처가 썩어 들어갔다. 열이 내리지 않았다.'))return;log('상처가 곪아 열이 오른다. (체력 -2)','bad')}
+  if(me.bleed){me.bleedT=(me.bleedT||0)+1;if(me.bleedT>6&&!I.infection&&ch(.15)){I.infection=24;log('출혈이 오래가더니 상처가 감염됐다. (감염: 약초로 치료)','bad')}}else me.bleedT=0;
+  if(me.gunNoise>0){me.gunNoise--;if(!G.fight&&ch(.22)){const g=pullNpc('총성을 듣고 누군가 다가온다.');if(g)queue(()=>npcCard(g))}}
+  // NPC food stash
+  for(const n of others())if(n.food<4&&ch((n.c.idle==='farm'||n.c.tags.includes('cook')?.08:.045)*(1+G.phase*.08)))n.food++;
+  pairSync();
+  repUpdate();
+  if(G.rep.bounty)bountyPull();
+}
+
+/* ---------- food ---------- */
+const FOODS={food:['식량을 씹어 삼켰다.',22,3,0],snack:['허기만 겨우 달랬다.',15,6,1],meal:['제대로 된 음식을 먹었다.',35,14,3],feast:['특제 요리를 천천히 음미했다.',55,30,8]};
+function eatItem(k,inFight){
+  const me=G.me,F=FOODS[k];
+  if(me.eatCd>0){log(`아직 속이 더부룩하다. ${me.eatCd}턴 뒤에 먹을 수 있다.`,'warn');return false}
+  if(k==='food'){if(!me.inv.food)return false;me.inv.food--}else{if(!me.it[k])return false;me.it[k]--}
+  full(F[1]);heal(F[2]);if(F[3])san(F[3]);me.eatCd=2;
+  log(`${F[0]} (포만감 +${F[1]}, 체력 +${F[2]}${F[3]?`, 정신 +${F[3]}`:''})${inFight?' 싸움 도중이라 제대로 씹지도 못했다.':''}`,'good');return true;
+}
+function useItem(k){const me=G.me;
+  if(FOODS[k]){eatItem(k);return}
+  if(!me.it[k])return;
+  if(k==='bandage'){me.it.bandage--;heal(12);me.bleed=false;log('붕대를 감았다. 피가 멎었다. (체력 +12)');return}
+  if(k==='sedative'){me.it.sedative--;san(18);log('진정제를 삼켰다. 손 떨림이 조금 멎었다. (정신 +18)');return}
+  if(k==='splint'){if(!me.inj.fracture){log('부러진 곳이 없다.');return}me.it.splint--;delete me.inj.fracture;log('부목을 대고 단단히 묶었다. 이제 버틸 만하다.','good');return}
+}
+function treatHerb(){const me=G.me;if(!me.inv.herb||!(me.inj.burn||me.inj.infection))return;me.inv.herb--;const c=me.inj.burn?'burn':'infection';delete me.inj[c];log(`약초를 짓이겨 ${INJN[c]} 부위에 발랐다. 열기가 가라앉았다.`,'good')}
+function bestFood(){const me=G.me;return['feast','meal','snack'].find(k=>me.it[k]>0)||(me.inv.food>0?'food':null)}
+function eatInFight(){const k=bestFood();if(k)eatItem(k,true)}
+function npcEat(f){const n=f.n;if(n.food>0&&n.hp<foeMax(f)*.4&&ch(.45)){n.food--;const v=16+Math.round(G.phase*1.5);n.hp=Math.min(foeMax(f),n.hp+v);log(`${J(nm(n),'이')} 품에서 음식을 꺼내 우겨넣었다. 기력을 되찾았다.`,'warn');return true}return false}
+function fightCard(){
+  const c=fightCardBase();if(!c)return c;const me=G.me;
+  const k=bestFood();
+  if(k){const i=c.opts.findIndex(o=>/도주/.test(o.l));const o=me.eatCd>0?{l:`음식을 먹는다`,dis:true,req:`${me.eatCd}턴 뒤 가능`,f:()=>{}}:{l:`${k==='food'?'식량':k==='snack'?'주전부리':k==='meal'?'음식':'특제 요리'}을 먹으며 버틴다`,f:()=>fightRound('eat')};c.opts.splice(i<0?c.opts.length:i,0,o)}
+  return c;
+}
+
+/* ---------- injuries ---------- */
+const INJN={fracture:'골절',burn:'화상',concussion:'뇌진탕',infection:'감염'};
+const INJD={fracture:'공격력 -15%, 도주 확률 -15%. 부목으로 치료',burn:'매 턴 체력 -1, 정신 감소. 약초로 치료',concussion:'선택 결과의 운이 나빠진다',infection:'3턴마다 체력 -2. 약초로 치료'};
+function injuryRoll(d,kind){
+  const me=G.me;if(d<16||!ch(.16+(d>=30?.1:0)))return;
+  let t=kind==='trap'||kind==='fall'?'fracture':kind==='beast'?'infection':['fire','gas','meteor'].includes(kind)?'burn':pick(['fracture','concussion','fracture','burn']);
+  if(me.inj[t])return;me.inj[t]=t==='fracture'?30:t==='infection'?24:t==='burn'?10:14;
+  log(`[부상] ${INJN[t]}. ${INJD[t]}.`,'bad');
+}
+
+/* ---------- pairs: Markus & Magnus, Lucia & Seres ---------- */
+const PAIRS=[['markus','magnus'],['lucia','seres']];
+const PAIR_LINE={
+ markus:'묵직한 발소리. 마커스가 망치를 어깨에 걸친 채 나타났다. 당신을 위아래로 훑어보더니 중얼거렸다. "…믿어볼까." 그리고 고개를 끄덕였다. "역시 서 있군…" 어깨를 툭 치는 손이 무겁다. "흠, 이 무게감. 듬직하군."',
+ magnus:'오토바이 엔진 소리가 멎었다. 매그너스가 헬멧을 벗으며 다가왔다. "…믿어볼까." 한참 당신을 바라보다 피식 웃었다. "역시 서 있군…" 등을 퍽 치는 손이 무겁다. "흠, 이 무게감. 듬직하군."',
+ seres:'"아가씨, 찾고 있었습니다." 세레스가 검을 거두고 한쪽 무릎을 꿇었다. "이제부터 곁을 떠나지 않겠습니다."',
+ lucia:'"세레스! 찾았잖아요!" 루치아가 총을 내던지고 달려와 당신의 팔을 붙잡았다.',
+};
+function pairSync(){
+  const me=G.me;
+  for(const [x,y] of PAIRS){
+    if(isMe(x)||isMe(y)){
+      const pid=isMe(x)?y:x;const p=npcById(pid);
+      if(p&&p.team!=='me'&&!G.flags['pj_'+pid]&&!G.fight){G.flags['pj_'+pid]=1;queue(()=>pairJoinCard(p))}
+      continue;
+    }
+    const a=npcById(x),b=npcById(y);if(!a||!b)continue;
+    if(a.team==='me'&&b.team!=='me'){if(canJoin([b])){if(G.flags['pf_'+b.c.id]!==G.phase){G.flags['pf_'+b.c.id]=G.phase;queue(()=>pairFollowCard(b,a))}}else{a.team=null;a.area=b.area;a.team=b.c.id;b.team=b.c.id;log(`${J(nm(a),'이')} 짐을 챙겼다. "${nm(b)} 쪽에 가 봐야겠어." 말릴 틈도 없이 떠났다.`,'warn')}continue}
+    if(b.team==='me'&&a.team!=='me'){if(canJoin([a])){if(G.flags['pf_'+a.c.id]!==G.phase){G.flags['pf_'+a.c.id]=G.phase;queue(()=>pairFollowCard(a,b))}}else{b.team=null;b.area=a.area;b.team=a.c.id;a.team=a.c.id;log(`${J(nm(b),'이')} 짐을 챙겼다. "${nm(a)} 쪽에 가 봐야겠어." 말릴 틈도 없이 떠났다.`,'warn')}continue}
+    if(a.team!=='me'&&b.team!=='me'&&(a.team!==a.c.id||b.team!==a.c.id)){G.npcs.forEach(n=>{if(n.alive&&(n.team===b.c.id||n.team===a.c.id)&&n!==a&&n!==b)n.team=null});a.team=a.c.id;b.team=a.c.id;b.area=a.area;a.hostile=a.hostile||b.hostile}
+  }
+}
+function pairJoinCard(p){
+  if(!p.alive||p.team==='me')return null;
+  return{tag:'재회',title:nm(p),cls:'good',text:PAIR_LINE[p.c.id],opts:[
+    {l:'고개를 끄덕인다',noTwist:1,f:()=>{while(!canJoin([p])){const x=allies().find(a=>!bonded(a.c,G.me.p));if(!x)break;x.team=null;x.area=pick(ADJ[x.area].filter(passable))||x.area;log(`${J(nm(x),'은')} 분위기를 읽고 자리를 비켜 줬다.`)}p.team=null;joinMe([p]);aff(p,60)}},
+  ]};
+}
+function pairFollowCard(n,partner){
+  if(!n.alive||n.team==='me'||!partner.alive||partner.team!=='me')return null;
+  return{tag:'동맹',title:`${nm(n)}의 합류`,cls:'good',text:`${J(nm(n),'이')} 어디선가 나타나 ${nm(partner)} 옆에 섰다. 둘은 아무 말 없이 고개만 끄덕였다. 설명은 없었다.`,opts:[{l:'…그래, 같이 가자',noTwist:1,f:()=>{n.team=null;joinMe([n])}}]};
+}
+// Shoichi & Alex
+function alexCard(a){
+  if(!a.alive||a.team==='me')return null;
+  return{tag:'제안',title:'알렉스',text:'낯선 억양의 남자가 그림자 속에서 걸어 나왔다. "아즈마 쇼이치. 당신이 마음에 들었거든요." 웃는 얼굴이지만 눈은 웃고 있지 않다.',opts:[
+    {l:'손을 잡는다',noTwist:1,f:()=>{if(!canJoin([a])){log('"동료가 많으시네요. 다음에 다시 오죠." 알렉스가 사라졌다.');return}a.alexPact=true;a.team=null;joinMe([a])}},
+    {l:'사기꾼한테 사기 치지 말라고 한다',noTwist:1,f:()=>{aff(a,-10);log('"후후, 역시." 알렉스는 어깨를 으쓱하고 사라졌다.')}},
+  ]};
+}
+
+/* ---------- relationship-aware cards ---------- */
+function bondLine(c,P){
+  const k=c.id+'>'+P.id;
+  const X={'markus>magnus':PAIR_LINE.markus,'magnus>markus':PAIR_LINE.magnus};
+  return X[k]||bondLineBase(c,P);
+}
+function betrayCard(a,line){
+  if(!a.alive||a.team!=='me')return null;
+  a.team=null;a.hostile=true;a.betrayedMe=true;aff(a,-50);G.me.betrayed++;san(-20);MEM(a).betrayedMe=1;
+  return{tag:'배신',title:nm(a),cls:'bad',text:line||`등 뒤에서 금속 소리. 돌아보니 ${J(nm(a),'이')} 무기를 치켜들고 있다. "${G.me.hp<30?'그 몸으로는 끝까지 못 가. 미안.':'미안. 마지막엔 한 명만 나가잖아.'}"`,opts:[
+    {l:'맞서 싸운다',f:()=>startFight([a],'foe',[],1.2)},
+    {l:'설득한다',d:a.c.bt>=.6?'무모함':'해볼 만함',f:()=>{if(ch(.6-a.c.bt*.6-(G.me.hp<30?.2:0))){a.team='me';a.hostile=false;G.me.betrayed--;log(`${J(nm(a),'이')} 무기를 내렸다. "…아직은 아니야."`,'good')}else{log('말이 끝나기도 전에 칼이 날아왔다.','bad');startFight([a],'foe',[],1.4)}}},
+    {l:'도망친다',f:()=>{if(ch(.45-(G.me.inj.fracture?.15:0))){const ok=ADJ[G.me.area].filter(x=>!G.zones.has(x)&&passable(x));if(ok.length)move(pick(ok));log('뒤도 보지 않고 달렸다.')}else startFight([a],'foe',[],1.3)}},
+  ]};
+}
+function conspiracyCard(al){
+  if(al.some(a=>!a.alive||a.team!=='me'))return null;
+  al.forEach(a=>{a.team=al[0].c.id;a.hostile=true;a.betrayedMe=true;aff(a,-50);MEM(a).betrayedMe=1});G.me.betrayed+=2;san(-25);
+  return{tag:'배신',title:names(al),cls:'bad',text:`불가에 앉은 ${J(nm(al[0]),'과')} ${J(nm(al[1]),'이')} 눈빛을 주고받았다. 언제부터였을까. 둘이 동시에 일어섰다. "미안. 우리 둘이서 가기로 했어."`,opts:[
+    {l:'둘 다 상대한다',f:()=>startFight(al,'foe',[],1.1)},
+    {l:'짐을 버리고 도망친다',f:()=>{if(ch(.5)){const k=pick(Object.keys(MATN));G.me.inv[k]=0;const ok=ADJ[G.me.area].filter(x=>!G.zones.has(x)&&passable(x));if(ok.length)move(pick(ok));log(`가방 하나를 던져 주고 달렸다. (${MATN[k]} 전부 잃음)`,'bad')}else startFight(al,'foe',[],1.3)}},
+  ]};
+}
+function stealRunCard(a){
+  if(!a.alive||a.team!=='me')return null;
+  const me=G.me;const got={};
+  for(let i=0;i<3;i++){const ks=Object.keys(MATN).filter(k=>me.inv[k]>0);const its=['meal','bandage','feast'].filter(k=>me.it[k]>0);if(its.length&&ch(.4)){const k=pick(its);me.it[k]--;got[k]=(got[k]||0)+1}else if(ks.length){const k=pick(ks);me.inv[k]--;got[k]=(got[k]||0)+1}}
+  a.team=null;MEM(a).stole=got;aff(a,-20);const to=ADJ[me.area].filter(passable);if(to.length)a.area=pick(to);
+  const txt=Object.entries(got).map(([k,v])=>`${MATN[k]||ITN[k]} ${v}`).join(', ')||'아무것도';
+  return{tag:'배신',title:`${nm(a)}의 탈주`,cls:'bad',text:`눈을 떠 보니 ${J(nm(a),'이')} 없다. 가방이 가볍다. ${txt}이(가) 사라졌다.${a.c.id==='laura'?' 바닥에 카드 한 장이 놓여 있다. "고마웠어요, 자기."':''}`,opts:[
+    {l:'흔적을 쫓는다',f:()=>{if(ch(.45)){a.area=me.area;log(`${J(nm(a),'을')} 따라잡았다.`,'warn');startFight([a],'me')}else{log('흔적이 끊겼다.');san(-4)}}},
+    {l:'잊어버린다',f:()=>{san(-6);log('믿은 내가 바보였다.')}},
+  ]};
+}
+Object.assign(ITN,{feast:'특제 요리',snack:'주전부리',splint:'부목'});
+function betrayCheck(){
+  const me=G.me,al=allies();if(!al.length||me.noBetray===G.phase)return;
+  const k=others().length;const weak=me.hp<30?1:me.hp<me.max*.45?.5:0;
+  const fear=clamp((myPow()-55)/90+me.kills*.025,0,.55);
+  const free=al.filter(a=>!bonded(a.c,me.p));
+  if(free.length===2&&ch(((free[0].c.bt+free[1].c.bt)/2)*.012*(1+weak*4)*(k<=6?2:1)*(1-fear)*Math.max(.2,1-((free[0].aff||0)+(free[1].aff||0))/160))){queue(()=>conspiracyCard(free));return}
+  for(const a of free){
+    if(a.c.id==='alex'&&a.alexPact&&me.hp<me.max*.4&&ch(.5)){queue(()=>betrayCard(a,'알렉스가 피식 웃으며 총구를 돌렸다. "당신이 이렇게 굴러다니는 꼴을 보면, 죽은 아내가 울겠는걸?"'));return}
+    const trust=Math.max(.15,1-(a.aff||0)/90),interest=(k<=6?2.2:1)*(k<=3?1.8:1);
+    let p=a.c.bt*.022*trust*interest*(1+weak*3)*(me.san<30?1.4:1)*(1-fear);
+    if(me.hp<30&&a.c.bt>.05)p=Math.max(p,.22+a.c.bt*.4);
+    if(ch(p)){queue(()=>betrayCard(a));return}
+    const sp=a.c.id==='laura'?.05:a.c.id==='isol'?.025:a.c.bt>=.5?.007:0;
+    if(sp&&ch(sp*(1+weak)*(1-fear))){queue(()=>stealRunCard(a));return}
+  }
+}
+function allyCard(){
+  const a=pick(allies());const P=G.me.p;const bd=bonded(a.c,P);
+  const hint=bd?`${J(nm(a),'은')} 당신 곁에서 한 발짝도 떨어지지 않는다.`:a.c.bt>=.6?`${J(nm(a),'은')} 웃고 있지만 시선이 자꾸 당신의 가방으로 향한다.`:a.c.bt>=.3?`${J(nm(a),'은')} 피곤해 보인다. 무슨 생각을 하는지 알 수 없다.`:`${J(nm(a),'은')} 묵묵히 주변을 경계한다. 믿을 만해 보인다.`;
+  const scene=night()?`작은 불을 피워 놓고 ${J(nm(a),'과')} 마주 앉았다.`:`${J(nm(a),'이')} 잠깐 쉬어 가자고 했다.`;
+  const o=[
+    {l:'지나온 이야기를 묻는다',f:()=>{san(6);aff(a,4);log(`${nm(a)}: ${a.c.d}`)}},
+    {l:'먹을 것을 나눠 먹는다',...req(G.me.inv.food>=1||G.me.it.meal>=1,'식량이나 음식 필요'),f:()=>{const me=G.me;if(me.it.meal>0)me.it.meal--;else me.inv.food--;aff(a,14);san(5);MEM(a).shared=1;log(`${J(nm(a),'이')} 고맙다며 웃었다. (정신 +5)`,'good')}},
+    {l:`${nm(a)}의 감을 믿고 따라간다`,f:()=>{const ms=bestMoves();const to=ADJ[G.me.area].find(x=>a.c.haunt.includes(x)&&!G.zones.has(x)&&passable(x))||(ms[0]&&ms[0].a);if(!to){log('갈 곳이 없다.');return}log(`"${to} 쪽이 좋겠어." ${J(nm(a),'이')} 앞장섰다.`);move(to)}},
+  ];
+  if(!bd)o.push({l:'먼저 등을 찌른다',d:'선공 · 정신 -15',f:()=>{a.team=null;a.hostile=true;san(-15);G.me.betrayer++;log(`${nm(a)}의 등 뒤로 다가가 무기를 휘둘렀다.`,'bad');startFight([a],'me',[],1.5)}});
+  o.push({l:'동맹을 끝낸다',f:()=>{if(bd){log(`${J(nm(a),'은')} 고개를 저었다. "그런 말은 못 들은 걸로 하지."`);return}a.team=null;a.area=pick(ADJ[a.area].filter(passable))||a.area;aff(a,-10);log(`${J(nm(a),'과')} 갈라섰다.`)}});
+  return{tag:'동맹',title:nm(a),text:`${scene} ${hint}`,opts:o};
+}
+function finalCard(){
+  const al=allies();const me=G.me;
+  if(!al.length){win(`[방송] 실험 종료. 최후의 생존자는 ${me.p.n}입니다.`);return null}
+  const N=names(al);
+  if(al.every(a=>bonded(a.c,me.p))){
+    const a=al[0];const ls=me.p.id==='lucia'||a.c.id==='lucia';
+    return{tag:'최후',title:'마지막 두 사람',cls:'warn',text:`[방송] 생존 실험체 ${al.length+1}명. 마지막 한 명만 섬을 나갈 수 있습니다.\n${J(N,'은')} 무기를 들지 않았다. 당신도 마찬가지다.`,opts:[
+      {l:'끝까지 함께 남는다',noTwist:1,f:()=>{me.pairEnd=a.c.id;log(ls?'두 사람은 끝내 서로에게 총구도 검끝도 겨누지 않았다. 아글라이아는 이 실험을 "결과 없음"으로 기록했다.':'두 거한은 등을 맞대고 앉아 금지구역 경보를 들었다. 아무도 일어서지 않았다. 아글라이아는 이 실험을 "결과 없음"으로 기록했다.','crit-win');win('[방송] 실험 종료. 기록 불가 판정. 두 실험체는 회수되었습니다.')}},
+      {l:`${J(nm(a),'을')} 내보내고 금지구역으로 걸어간다`,noTwist:1,f:()=>{me.pairEnd='sacrifice';die('zone',`당신은 ${nm(a)}에게 마지막으로 웃어 보이고 금지구역 쪽으로 걸었다. 뒤에서 이름을 부르는 소리가 들렸다.`)}},
+    ]};
+  }
+  return{tag:'최후',title:'마지막 두 사람',cls:'warn',text:`[방송] 생존 실험체 ${al.length+1}명. 마지막 한 명만 섬을 나갈 수 있습니다.\n${J(N,'이')} 천천히 당신을 돌아봤다.`,opts:[
+    {l:'정정당당하게 결투한다',noTwist:1,f:()=>{al.forEach(a=>{a.team=null;a.hostile=true;a.duel=true});startFight(al,null)}},
+    ...(G.pacifist?[]:[{l:'먼저 기습한다',noTwist:1,f:()=>{san(-15);me.betrayer++;al.forEach(a=>{a.team=null;a.hostile=true});startFight(al,'me',[],1.5)}}]),
+    {l:'무기를 내려놓는다',noTwist:1,f:()=>{
+      const a=al[0];const loyal=bonded(a.c,me.p)||ch(clamp(((a.aff||0)+20)/120*(1-a.c.bt*.5)+(MEM(a).shared?.1:0),.02,.85));
+      if(loyal&&al.length===1){me.allySacrifice=nm(a);log(`${J(nm(a),'은')} 한참 당신을 바라보다가 고개를 저었다. "네가 나가." 그리고 금지구역으로 걸어갔다.`,'good');kill(a,'스스로 금지구역으로 걸어 들어감',null);win(`[방송] 실험 종료. 최후의 생존자는 ${me.p.n}입니다.`)}
+      else{const at=al.filter(x=>!bonded(x.c,me.p));at.forEach(x=>{x.team=null;x.hostile=true;x.betrayedMe=true});log(`무기를 내려놓는 순간 ${J(names(at),'이')} 달려들었다.`,'bad');startFight(at,'foe',[],1.7)}
+    }},
+  ]};
+}
+
+/* ---------- ally personality reactions ---------- */
+const RX={aggr:/기습|덮친|먼저 공격|쫓아간|마무리|들이받|노린다|찌른|저격|사냥/,mercy:/살려 보낸|보내 준|치료|나눠|상처를 봐|구한다|돕는다|돌봐|숨겨 준/,flee:/도망|달아|물러|피한다|피하며|우회|숨죽/,greed:/훔친|뒤진|가방을|슬쩍|털어|빼앗/};
+function socialReact(o){
+  const l=o.l;const cat=Object.keys(RX).find(k=>RX[k].test(l));if(!cat)return;
+  for(const a of allies()){
+    if(bonded(a.c,G.me.p))continue;const c=a.c;let v=0;
+    if(c.agg>=.6){v+=cat==='aggr'?4:cat==='flee'?-5:cat==='mercy'?-4:0}
+    if(c.agg<=.4&&c.ally>=.55){v+=cat==='aggr'?-7:cat==='greed'?-6:cat==='mercy'?6:0}
+    if(c.bt>=.6&&cat==='greed')v+=3;
+    if(!v)continue;aff(a,v);
+    if(v<=-5&&ch(.6))log(`${J(nm(a),'이')} 못마땅한 얼굴로 당신을 쳐다봤다.`,'warn');else if(v>=4&&ch(.35))log(`${J(nm(a),'이')} 슬쩍 고개를 끄덕였다.`,'news');
+  }
+}
+function onPlayerBetray(){
+  G.rep.inf+=3;
+  if(G.fight)G.fight.foes.forEach(f=>{if(f.kind==='npc')MEM(f.n).betrayedBy=1});
+  others().filter(n=>n.area===G.me.area||ADJ[G.me.area].includes(n.area)).forEach(n=>{aff(n,-10);MEM(n).heardBetray=1});
+}
+function lootWitness(dead){
+  const me=G.me;const w=others().filter(n=>n!==dead&&!n.busy&&(n.area===me.area||ADJ[me.area].includes(n.area)));
+  w.forEach(n=>{MEM(n).sawLoot=1;aff(n,-8)});if(w.length){G.rep.inf+=1;if(ch(.5))log(`멀리서 누군가 이쪽을 지켜보고 있었다. ${nm(pick(w))}였던 것 같다.`,'warn')}
+  if(dead.food>0){me.inv.food+=dead.food;log(`가방에서 식량 ${dead.food}개가 나왔다.`,'good');dead.food=0}
+  if(WT_GUN.includes(me.p.w)&&WT_GUN.includes(dead.c.w)){me.ammo+=6;log('탄약을 챙겼다. (탄약 +6)','good')}
+}
+
+/* ---------- reputation ---------- */
+function repUpdate(){
+  const me=G.me,R=G.rep;const inf=me.kills+me.betrayer*3+R.inf,hon=me.st.spare*2+R.hon;
+  R.infv=inf;R.honv=hon;
+  if(!R.bounty&&inf>=10&&inf>hon+3&&G.phase>=2){R.bounty=true;queue(()=>({tag:'방송',title:'현상금',cls:'bad',text:`[방송] 아글라이아가 실험체 ${me.p.n}에게 현상금을 걸었습니다. 처치한 실험체에게 상위 등급 장비를 지급합니다.\n섬 곳곳에서 사냥꾼들의 눈빛이 이쪽을 향한다.`,opts:[{l:'올 테면 오라지',noTwist:1,f:()=>{san(-5);log('이제부터는 사냥당하는 쪽이다.','warn')}}]}))}
+  if(!R.helpers&&hon>=7&&hon>inf+2){R.helpers=true;queue(()=>({tag:'소문',title:'좋은 소문',cls:'good',text:'"그 실험체는 사람을 살려 보낸대." 섬 어딘가에서 당신 이야기가 돌고 있다. 낯선 실험체들의 눈빛이 조금 부드러워졌다.',opts:[{l:'…그래도 방심은 금물이다',noTwist:1,f:()=>{san(8);others().forEach(n=>aff(n,8))}}]}))}
+}
+function bountyPull(){
+  const me=G.me;if(G.fight||!ch(.12))return;
+  const D=distMap(me.area);const hs=others().filter(n=>!n.busy&&n.c.agg>=.5&&(D[n.area]??9)<=2&&n.area!==me.area);
+  if(!hs.length)return;const n=pick(hs);const to=ADJ[n.area].filter(passable).sort((a,b)=>(D[a]??9)-(D[b]??9))[0];if(to)n.area=to;
+}
+function helperCard(who){
+  const me=G.me;const c=who?[who]:others().filter(n=>!n.busy&&n.c.ally>=.55&&(n.aff||0)>=10&&!n.hostile&&(MEM(n).healed||MEM(n).shared||n.spared||G.rep.helpers));
+  if(!c.length)return null;const n=pick(c);n.area=me.area;
+  const gift=me.inv.food+me.it.meal===0?{food:2}:me.hp<45?{bandage:1}:{food:1};
+  return{tag:'기억',title:nm(n),cls:'good',text:`${J(nm(n),'이')} 먼저 손을 흔들며 다가왔다. "${MEM(n).healed?'그때 치료해 준 거, 아직 안 잊었어.':MEM(n).shared?'그때 나눠 준 거, 고마웠어.':n.spared?'그때 살려 줬잖아. 빚은 갚아야지.':'네 얘기 들었어.'}" ${me.hp<45||me.inv.food===0?'궁지에 몰린 당신을 보더니 말없이 가방을 열었다.':''}`,opts:[
+    {l:'받는다',noTwist:1,f:()=>{for(const k in gift){if(k in me.inv)me.inv[k]+=gift[k];else me.it[k]+=gift[k]}log(`(${Object.entries(gift).map(([k,v])=>`${MATN[k]||ITN[k]} +${v}`).join(', ')})`,'good');aff(n,5);if(canJoin([n])&&ch(n.c.ally*.6))chain(()=>({tag:'제안',title:nm(n),text:'"같이 다닐래?"',opts:[{l:'함께 간다',f:()=>joinMe([n])},{l:'고맙지만 혼자 가겠다',f:()=>log('고개를 숙여 인사했다.')}]}))}},
+    {l:'정중히 사양한다',noTwist:1,f:()=>{aff(n,3);san(4);log('"몸조심해." 둘은 각자 갈 길을 갔다.')}},
+  ]};
+}
+
+/* ---------- memory-driven encounters ---------- */
+function stanceOf(g){
+  const me=G.me,L=leader(g),m=MEM(L),R=G.rep;
+  if(g.some(n=>bonded(n.c,me.p)))return'bond';
+  if(m.betrayedBy&&!me.ambush)return'grudge';
+  if(m.stole&&!m.stoleSeen)return'thief';
+  let st=stanceOfBase(g);
+  if(st==='offer'&&(m.sawLoot||m.heardBetray||R.bounty)&&ch(.55))st='standoff';
+  if(st==='offer'&&G.pacifist&&ch(.3))st='standoff';
+  if((st==='standoff'||st==='offer')&&R.bounty&&L.c.agg>=.45&&ch(.35))st='attack';
+  if(st==='standoff'&&R.bounty&&L.c.agg<.35&&ch(.4))st='flee';
+  if(st==='attack'&&(m.healed||m.shared)&&!L.hostile&&ch(.6))st='standoff';
+  if(st==='attack'&&G.pacifist&&ch(.0))st='attack';
+  if(st==='standoff'&&(m.healed||m.shared||L.spared)&&(L.aff||0)>=0&&!m.greeted)st='friend';
+  return st;
+}
+function npcCard(g,force){
+  g=g.filter(n=>n.alive);if(!g.length)return null;
+  const me=G.me;
+  if(!force&&!(me.cat>0)){
+    const st=stanceOf(g);const L=leader(g);const N=names(g);
+    if(st==='grudge'){g.forEach(n=>{n.area=me.area;n.hostile=true});return{tag:'기억',title:N,cls:'bad',text:`${J(nm(L),'이')} 당신을 알아봤다. "너… 그때 나한테 칼을 꽂았던 놈이지." 대화할 여지는 없어 보인다. ${threatText(g)}`,opts:[
+      {l:'맞선다',f:()=>startFight(g,'foe')},{l:'사과한다',f:()=>{if(ch(.15+(L.c.ally*.2))){aff(L,15);delete MEM(L).betrayedBy;log(`"…한 번만이야." ${J(nm(L),'이')} 침을 뱉고 돌아섰다.`)}else{log('"이제 와서?"','bad');startFight(g,'foe',[],1.2)}}},{l:'도망친다',noTwist:1,f:()=>fleeFrom(g)}]}}
+    if(st==='thief'){MEM(L).stoleSeen=1;g.forEach(n=>n.area=me.area);return{tag:'기억',title:N,text:`${J(nm(L),'이')} 당신을 보고 굳었다. 당신 가방에서 사라졌던 물건이 저 허리춤에 매달려 있다. "아… 그거. 빌린 거야, 빌린 거."`,opts:[
+      {l:'돌려 달라고 한다',f:()=>{if(ch(.4+L.c.ally*.3)){const s=MEM(L).stole;for(const k in s){if(k in me.inv)me.inv[k]+=s[k];else me.it[k]=(me.it[k]||0)+s[k]}delete MEM(L).stole;aff(L,5);log('투덜대며 돌려줬다.','good')}else{log('"싫은데?"','bad');startFight(g,'foe')}}},
+      {l:'말없이 덮친다',f:()=>startFight(g,'me')},{l:'그냥 보낸다',f:()=>{san(-3);log('웃으며 손을 흔드는 꼴이 얄밉다.')}}]}}
+    if(st==='friend'){MEM(L).greeted=G.phase;g.forEach(n=>n.area=me.area);const c=helperCard(L);if(c)return c;return npcCardV2(g,'standoff')}
+    return npcCardV2(g,st);
+  }
+  return npcCardV2(g,force);
+}
+
+/* ---------- rumors ---------- */
+const RUMT={
+ strong:(a)=>`"${a}에서 엄청 센 놈이 목격됐대. 웬만하면 피해."`,
+ food:(a)=>`"${a}에 식량이 잔뜩 남아 있다던데. 아직 아무도 손 안 댔대."`,
+ boss:(a,b)=>`"${a}에서 ${b}이(가) 발견됐다는 보고가 들어왔어."`,
+ lab:()=>'"연구소 보안 시스템이 일부 해제됐다고 하더라."',
+ escape:()=>'"항구 근처에서 탈출 준비를 하는 실험체들이 목격됐대. 지하로 뭔가 있다나."',
+ drop:(a)=>`"${a}에 보급 상자가 떨어지는 걸 봤어."`,
+};
+function makeRumor(src){
+  const me=G.me;const open=AREAS.filter(a=>passable(a)&&!G.zones.has(a)&&a!==me.area);if(!open.length)return null;
+  const liar=src&&((src.hostile&&ch(.6))||((src.aff||0)<-10&&src.c.bt>=.5&&ch(.5)))||(!src&&ch(.15));
+  const types=['strong','food','food','drop'];if(G.boss)types.push('boss');if(me.p.id==='jp'||G.hacked.size)types.push('lab');if(G.phase>=5&&!me.hint)types.push('escape');
+  const t=pick(types);let area=pick(open),truth=ch(.7),extra='';
+  if(t==='strong'){const s=others().slice().sort((a,b)=>npcPow(b)-npcPow(a))[0];if(s&&truth){area=s.area;s.seen={area,phase:G.phase}}}
+  if(t==='boss'){extra=G.boss.name;if(truth)area=G.boss.area}
+  if(t==='drop'){if(G.drop&&truth)area=G.drop;else truth=false}
+  if(t==='lab'){area=LAB;truth=G.hacked.size>0}
+  if(t==='escape'){area='항구';truth=ch(.5)}
+  if(liar){truth=false}
+  const r={t,area,truth,trap:liar&&t==='food'?(src?src.c.id:pick(others()).c.id):null,phase:G.phase};
+  return{r,text:RUMT[t](area,extra)};
+}
+function rumorCard(){
+  const me=G.me;const near=others().filter(n=>!n.busy&&n.area===me.area&&!n.hostile);
+  const src=near.length?pick(near):null;const R=makeRumor(src);if(!R)return null;
+  const who=src?`${J(nm(src),'이')} 지나가며 말을 흘렸다.`:pick(['벽에 휘갈긴 낙서가 눈에 들어왔다.','주운 무전기에서 지직거리는 목소리가 들렸다.','쓰러진 실험체의 수첩에 메모가 남아 있다.']);
+  return{tag:'소문',title:'소문',text:`${who} ${R.text}${src?` ${src.c.bt>=.6?'웃는 얼굴이 어딘가 얄팍하다.':'거짓말을 할 사람 같지는 않다.'}`:''}`,opts:[
+    {l:'기억해 둔다',noTwist:1,f:()=>{G.rumors.push(R.r);if(R.r.t==='escape'&&R.r.truth)me.hint=true;log(`소문을 머릿속에 적어 뒀다. (지도·이동 선택지에 표시)`)}},
+    {l:'흘려듣는다',noTwist:1,f:()=>log('소문은 소문일 뿐이다.')},
+  ]};
+}
+function onArrive(a){
+  const me=G.me;const rs=G.rumors.filter(r=>r.area===a&&r.phase>=G.phase-2);
+  for(const r of rs){G.rumors.splice(G.rumors.indexOf(r),1);
+    if(r.t==='food'){
+      if(r.trap){const n=npcById(r.trap);if(n&&n.team!=='me'){const g=G.npcs.filter(x=>x.alive&&(x===n||(n.team&&n.team!=='me'&&x.team===n.team)));g.forEach(x=>x.area=a);queue(()=>({tag:'기습',title:'함정',cls:'bad',text:`식량은커녕 빈 상자뿐이다. 상자 뒤에서 ${J(nm(n),'이')} 걸어 나왔다. "진짜 왔네?" 소문을 퍼뜨린 건 처음부터 이 녀석이었다.`,opts:[{l:'맞선다',f:()=>startFight(g,'foe',[],1.15)},{l:'도망친다',noTwist:1,f:()=>fleeFrom(g)}]}));return}}
+      if(r.truth)queue(()=>({tag:'식량',title:'소문 속 식량',cls:'good',text:`소문은 사실이었다. 무너진 선반 아래 통조림과 건빵이 쌓여 있다.`,opts:[{l:'챙길 수 있는 만큼 챙긴다',f:()=>{log(`(${gain({food:3})}) 주전부리도 하나 챙겼다.`,'good');me.it.snack++}},{l:'조금만 챙기고 서둘러 뜬다',noTwist:1,f:()=>log(`(${gain({food:1})})`)}]}));
+      else log('소문 속 식량은 어디에도 없었다. 누군가 먼저 털어 갔거나, 애초에 없었거나.');
+    }
+    if(r.t==='strong'&&!r.truth)log('소문과 달리 조용하다.');
+    if(r.t==='drop'&&!r.truth)log('보급 상자는 보이지 않는다. 헛걸음이었다.');
+  }
+}
+
+/* ---------- goal setting ---------- */
+const GOALN={weapon:'무기 강화',armor:'방어구 제작',both:'무기 + 방어구'};
+function goalNeeds(){
+  const me=G.me;if(!G.goal)return{mats:[],sp:false};
+  const R=recipes().filter(r=>(G.goal!=='armor'&&/무기 강화/.test(r.l))||(G.goal!=='weapon'&&/방어구 제작/.test(r.l)));
+  const need={};let sp=false;
+  for(const r of R){for(const k in r.cost){const lack=r.cost[k]-(me.inv[k]||0);if(lack>0)need[k]=Math.max(need[k]||0,lack)}if(r.sp&&!r.sp.some(s=>me.sp[s]>0))sp=true}
+  if(!R.length){return{mats:[],sp:false,done:true}}
+  return{mats:Object.keys(need),sp};
+}
+function goalInject(mv,final){
+  const RN2={strong:'강자',food:'식량',boss:'보스',lab:'보안 해제',escape:'탈출',drop:'보급'};mv.forEach(m=>(G.rumors||[]).filter(r=>r.area===m.a).forEach(r=>m.tags.push('소문: '+RN2[r.t])));
+  if(!G.goal||final)return mv;
+  const me=G.me,N=goalNeeds();if(!N.mats.length&&!N.sp)return mv;
+  const hasNeed=a=>N.mats.some(k=>AREA_MATS[a].includes(k))||(N.sp&&!!G.specials[a]);
+  mv.forEach(m=>{if(hasNeed(m.a))m.tags.unshift('[목표] '+[...N.mats.filter(k=>AREA_MATS[m.a].includes(k)).map(k=>MATN[k]),...(N.sp&&G.specials[m.a]?[G.specials[m.a]]:[])].join('·'))});
+  if(mv.some(m=>hasNeed(m.a)))return mv;
+  const cand=AREAS.filter(a=>passable(a)&&!G.zones.has(a)&&a!==me.area&&hasNeed(a));if(!cand.length)return mv;
+  const D=distMap(me.area);const tgt=cand.sort((a,b)=>(D[a]??9)-(D[b]??9))[0];
+  const TD=distMap(tgt);const step=ADJ[me.area].filter(x=>passable(x)&&!G.zones.has(x)).sort((a,b)=>(TD[a]??9)-(TD[b]??9))[0];if(!step)return mv;
+  const label=step===tgt?'[목표] '+N.mats.filter(k=>AREA_MATS[tgt].includes(k)).map(k=>MATN[k]).join('·'):`[목표] ${tgt} 방향`;
+  const ex=mv.find(m=>m.a===step);if(ex){ex.tags.unshift(label);return mv}
+  return[...mv,{a:step,tags:[label],score:0}];
+}
+
+/* ---------- disguised good encounters ---------- */
+const GOODTAGS=new Set(['회복','휴식','보급','치료','식량']);
+function disguiseCard(c){
+  const me=G.me;
+  const pool=['shoichi','rozzi','laura','alex','isaac','jackie','haze'].map(npcById).filter(n=>n&&n.team!=='me'&&!n.busy&&!bonded(n.c,me.p));
+  const cand=pool.length?pool:others().filter(n=>!n.busy&&n.c.bt>=.4&&n.c.agg>=.4&&!bonded(n.c,me.p));if(!cand.length)return c;
+  const n=pick(cand);const g=G.npcs.filter(x=>x.alive&&(x===n||(n.team&&n.team!=='me'&&x.team===n.team)));
+  const spring=()=>{g.forEach(x=>{x.area=me.area;MEM(x).tricked=1});log(`가까이 다가간 순간, ${J(nm(n),'이')} 등 뒤에서 튀어나왔다. "${n.c.id==='shoichi'?'정말 믿었어? 귀엽네.':'공짜는 없어.'}" 너무 그럴싸했다.`,'bad');startFight(g,'foe',[],1.35)};
+  return{...c,text:c.text+(ch(.35)?' 어딘가 지나치게 깔끔하다.':''),opts:c.opts.map(o=>/지나|떠난|무시|그냥 간|돌아간|피한다|물러/.test(o.l)?o:{...o,noTwist:1,f:spring,req:undefined,reqText:undefined,dis:false})};
+}
+
+/* ---------- draw ---------- */
+function drawCard(){
+  const me=G.me;const a=me.area;
+  if(!G.zones.has(a)&&a!==LAB&&!(G.phase>=FINAL&&G.finalArea&&a!==G.finalArea)){
+    const r=rnd();
+    if(r<.05)return rumorCard()||drawCardBase();
+    if(r<.09&&(me.hp<55||me.inv.food+me.it.meal===0)){const h=helperCard();if(h)return h}
+    if(me.p.id==='shoichi'&&!G.flags.alex&&G.phase>=1&&ch(.25)){const x=npcById('alex');if(x&&x.team!=='me'){G.flags.alex=1;x.area=a;return alexCard(x)}}
+  }
+  const c=drawCardBase();
+  if(c&&GOODTAGS.has(c.tag)&&!c.fight&&!c.group&&G.phase>=1&&ch(.05+G.phase*.012))return disguiseCard(c);
+  return c;
+}
+
+/* ---------- endings ---------- */
+Object.assign(ENDINGS,{53:'현상금 사냥감',54:'섬의 은인',55:'불살',56:'끝까지 곁에',57:'듬직한 무게감'});
+Object.assign(END_TXT,{
+ 53:p=>`섬 전체가 ${J(p,'을')} 노렸다. 현상금 사냥꾼들의 시체를 넘어 ${J(p,'은')} 마지막까지 서 있었다. 아글라이아의 기록에는 '통제 불가'라는 붉은 도장이 찍혔다.`,
+ 54:p=>`${J(p,'이')} 살려 보낸 이들은 끝내 ${p}의 이름을 기억했다. 섬을 나서는 배 위에서, ${J(p,'은')} 처음으로 뒤를 돌아봤다.`,
+ 55:p=>`${J(p,'은')} 단 한 명도 죽이지 않았다. 아글라이아는 이 결과를 설명하지 못했다. 보고서의 마지막 줄은 끝내 비어 있었다.`,
+ 56:p=>`둘은 끝내 서로에게 무기를 겨누지 않았다. 실험은 '결과 없음'으로 끝났다. ${J(p,'은')} 그것으로 충분했다.`,
+ 57:p=>`"흠, 이 무게감." 마커스와 매그너스는 끝까지 한 팀이었다. 그 둘이 무슨 사이였는지는 아글라이아도 끝내 알아내지 못했다.`,
+});
+function decideEnding(){
+  const o=G.over,m=G.me;
+  if(o.win){
+    if(m.pairEnd&&m.pairEnd!=='sacrifice')return['markus','magnus'].includes(m.p.id)?57:56;
+    const base=decideEndingBase();
+    if(base>=11&&base<=31)return base;
+    if(G.pacifist&&m.kills===0)return 55;
+    if(G.rep.bounty)return 53;
+    if((G.rep.honv||0)>=8&&m.kills<=3)return 54;
+    if(['markus','magnus'].includes(m.p.id)&&allies().some(a=>['markus','magnus'].includes(a.c.id))&&!m.allySacrifice)return 57;
+    return base;
+  }
+  return decideEndingBase();
+}
+
+/* ---------- extra recipes ---------- */
+function recipes(){
+  const m=G.me,R=recipesBase();
+  R.push({l:'특제 요리',cost:{food:2,herb:1},f:()=>{m.it.feast++;m.cooked++;log('약초로 향을 낸 특제 요리를 만들었다. (특제 요리 +1)','good')}});
+  R.push({l:'부목 만들기',cost:{cloth:1,metal:1},f:()=>{m.it.splint++;log('쇠막대에 천을 감아 부목을 만들었다. (부목 +1)')}});
+  if(WT_GUN.includes(m.p.w))R.push({l:'탄약 만들기',cost:{powder:1,metal:1},f:()=>{m.ammo+=10;log('화약을 다져 탄약을 만들었다. (탄약 +10)','good')}});
+  return R;
+}
+
+/* ===================== V2.4 · RELATIONSHIP & SANITY ENCOUNTERS ===================== */
+const both=(x,y)=>{const a=npcById(x),b=npcById(y);return a&&b&&a.team!=='me'&&b.team!=='me'&&!a.busy&&!b.busy&&!isMe(x)&&!isMe(y)?[a,b]:null};
+const one=x=>{const a=npcById(x);return a&&a.team!=='me'&&!a.busy&&!isMe(x)?a:null};
+const here=(...ns)=>ns.forEach(n=>{n.area=G.me.area;n.seen={area:G.me.area,phase:G.phase}});
+const PS=(id,w,x,y,where,make)=>({id,w,c:a=>(!where||where.includes(a))&&!!both(x,y),make:a=>{const p=both(x,y);if(!p)return null;here(...p);return make(a,p[0],p[1])}});
+const leaveA=(...ns)=>ns.forEach(n=>{const to=ADJ[n.area].filter(passable);if(to.length)n.area=pick(to)});
+
+SCENES.push(
+/* ---------- Markus & Magnus ---------- */
+ PS('mm_talk',1.6,'markus','magnus',['숲','공장','항구','창고'],(a,mk,mg)=>({tag:'밈',title:'수상한 대화',text:`${a} 안쪽에서 낮은 목소리가 들린다. 가까이 가 보니 마커스와 매그너스가 심각한 표정으로 마주 앉아 있다.\n매그너스: "그래서 어제는 어땠냐?"\n마커스: "……괜찮았다."\n매그너스: "다행이네."\n당신이 나타나자 둘은 동시에 입을 다물었다.`,opts:[
+   {l:'뭘 이야기하고 있었냐고 묻는다',f:()=>{const r=pick(['마커스: "…날씨."','매그너스: "아무것도 아니다."','둘은 동시에 "운동."이라고 대답했다. 그리고 서로를 쳐다봤다.','마커스가 헛기침을 했다. 매그너스는 오토바이 열쇠만 만지작거렸다.']);san(6);log(`${r} 끝내 제대로 된 설명은 듣지 못했다. (정신 +6)`)}},
+   {l:'못 들은 척하고 지나간다',f:()=>{san(4);log('등 뒤에서 매그너스가 작게 말했다. "…들었을까?" 마커스: "아니." (정신 +4)')}},
+   {l:'"둘이 무슨 사이야?"',f:()=>{aff(mk,-5);aff(mg,-5);if(ch(.3)){log('둘이 동시에 일어섰다. 대답 대신 망치와 방망이가 날아왔다.','bad');startFight([mk,mg],'foe')}else{log('"……." 침묵이 십 초쯤 이어졌다. 둘은 동시에 다른 방향으로 걸어갔다. 그리고 30초 뒤 같은 방향에서 다시 만났다.');san(8)}}},
+ ]})),
+ PS('mm_gym',1,'markus','magnus',['학교','공장','골목길'],(a,mk,mg)=>({tag:'밈',title:'오해할 만한 장면',text:'폐허 한구석. 매그너스가 숨을 몰아쉬며 누워 있고, 마커스가 그 위에서 무언가를 들어 올리고 있다. 땀범벅이다. 둘 다.\n…자세히 보니 벤치 프레스다. 매그너스가 보조를 서고 있었다.',opts:[
+   {l:'조용히 돌아선다',f:()=>{san(5);log('아무것도 못 본 거다. (정신 +5)')}},
+   {l:'"몇 세트째야?"',f:()=>{san(7);gainXp(3);log('"…스물두 번째." 마커스가 숨도 안 차게 대답했다. 어쩐지 당신도 팔굽혀펴기를 했다. (정신 +7)')}},
+   {l:'"너희 둘, 뭐 하는 거야?"',f:()=>{aff(mk,-8);aff(mg,-8);log('"보면 모르냐." 매그너스가 정색했다. 마커스는 들고 있던 바벨을 내려놓지 않았다. 무거운 침묵.')}},
+ ]})),
+/* ---------- Xiukai cooking duel ---------- */
+ {id:'xk_duel',w:1.4,c:a=>!!one('xiukai')&&G.me.inv.food>=1&&!G.flags.xkDone,make:a=>{const x=one('xiukai');if(!x)return null;here(x);const me=G.me;
+   const duel=(food,herb)=>{me.inv.food-=food;if(herb)me.inv.herb--;const p=.18+me.ml*.03+(food>1?.12:0)+(herb?.1:0);const r=rnd();
+     if(r<.07){G.flags.xkDone=false;me.it.feast+=2;aff(x,30);log('쇼우가 한 숟갈 뜨더니 그대로 굳었다.\n"……."\n한참 뒤 숟가락을 내려놓았다. "야, 너 이거 어떻게 만들었냐?" (특제 요리 +2, 다음에 다시 대결할 수 있다)','crit-win');return}
+     G.flags.xkDone=true;
+     if(r<p){me.it.feast++;aff(x,20);gainXp(5);log('"…인정." 쇼우가 앞치마를 벗어 던지고 특제 요리를 내밀었다. (특제 요리 +1)','crit-good')}
+     else if(r<p+.35){me.it.meal++;aff(x,8);log(`"나쁘지 않네." 평범한 음식과 함께 남은 재료를 챙겨 줬다. (음식 +1, ${gain({herb:1})})`,'good')}
+     else if(r<p+.65){me.it.snack++;log('"…간이 안 됐잖아." 회복량이 형편없는 주전부리가 됐다. (주전부리 +1)')}
+     else{san(-5);aff(x,-5);log('쇼우가 접시를 바라보며 오래 침묵했다. 아무 말도 하지 않았다. 그게 더 아팠다. (정신 -5)','bad')}};
+   return{tag:'제안',title:'쇼우의 미슐랭 도전',text:`쇼우가 웍을 어깨에 걸치고 길을 막았다. "너 요리 좀 한다며? 그럼 어디 한번 해 봐." 이미 불까지 피워 놨다.`,opts:[
+     {l:'식량 1개로 승부한다',f:()=>duel(1,false)},
+     {l:'식량 2개와 약초로 공들인다',...req(me.inv.food>=2&&me.inv.herb>=1,'식량 2·약초 1 필요'),f:()=>duel(2,true)},
+     {l:'"요리는 먹는 거지 하는 게 아니야"',f:()=>{G.flags.xkDone=true;log('"쳇." 쇼우가 혀를 찼다. 그래도 국 한 그릇은 떠 줬다. (포만감 +12)');full(12)}},
+   ]}}},
+/* ---------- relationship scenes ---------- */
+ PS('r_ayajackie',1.1,'aya','jackie',null,(a,ay,jk)=>({tag:'목격',title:'추격',cls:'warn',text:'"재키! 거기 서!" 아야가 떨리는 손으로 총을 겨눈 채 뛰어간다. 그 앞에서 재키가 웃으며 뒷걸음질 친다. "경찰 아가씨, 아직도 쫓아와?"',opts:[
+   {l:'아야를 돕는다',f:()=>{aff(ay,25);startFight([jk],'me',[ay])}},
+   {l:'재키 편에 선다',f:()=>{aff(jk,20);aff(ay,-30);startFight([ay],'me',[jk])}},
+   {l:'둘 다 지나가게 둔다',f:()=>{leaveA(ay,jk);log('총성이 멀어졌다.')}},
+ ]})),
+ PS('r_fire',1,'estelle','adriana',['소방서','공장','주유소','숲'],(a,es,ad)=>({tag:'목격',title:'불길 앞에서',cls:'warn',text:`${a}에 불이 번지고 있다. 아드리아나가 불길 속에서 웃고, 에스텔이 도끼로 문을 부수며 소리친다. "안에 아무도 없어요?!"`,opts:[
+   {l:'에스텔과 함께 불을 끈다',f:()=>{aff(es,25);G.rep.hon+=1;if(ch(.6)){san(8);log('불길이 잡혔다. 에스텔이 그을린 얼굴로 웃었다. "고마워요!" (정신 +8)','good')}else{if(hurt(ri(6,12),'fire','불길 속에서 길을 잃었다.'))return;if(!G.me.inj.burn){G.me.inj.burn=8;log('[부상] 화상. 약초로 치료할 수 있다.','bad')}}}},
+   {l:'아드리아나를 막는다',f:()=>{aff(es,15);startFight([ad],'me',[es])}},
+   {l:'불길을 피해 돌아간다',f:()=>{leaveA(es,ad);log('등 뒤가 뜨겁다.')}},
+ ]})),
+ PS('r_jam',1.2,'hart','priya',null,(a,ht,pr)=>({tag:'휴식',title:'즉흥 합주',cls:'good',text:'어디선가 기타 소리가 들린다. 하트의 거친 리프 위로 프리야의 맑은 선율이 겹친다. 이 섬에서 이런 소리를 듣게 될 줄은 몰랐다.',opts:[
+   {l:'앉아서 듣는다',f:()=>{san(16);log('한 곡이 끝날 때까지 아무도 무기를 들지 않았다. (정신 +16)','good')}},
+   {l:'박자를 맞춰 손뼉을 친다',f:()=>{san(12);aff(ht,10);aff(pr,10);log('하트가 엄지를 들어 보였다. (정신 +12)','good')}},
+   {l:'소리를 듣고 올 놈들을 경계한다',f:()=>{san(6);if(ch(.4))noise(1)}},
+ ]})),
+ PS('r_mukbang',1,'xiukai','eleven',['호텔','고급 주택가','항구'],(a,xk,el)=>({tag:'식량',title:'먹방 촬영 중',cls:'good',text:'일레븐이 휴대폰을 세워 두고 쇼우의 요리를 먹고 있다. "여러분, 이게 바로 루미아 섬 맛집이에요!" 쇼우는 뿌듯한 얼굴로 다음 접시를 볶는다.',opts:[
+   {l:'게스트로 출연한다',f:()=>{full(25);san(8);aff(el,12);log('"게스트 오셨어요!" 오랜만에 배가 터지게 먹었다. (포만감 +25, 정신 +8)','good')}},
+   {l:'남은 음식을 싸 달라고 한다',f:()=>{if(ch(.6)){G.me.it.meal++;aff(xk,5);log('"가져가, 가져가." (음식 +1)','good')}else log('"…촬영 중이거든?" 일레븐이 째려봤다.')}},
+   {l:'촬영 소리가 시끄럽다며 떠난다',f:()=>log('"구독 좋아요 알림 설정!" 소리가 등 뒤로 멀어졌다.')},
+ ]})),
+ PS('r_hunt',1,'nadine','bernice',['숲','양궁장','개울'],(a,nd,bn)=>({tag:'야생',title:'사냥 내기',text:'나딘과 버니스가 같은 사슴 흔적을 두고 신경전을 벌이고 있다. "내 사냥감이야." "먼저 쏘는 사람이 임자지."',opts:[
+   {l:'심판을 봐 준다',f:()=>{const w=ch(.5)?nd:bn;aff(w,12);G.me.inv.food+=1;san(5);log(`${J(nm(w),'이')} 이겼다. 수고비로 고기 한 덩이를 받았다. (식량 +1, 정신 +5)`,'good')}},
+   {l:'둘이 싸우는 사이 사슴을 가로챈다',f:()=>{if(ch(.5)){G.me.inv.food+=3;aff(nd,-20);aff(bn,-20);log('사슴을 들쳐 메고 달렸다. 뒤에서 화살이 날아왔다. (식량 +3)','warn')}else{log('두 사냥꾼이 동시에 당신을 겨눴다.','bad');startFight([nd,bn],'foe')}}},
+   {l:'괜히 끼지 않는다',f:()=>{leaveA(nd,bn);log('사냥꾼들 일에 끼는 게 아니다.')}},
+ ]})),
+ PS('r_spar',1.1,'hyunwoo','nicky',['골목길','학교','경찰서'],(a,hw,nk)=>({tag:'목격',title:'맨주먹 대결',text:'현우와 니키가 웃통을 벗고 주먹을 맞대고 있다. 살기는 없다. 그냥 누가 더 센지 궁금한 모양이다.',opts:[
+   {l:'구경하며 동작을 익힌다',f:()=>{gainXp(8);san(5);log('주먹이 오가는 각도를 눈에 새겼다. (숙련 경험치 +8, 정신 +5)','good')}},
+   {l:'승자와 한판 붙는다',f:()=>{const w=ch(.5)?hw:nk;log(`${J(nm(w),'이')} 이겼다. 숨도 고르기 전에 당신을 보며 씩 웃었다.`);w.duel=true;startFight([w],null)}},
+   {l:'둘 다 지칠 때를 노린다',f:()=>{hw.hp-=25;nk.hp-=25;log('둘 다 숨을 헐떡인다. 지금이다.','warn');startFight([hw,nk],'me')}},
+ ]})),
+ PS('r_faith',.9,'chiara','johann',['성당','묘지'],(a,ci,jh)=>({tag:'회상',title:'성당의 논쟁',text:'무너진 성당에서 요한과 키아라가 언성을 높이고 있다. "신은 아직 우리를 버리지 않았습니다." "그럼 이 섬은 뭐지?"',opts:[
+   {l:'요한의 말에 귀 기울인다',f:()=>{san(12);aff(jh,10);log('요한이 당신의 이마에 손을 얹었다. 이상하게 마음이 가라앉는다. (정신 +12)','good')}},
+   {l:'키아라 편을 든다',f:()=>{san(4);aff(ci,12);aff(jh,-8);log('"…너는 좀 아는군." 키아라가 처음으로 입꼬리를 올렸다.')}},
+   {l:'둘 다 무시하고 성수를 챙긴다',f:()=>{G.me.it.sedative++;aff(jh,-10);log('제단의 성수병을 챙겼다. 진정제 대신 쓸 수 있을 것 같다. (진정제 +1)')}},
+ ]})),
+ PS('r_arms',1,'isol','haze',['공장','창고','항구'],(a,is,hz)=>({tag:'거래',title:'무기 거래 현장',text:'아이솔과 헤이즈가 상자를 사이에 두고 흥정 중이다. 상자 안에서 총기 부품이 번쩍인다. 둘 다 당신을 봤다.',opts:[
+   {l:'끼워 달라고 한다',...req(G.me.inv.metal>=2,'금속 2 필요'),f:()=>{G.me.inv.metal-=2;if(ch(.65)){if(G.me.wg<4){G.me.wg++;log(`부품을 받아 무기를 손봤다. (무기 ${GR[G.me.wg]})`,'good')}else{G.me.ammo+=10;log('탄약 한 상자를 받았다. (탄약 +10)','good')}}else{log('"선불이야." 금속만 날렸다.','bad')}}},
+   {l:'상자째 털어 간다',f:()=>{startFight([is,hz],'me')}},
+   {l:'못 본 걸로 한다',f:()=>{leaveA(is,hz);log('헤이즈가 윙크를 날렸다. 기분 나쁘다.')}},
+ ]})),
+ PS('r_press',1,'martina','nathapon',null,(a,mt,np)=>({tag:'목격',title:'특종 경쟁',text:'마르티나와 나타폰이 같은 장면을 두고 카메라를 들이밀고 있다. 피사체는… 당신이다.',opts:[
+   {l:'포즈를 취한다',f:()=>{san(10);aff(mt,8);aff(np,8);log('"좋아요, 그대로!" 오랜만에 사람 대접을 받았다. (정신 +10)','good')}},
+   {l:'카메라를 손으로 가린다',f:()=>{aff(mt,-6);aff(np,-6);log('"아, 진짜!" 둘이 동시에 투덜거렸다.')}},
+   {l:'플래시 터지는 틈에 사라진다',f:()=>{G.me.ambush=true;log('눈부신 틈을 타 그림자에 숨었다. 다음 조우는 내가 먼저다.')}},
+ ]})),
+ PS('r_magic',1,'emma','shoichi',['호텔','학교','고급 주택가','골목길'],(a,em,sh)=>({tag:'밈',title:'마술 대 사기',text:'엠마가 카드 마술을 선보이자 쇼이치가 박수를 치며 다가간다. "대단해요. 그 카드, 저도 한 장만 볼 수 있을까요?" 쇼이치의 다른 손이 엠마의 가방 쪽으로 움직인다.',opts:[
+   {l:'엠마에게 경고한다',f:()=>{aff(em,20);aff(sh,-20);G.rep.hon+=1;log('"어머!" 엠마가 가방을 끌어안았다. 쇼이치는 웃으며 손을 털었다. "들켰네."','good')}},
+   {l:'쇼이치와 눈짓을 주고받는다',f:()=>{aff(sh,15);log(`쇼이치가 훔친 걸 반으로 나눠 줬다. (${gain({cloth:1,food:1})})`)}},
+   {l:'마술만 구경한다',f:()=>{san(8);log('엠마의 카드가 비둘기로 변했다. 쇼이치의 손엔 엠마의 지갑이 들려 있었다. 둘 다 대단하다. (정신 +8)')}},
+ ]})),
+ PS('r_vamp',.9,'bianca','johann',['성당','묘지','호텔'],(a,bi,jh)=>({tag:'밤',title:'흡혈귀와 사제',text:'요한이 십자가를 치켜들고 있고, 비앙카가 하품을 하며 그 앞을 지나간다. "그거 나한테 안 통해, 신부님." "…통해야 하는데."',opts:[
+   {l:'웃음을 참지 못한다',f:()=>{san(10);aff(bi,6);aff(jh,-4);log('비앙카가 당신을 보고 씩 웃었다. 요한은 조용히 십자가를 내렸다. (정신 +10)')}},
+   {l:'요한에게 마늘을 건넨다',...req(G.me.inv.food>=1,'식량 1 필요'),f:()=>{G.me.inv.food--;aff(jh,12);aff(bi,-12);log('"…감사합니다." 비앙카가 코를 막고 멀어졌다.')}},
+   {l:'둘 다 피한다',f:()=>leaveA(bi,jh)},
+ ]})),
+ PS('r_blades',.9,'yuki','hisui',['절','학교','숲'],(a,yk,hs)=>({tag:'목격',title:'검객의 예',text:'유키와 히스이가 서로에게 고개를 숙인 채 검을 겨누고 있다. 한 번의 교차로 끝날 승부다. 숨소리조차 들리지 않는다.',opts:[
+   {l:'끝까지 지켜본다',f:()=>{gainXp(10);const w=ch(.5)?yk:hs,l=w===yk?hs:yk;l.hp=Math.max(10,l.hp-40);log(`${J(nm(w),'이')} 한 발 빨랐다. ${J(nm(l),'은')} 고개를 숙이고 물러났다. 한 수 배웠다. (숙련 경험치 +10)`,'good');leaveA(l)}},
+   {l:'승부에 끼어든다',f:()=>{aff(yk,-15);aff(hs,-15);log('"무례하군." 두 자루의 검이 동시에 당신을 향했다.','bad');startFight([yk,hs],'foe')}},
+   {l:'조용히 자리를 뜬다',f:()=>{san(4);log('저런 승부에 낄 자리는 없다.')}},
+ ]})),
+ PS('r_cop',1,'laura','isaac',['경찰서','고급 주택가','골목길','호텔'],(a,lr,ic)=>({tag:'목격',title:'괴도와 형사',cls:'warn',text:'"거기 서!" 아이작이 라우라를 쫓고 있다. 라우라는 지붕 위에서 키스를 날린다. "잡아 보시든가요, 형사님." 아이작이 당신을 보더니 소리쳤다. "너! 저 여자 잡아!"',opts:[
+   {l:'아이작을 돕는다',f:()=>{aff(ic,15);aff(lr,-20);startFight([lr],'me',[ic])}},
+   {l:'라우라가 빠져나가게 돕는다',f:()=>{aff(lr,20);aff(ic,-20);log(`라우라가 지나가며 무언가를 던져 줬다. "보답이에요." (${gain({cloth:1,metal:1})})`,'good');leaveA(lr)}},
+   {l:'둘 다 무시한다',f:()=>{leaveA(lr,ic);log('경찰과 도둑 놀이엔 관심 없다.')}},
+ ]})),
+ PS('r_chess',.8,'adela','zahir',['호텔','성당','절'],(a,ad,zh)=>({tag:'휴식',title:'체스와 예언',text:'아델라와 자히르가 부서진 체스판을 사이에 두고 앉아 있다. "다음 수는 나이트야." "신께서 비숍이라 하셨다." 둘 다 틀렸다는 표정이다.',opts:[
+   {l:'훈수를 둔다',f:()=>{san(9);if(ch(.5)){aff(ad,12);log('"…나쁘지 않은 수군요." 아델라가 처음으로 당신을 쳐다봤다. (정신 +9)','good')}else{aff(zh,12);log('"신의 뜻이로다." 자히르가 당신의 손을 꼭 잡았다. (정신 +9)','good')}}},
+   {l:'예언을 들어 본다',f:()=>{G.me.fortune=true;san(5);log('"너는 곧 큰 행운을 만나리라." 왠지 믿고 싶어진다. (다음 선택에 행운)')}},
+   {l:'체스판을 엎는다',f:()=>{aff(ad,-25);aff(zh,-25);san(3);log('두 사람의 눈빛이 동시에 차가워졌다. 속은 시원하다.')}},
+ ]})),
+ PS('r_dance',.9,'camilo','elena',['호텔','연못','학교'],(a,cm,el)=>({tag:'휴식',title:'빙판 위의 플라멩코',text:'얼어붙은 연못 위에서 카밀로가 플라멩코를 추고, 엘레나가 그 옆에서 말없이 회전한다. 장르는 엉망인데 이상하게 아름답다.',opts:[
+   {l:'넋을 놓고 본다',f:()=>{san(14);log('잠시 이곳이 실험장이라는 걸 잊었다. (정신 +14)','good')}},
+   {l:'같이 춘다',f:()=>{if(ch(.5)){san(18);aff(cm,10);log('"올레!" 카밀로가 당신의 손을 잡아 돌렸다. (정신 +18)','crit-good')}else{if(hurt(ri(4,8),'fall','빙판에서 미끄러졌다.'))return;san(6);log('빙판에서 미끄러져 엉덩방아를 찧었다. 엘레나가 처음으로 웃었다. (정신 +6)')}}},
+   {l:'박수만 치고 간다',f:()=>{san(6);aff(el,5)}},
+ ]})),
+ PS('r_twins',1,'debimarlene','tia',null,(a,dm,ti)=>({tag:'밈',title:'초상화',text:'띠아가 데비와 마를렌을 그리고 있다. "언니, 나 더 예쁘게 그려 줘!" "움직이지 마, 데비." 그림 속 쌍둥이는 어쩐지 셋이다.',opts:[
+   {l:'그림을 칭찬한다',f:()=>{san(10);aff(ti,15);log('띠아가 당신 얼굴도 구석에 작게 그려 넣었다. (정신 +10)','good')}},
+   {l:'셋째가 누구냐고 묻는다',f:()=>{san(-3);log('"셋째? 무슨 셋째?" 셋 모두 진지한 얼굴이다. 소름이 돋았다.')}},
+   {l:'물감을 조금 얻는다',f:()=>{G.me.it.trap++;log('띠아의 물감 폭탄 하나를 얻었다. 덫 대신 쓸 수 있을 것 같다. (덫 +1)')}},
+ ]})),
+ PS('r_lab',.8,'istvan','eva',['학교','병원','연구소'],(a,is,ev)=>({tag:'회상',title:'연구원과 피험자',text:'이슈트반이 수첩을 넘기며 이바에게 무언가를 묻고 있다. 이바는 대답 대신 이슈트반을 노려본다. "또 나를 실험할 생각이야?"',opts:[
+   {l:'이바 편을 든다',f:()=>{aff(ev,18);aff(is,-10);san(4);log('"…고마워." 이바가 작게 말했다.')}},
+   {l:'이슈트반의 수첩을 엿본다',f:()=>{gainXp(6);if(G.me.p.id==='jp'){G.nodesKnown=true;log('수첩에 보안 노드 위치가 적혀 있다!','crit-good')}else log('VF 혈액 반응 기록… 무서운 내용이다. 그래도 싸우는 법에 대한 단서를 얻었다. (숙련 +6)')}},
+   {l:'둘 다 피한다',f:()=>leaveA(is,ev)},
+ ]})),
+ PS('r_wolf',.8,'fenrir','blair',null,(a,fr,bl)=>({tag:'목격',title:'사냥꾼과 늑대',cls:'warn',text:'블레어가 쌍검을 뽑아 들고 펜리르를 몰아붙이고 있다. 펜리르의 사슬이 찰랑거린다. 둘 다 피투성이다.',opts:[
+   {l:'펜리르를 돕는다',f:()=>{aff(fr,25);startFight([bl],'me',[fr])}},
+   {l:'블레어를 돕는다',f:()=>{aff(bl,25);startFight([fr],'me',[bl])}},
+   {l:'둘이 지칠 때까지 기다린다',f:()=>{const W=npcBattle([fr],[bl]);if(W.length){here(...W);log(`${J(names(W),'이')} 살아남았다. 숨을 헐떡이고 있다.`);chain(()=>({tag:'기회',title:`지친 ${names(W)}`,text:'무기를 늘어뜨린 채 서 있다.',opts:[{l:'지금 덮친다',f:()=>startFight(W,'me')},{l:'보내 준다',f:()=>{W.forEach(n=>{aff(n,10);n.spared=true});log('고개만 끄덕이고 지나갔다.')}}]}))}}},
+ ]})),
+ PS('r_lucia_alone',.8,'lucia','seres',['고급 주택가','호텔','성당'],(a,lu,se)=>({tag:'목격',title:'아가씨와 호위',cls:'good',text:'루치아가 동화책을 소리 내어 읽고, 세레스가 검을 쥔 채 문가를 지키고 있다. 세레스의 눈이 당신을 향했다. "아가씨께 다가오지 마십시오."',opts:[
+   {l:'멀리서 이야기를 듣는다',f:()=>{san(12);log('정의로운 총사가 악당을 물리치는 이야기였다. 끝은 해피엔딩이었다. (정신 +12)','good')}},
+   {l:'식량을 두고 간다',...req(G.me.inv.food>=1,'식량 1 필요'),f:()=>{G.me.inv.food--;aff(lu,20);aff(se,15);MEM(lu).shared=1;MEM(se).shared=1;G.rep.hon+=2;log('세레스가 짧게 고개를 숙였다. 루치아가 손을 흔들었다.','good')}},
+   {l:'조용히 돌아선다',f:()=>log('세레스는 당신이 사라질 때까지 눈을 떼지 않았다.')},
+ ]})),
+/* ---------- sanity recovery ---------- */
+ {id:'s_sunset',w:1.3,c:a=>['모래사장','항구','연못','개울'].includes(a)&&!night(),make:a=>({tag:'휴식',title:'노을',cls:'good',text:`${a} 너머로 해가 진다. 바다도, 섬도, 피 냄새도 잠깐 주황색으로 덮였다.`,opts:[
+   {l:'해가 질 때까지 앉아 있는다',f:()=>{san(14);full(-4);log('아무 생각도 하지 않았다. 그게 좋았다. (정신 +14)','good')}},
+   {l:'노을을 보며 다음 계획을 짠다',f:()=>{san(7);G.me.fortune=true;log('머리가 맑아졌다. (정신 +7, 다음 선택에 행운)')}},
+ ]})},
+ {id:'s_radio',w:1.1,c:a=>INDOOR.has(a),make:a=>({tag:'휴식',title:'낡은 라디오',text:'먼지 쌓인 라디오를 켜자 지직거리는 소리 사이로 옛날 노래가 흘러나온다. 섬 밖에서는 아직 노래를 틀고 있구나.',opts:[
+   {l:'볼륨을 낮춰 끝까지 듣는다',f:()=>{san(12);log('세상이 아직 거기 있다. (정신 +12)','good')}},
+   {l:'크게 틀고 따라 부른다',f:()=>{san(18);noise(.7);log('목이 쉬도록 불렀다. (정신 +18) 누군가 들었을지도 모른다.','warn')}},
+   {l:'분해해서 부품을 챙긴다',f:()=>log(`(${gain({metal:1,powder:1})})`)},
+ ]})},
+ {id:'s_cat',w:1.1,c:a=>true,make:a=>({tag:'휴식',title:'길고양이',cls:'good',text:'삐쩍 마른 고양이 한 마리가 다리에 몸을 비빈다. 이 섬에서 당신을 무서워하지 않는 유일한 생명체다.',opts:[
+   {l:'쓰다듬는다',f:()=>{san(10);log('골골거리는 소리가 들린다. (정신 +10)','good')}},
+   {l:'식량을 조금 나눠 준다',...req(G.me.inv.food>=1,'식량 1 필요'),f:()=>{G.me.inv.food--;san(20);G.me.fortune=true;log('고양이가 한참 당신 곁에 머물렀다. (정신 +20, 다음 선택에 행운)','crit-good')}},
+   {l:'쫓아 버린다',f:()=>{san(-3);log('고양이가 서운한 눈으로 돌아봤다.')}},
+ ]})},
+ {id:'s_letter',w:.9,c:a=>INDOOR.has(a),make:a=>({tag:'회상',title:'편지지',text:'책상 서랍에 빈 편지지와 볼펜이 있다. 누구에게 보낼 수도 없는 편지다.',opts:[
+   {l:'가족에게 편지를 쓴다',f:()=>{san(15);log('쓰다 보니 눈물이 났다. 접어서 주머니에 넣었다. 살아서 전해 줄 거다. (정신 +15)','good')}},
+   {l:'유서를 쓴다',f:()=>{san(6);G.me.berserk=false;log('담담하게 썼다. 이상하게 마음이 가벼워졌다. (정신 +6)')}},
+   {l:'편지지로 불쏘시개를 만든다',f:()=>{G.me.inv.cloth++;log('(천 +1)')}},
+ ]})},
+ {id:'s_stars',w:1,c:a=>night()&&!INDOOR.has(a),make:a=>({tag:'밤',title:'별',cls:'good',text:'구름이 걷혔다. 도시에서는 볼 수 없던 별이 쏟아질 듯 많다.',opts:[
+   {l:'별자리를 세어 본다',f:()=>{san(13);log('아는 별자리는 두 개뿐이었다. 그래도 좋았다. (정신 +13)','good')}},
+   {l:'누워서 잠깐 눈을 붙인다',f:()=>{san(8);heal(6);if(ch(.25)){const g=pullNpc('발소리에 눈을 떴다!');if(g)chain(()=>npcCard(g))}}},
+ ]})},
+ {id:'s_tea',w:1,c:a=>['절','성당','호텔','고급 주택가'].includes(a),make:a=>({tag:'휴식',title:'따뜻한 차',cls:'good',text:'찬장에 말린 찻잎이 남아 있다. 주전자도 멀쩡하다.',opts:[
+   {l:'천천히 차를 우린다',f:()=>{san(12);full(4);log('김이 피어오른다. 손끝까지 따뜻해졌다. (정신 +12)','good')}},
+   {l:'찻잎을 약초 대신 챙긴다',f:()=>{G.me.inv.herb++;log('(약초 +1)')}},
+ ]})},
+ {id:'s_organ',w:.8,c:a=>a==='성당',make:a=>({tag:'휴식',title:'오르간',text:'무너진 성당 한쪽에 파이프 오르간이 멀쩡히 서 있다. 건반 위로 먼지가 소복하다.',opts:[
+   {l:'아무 건반이나 눌러 본다',f:()=>{san(10);noise(.4);log('웅장한 소리가 성당을 채웠다. (정신 +10)')}},
+   {l:'기도한다',f:()=>{san(14);log('누구에게 하는 기도인지는 모르겠다. (정신 +14)','good')}},
+ ]})},
+ {id:'s_photo',w:.9,c:a=>true,make:a=>({tag:'회상',title:'사진 한 장',text:'바닥에 구겨진 사진이 떨어져 있다. 모르는 가족이 바닷가에서 웃고 있다. 뒷면에 "꼭 돌아올게"라고 적혀 있다.',opts:[
+   {l:'사진을 챙긴다',f:()=>{san(10);log('모르는 사람들의 약속이 이상하게 힘이 된다. (정신 +10)','good')}},
+   {l:'사진 주인을 위해 묵념한다',f:()=>{san(7);G.rep.hon+=1}},
+   {l:'그냥 둔다',f:()=>san(-2)},
+ ]})},
+ {id:'s_graffiti',w:.9,c:a=>['골목길','학교','창고','공장'].includes(a),make:a=>({tag:'밈',title:'낙서 벽',text:'벽 가득 실험체들의 낙서가 남아 있다. "엄마 보고 싶다" "아글라이아 망해라" "치킨 먹고 싶다" "여기 덫 있음 ㅋㅋ" "마커스♡매그너스"',opts:[
+   {l:'한 줄 남긴다',f:()=>{san(11);log('"나 여기 있었다." 이름을 크게 새겼다. (정신 +11)','good')}},
+   {l:'"여기 덫 있음"을 믿는다',f:()=>{G.me.scouted.add(a);san(5);log('덫 위치를 조심해서 피해 갔다. 진짜 있었다. (정신 +5)')}},
+   {l:'마지막 낙서를 오래 본다',f:()=>{san(8);log('…누가 썼을까. (정신 +8)')}},
+ ]})},
+ {id:'s_broadcast',w:.7,c:a=>true,make:a=>({tag:'밈',title:'방송 사고',text:'[방송] "실험체 여러분, 다음 금지구역은— 어, 잠깐만. 이거 마이크 켜져 있어? …아 켜져 있구나. 아무튼 오늘 점심 메뉴는 김치찌개—" 방송이 툭 끊겼다.',opts:[
+   {l:'배를 잡고 웃는다',f:()=>{san(15);log('웃다가 눈물이 났다. 저 사람들도 사람이긴 하구나. (정신 +15)','crit-good')}},
+   {l:'김치찌개가 먹고 싶어진다',f:()=>{san(6);full(-6);log('배가 꼬르륵거렸다. (정신 +6, 포만감 -6)')}},
+ ]})},
+ {id:'s_allytalk',w:1.3,c:a=>allies().length>0,make:a=>{const x=pick(allies());return{tag:'동맹',title:`${nm(x)}와 수다`,cls:'good',text:`${J(nm(x),'이')} 갑자기 섬 밖에서 제일 먹고 싶은 음식이 뭐냐고 물었다. 쓸데없는 질문인데, 대답하고 싶어진다.`,opts:[
+   {l:'진지하게 대답한다',f:()=>{san(12);aff(x,8);log('둘이서 메뉴판 하나를 통째로 읊었다. (정신 +12)','good')}},
+   {l:'"살아서 나가면 사 줄게"',f:()=>{san(9);aff(x,15);log(`${J(nm(x),'이')} 웃었다. "약속했다?" (정신 +9)`,'good')}},
+   {l:'"그런 얘기 하지 마"',f:()=>{aff(x,-5);san(-2)}},
+ ]}}},
+ {id:'s_lullaby',w:.9,c:a=>!!(one('hart')||one('priya')||one('lenore')),make:a=>{const m=one('lenore')||one('priya')||one('hart');return{tag:'소리',title:'멀리서 들리는 연주',cls:'good',text:`멀리서 ${nm(m)}의 연주가 들린다. ${m.c.id==='lenore'?'바이올린':'기타'} 소리가 바람을 타고 이곳까지 왔다.`,opts:[
+   {l:'눈을 감고 듣는다',f:()=>{san(13);log('연주가 끝날 때까지 움직이지 않았다. (정신 +13)','good')}},
+   {l:'소리 나는 쪽으로 간다',f:()=>{m.area=G.me.area;chain(()=>npcCard([m]))}},
+ ]}}},
+);
+
 /* ===================== UI ===================== */
 const app=document.getElementById('app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -3387,7 +4075,7 @@ let curPid=null;
 const playable=()=>PROF.filter(p=>!p.hiddenChar||jpUnlocked());
 
 
-const PATCH=[["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 진행 중인 상황이 넘어가지 않습니다. 스킬 효과가 적용된 뒤 같은 상황에서 계속 선택할 수 있습니다. (이동하거나 새로운 조우가 발생하는 스킬은 제외)", "필드 스킬 사용은 시간을 소모하지 않습니다.", "모든 필드 스킬의 재사용 대기 시간이 약 2배로 늘어났습니다. (대부분 12~16턴)"]], ["버그 수정", ["마지막 실험체를 처치해 최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다. 이제 최후의 1인이 되는 즉시 실험이 종료됩니다."]], ["밸런스", ["필드 스킬 변경과 버그 수정에 따라 상대 실험체의 공격력이 소폭 상향되었습니다."]]]], ["v2.2", "2026.10.28", [["역할군 패시브", ["실험체별 패시브가 역할군 패시브로 통합되었습니다. 같은 역할군의 실험체는 같은 전투 패시브를 가집니다.", "탱커 「불굴」: 받는 피해 -10%, 체력 30% 이하에서 추가로 -15%. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 +25%, 처치 시 체력 15 회복.", "원거리 딜러 「선제 사격」: 먼저 칠 때 피해 +35%, 교전 첫 라운드 피해 +30%.", "레인저 「야생 감각」: 교전 첫 라운드 피해 +15%, 안전한 사냥, 재료 획득량 증가.", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 상대에게 피해 +20%. 낮의 정면 교전에서는 피해 -15%.", "마법사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 +15%, 정신력 감소 -25%.", "서포터 「돌봄」: 회복량 +35%, 정신력 감소 -40%, 교전 중 매 라운드 체력 2 회복.", "에키온의 무기 진화, 마르티나의 촬영, JP의 해킹은 '고유 특성'으로 그대로 유지됩니다."]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종)", "예시: 혜진 「수호 부적」은 치명상을 한 번 버티게 하고, 로지 「사보타주」는 상대의 무기 등급을 떨어뜨리며, 아이작 「투항 권고」는 상대를 동료로 끌어들입니다.", "필드 스킬별 재사용 대기 시간이 개별 조정되었습니다. 실험체 선택 화면의 프로필에서 상세 효과를 확인할 수 있습니다."]], ["전투 밸런스", ["교전 중 역할군 전용 행동(도발하며 버틴다, 돌진한다 등)이 삭제되고 역할군 패시브로 대체되었습니다.", "'방어하며 빈틈을 노린다'를 연속으로 선택하면 방어 효율이 점점 떨어집니다.", "피해를 거의 주지 않는 라운드에서는 숙련도 경험치를 적게 얻습니다.", "원거리 딜러 공격력 소폭 상향, 받는 피해 소폭 감소.", "근접 전사 공격력과 방어력 소폭 상향.", "암살자 공격력 소폭 하향."]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 동작하지 않던 문제를 수정했습니다."]]]], ["v2.1", "2026.10.28", [["지도 개편", ["루미아 섬 지도가 실제 지형에 맞게 새로 그려졌습니다. 일부 구역의 위치와 구역 간 이동 경로가 변경됩니다.", "신규 구역 '주유소'가 추가되었습니다. 주유소에서만 발생하는 전용 이벤트가 준비되어 있습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]]], ["v2.0", "2026.10.28", [["연구소 봉쇄와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄되어 진입할 수 없습니다.", "마지막 날에는 무작위로 선정된 구역 하나만 최종 안전지대로 지정되며, 나머지 구역은 모두 폐쇄됩니다."]], ["신규 히든 실험체 JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 시스템 암호 코드를 완성해 봉쇄된 연구소를 열 수 있습니다.", "연구소 중앙 컴퓨터에 암호 코드를 입력하면 '해킹 승리'로 실험을 끝낼 수 있습니다.", "연구소가 열리면 모든 실험체가 침입자를 막기 위해 연구소로 모여듭니다.", "엔딩 5개를 수집하면 해금됩니다."]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 새로운 무기로 교체됩니다.", "에키온의 VF 의수는 제작할 수 없는 대신 무기 숙련도에 따라 진화합니다. 진화 방향은 직접 선택할 수 있습니다.", "역할군 상성이 추가되었습니다. 상성이 유리하면 피해량이 증가하고, 불리하면 감소합니다.", "모든 실험체에게 고유 패시브와 필드 스킬이 추가되었습니다. 필드 스킬은 전투 외 상황에서 사용할 수 있으며 재사용 대기시간이 있습니다.", "역할군별 전용 행동이 추가되었습니다. 암살자는 밤에 잠든 실험체를 기습할 수 있지만, 정면 교전에서는 약해집니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재합니다. 우호도는 직접 표시되지 않으며, 대화와 행동을 통해 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다. 조우 시 상대의 성장 상태(도태·평범·성장·괴물)와 처치 수를 확인할 수 있습니다.", "우호적인 실험체와 식량, 재료, 붕대 등을 교환할 수 있습니다."]], ["밸런스 조정", ["동맹이 하향되었습니다. 동료의 피해량이 감소하며, 페이즈마다 식량을 나눠야 합니다.", "동료와 함께 도주할 경우 동료가 남겨질 수 있습니다. 살아남은 동료는 이후 적으로 돌아올 수 있습니다.", "정신력이 더 쉽게 감소합니다. 정신력이 40 미만이면 다양한 정신 붕괴 이벤트가 발생하며, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다.", "전반적인 난이도가 재조정되었습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다. 일부 엔딩은 특정 실험체로만 볼 수 있습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다. 스토리에서의 선택에 따라 결말이 달라집니다.", "지도 탭에서 섬 전체 지도를 확인할 수 있습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 식량이 음수가 되던 문제를 수정했습니다."]]]], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "조건을 만족해야만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]]], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["같은 선택이라도 결과가 달라질 수 있습니다. 대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 대폭 늘어났습니다. 실험체 전용 이벤트도 추가되었습니다.", "식량 획득과 체력 회복 관련 이벤트가 추가되었습니다."]]]], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다. 사냥과 교전으로 숙련도를 올릴 수 있으며, 숙련도가 오르면 피해량이 증가합니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 동일한 체력으로 시작하며, 시간이 지날수록 강해집니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]]], ["v1.0", "2026.10.27", [["정식 오픈", ["루미아 섬 생존 일지가 공개되었습니다. 24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]]]];
+const PATCH=[["v2.4", "2026.10.28", [["실험체 정보 수정", ["일부 실험체의 소개 문구가 실제 설정과 다르던 문제를 수정했습니다. (테오도르, 레녹스, 이안, 레니, 샬럿, 가넷, 르노어, 유민, 유스티나, 니아, 코렐라인, 알론소, 이바, 얀, 이슈트반, 크레이버, 루치아 등)", "이안의 무기가 쌍검으로, 역할군이 근접 전사로 변경되었습니다.", "실험체 프로필의 '전투력' 표기가 '플레이 난이도(쉬움·보통·어려움)'로 바뀌었습니다.", "니아, 유스티나, 르노어의 필드 스킬 이름과 효과가 설정에 맞게 변경되었습니다."]], ["관계 시스템", ["마커스와 매그너스가 같은 게임에 있으면 무슨 일이 있어도 한 팀으로 움직입니다. 둘 중 한 명과 동맹 중일 때 다른 한 명을 받아들일 수 없으면, 동료가 그쪽으로 떠납니다.", "마커스·매그너스로 플레이하면 상대가 찾아와 합류하며, 절대 배신하지 않습니다.", "루치아·세레스로 플레이하면 상대가 찾아와 합류하며, 두 사람은 어떤 상황에서도 서로를 해치지 않습니다.", "쇼이치로 플레이하면 알렉스가 동맹을 제안해 옵니다. 다만 믿을 수 있는 상대는 아닙니다.", "실험체 관계를 활용한 신규 인카운터 20종 이상이 추가되었습니다. (마커스와 매그너스의 수상한 관계, 쇼우의 미슐랭 도전 등)"]], ["배신과 기억", ["동료의 배신이 신뢰도, 성격, 이해관계, 플레이어에 대한 두려움을 함께 따져 결정됩니다. 체력이 30 미만으로 떨어지면 배신하지 않는 일부 실험체를 제외한 거의 모든 동료가 등을 돌립니다.", "3인 동맹에서 두 동료가 몰래 손잡고 플레이어를 노릴 수 있습니다.", "동료가 자원을 훔쳐 달아날 수 있습니다. 아이솔은 자주, 라우라는 아주 자주 그렇습니다.", "동료의 성향과 맞지 않는 선택을 하면 관계가 나빠지고, 맞는 선택을 하면 좋아집니다.", "실험체가 플레이어의 행동을 기억합니다. 치료해 주거나 음식을 나눈 상대는 먼저 말을 걸고 궁지에 몰렸을 때 도와주며, 배신당한 상대는 적대적으로 나옵니다. 시체를 뒤지는 장면을 본 실험체는 플레이어를 경계합니다.", "플레이어의 행동에 따라 평판이 쌓입니다. 악명이 높아지면 현상금이 걸려 사냥꾼들이 몰려들고 동맹 제안이 줄어들며, 선행을 쌓으면 도우려는 실험체가 생깁니다."]], ["정보와 소문", ["실험체를 만났을 때 정확한 강함 대신 장비 상태, 전투 흔적, 부상 정도 같은 단서만 보입니다.", "교전 중 상대의 체력 수치가 보이지 않으며, '숨을 헐떡이고 있다'처럼 상태로만 표시됩니다.", "다른 실험체나 낙서, 무전을 통해 다른 구역의 소문을 들을 수 있습니다. 소문은 틀리거나, 누군가 함정을 위해 퍼뜨린 거짓일 수 있습니다."]], ["생존", ["음식이 체력 회복의 중심이 됩니다. 식량·주전부리·음식·특제 요리로 회복량이 나뉘며, 2턴에 한 번만 먹을 수 있습니다. 교전 중에도 먹을 수 있습니다.", "상대 실험체도 음식을 모으고 교전 중에 먹어 회복합니다. 후반으로 갈수록 음식을 충분히 준비해야 합니다.", "출혈 외에 골절, 화상, 뇌진탕, 감염 부상이 추가되었습니다. 부목과 약초로 치료할 수 있습니다.", "가방에서 제작 목표(무기·방어구)를 설정하면, 이동할 때 필요한 재료가 있는 구역이 선택지에 반드시 포함됩니다.", "회복·보급처럼 좋아 보이는 상황이 다른 실험체가 꾸민 함정일 수 있습니다.", "정신력을 회복할 수 있는 인카운터가 추가되었습니다."]], ["무기 특성", ["무기 종류마다 고유 특성이 생겼습니다. 총기는 강하지만 탄약을 쓰고 총성이 주변 실험체를 불러들이며, 탄약이 떨어지면 피해가 크게 줄어듭니다. 탄약은 화약과 금속으로 만들 수 있습니다.", "둔기는 상대를 휘청이게 하고, 날붙이는 출혈을 남기며, 활·석궁은 조용하고 첫 공격이 강합니다. 그 밖의 무기 특성은 프로필에서 확인할 수 있습니다."]], ["불살 모드", ["실험체 선택 화면에서 '불살 모드'를 켤 수 있습니다. 아무도 죽이지 않고 살아남아야 하며, 쓰러진 상대는 숨이 붙은 채 달아납니다. 일반 모드보다 어렵습니다.", "신규 엔딩 5종이 추가되었습니다. (총 57종)"]], ["밸런스", ["상대 실험체들이 전반적으로 더 호전적으로 바뀌었습니다.", "실험체가 줄어드는 속도가 느려져 후반까지 더 많은 실험체가 살아남습니다.", "역할군별 공격력과 방어력이 조정되었습니다. 암살자는 하향, 술사·근접 전사·서포터는 상향되었습니다.", "붕대의 체력 회복량이 줄었습니다. 대신 출혈은 그대로 멈춥니다."]]]], ["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 진행 중인 상황이 넘어가지 않습니다. 스킬 효과가 적용된 뒤 같은 상황에서 계속 선택할 수 있습니다. (이동하거나 새로운 조우가 발생하는 스킬은 제외)", "필드 스킬 사용은 시간을 소모하지 않습니다.", "모든 필드 스킬의 재사용 대기 시간이 약 2배로 늘어났습니다. (대부분 12~16턴)"]], ["버그 수정", ["마지막 실험체를 처치해 최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다. 이제 최후의 1인이 되는 즉시 실험이 종료됩니다."]], ["밸런스", ["필드 스킬 변경과 버그 수정에 따라 상대 실험체의 공격력이 소폭 상향되었습니다."]]]], ["v2.2", "2026.10.28", [["역할군 패시브", ["실험체별 패시브가 역할군 패시브로 통합되었습니다. 같은 역할군의 실험체는 같은 전투 패시브를 가집니다.", "탱커 「불굴」: 받는 피해 -10%, 체력 30% 이하에서 추가로 -15%. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 +25%, 처치 시 체력 15 회복.", "원거리 딜러 「선제 사격」: 먼저 칠 때 피해 +35%, 교전 첫 라운드 피해 +30%.", "레인저 「야생 감각」: 교전 첫 라운드 피해 +15%, 안전한 사냥, 재료 획득량 증가.", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 상대에게 피해 +20%. 낮의 정면 교전에서는 피해 -15%.", "마법사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 +15%, 정신력 감소 -25%.", "서포터 「돌봄」: 회복량 +35%, 정신력 감소 -40%, 교전 중 매 라운드 체력 2 회복.", "에키온의 무기 진화, 마르티나의 촬영, JP의 해킹은 '고유 특성'으로 그대로 유지됩니다."]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 서로 다른 고유 효과를 갖도록 전면 재설계되었습니다. (92종)", "예시: 혜진 「수호 부적」은 치명상을 한 번 버티게 하고, 로지 「사보타주」는 상대의 무기 등급을 떨어뜨리며, 아이작 「투항 권고」는 상대를 동료로 끌어들입니다.", "필드 스킬별 재사용 대기 시간이 개별 조정되었습니다. 실험체 선택 화면의 프로필에서 상세 효과를 확인할 수 있습니다."]], ["전투 밸런스", ["교전 중 역할군 전용 행동(도발하며 버틴다, 돌진한다 등)이 삭제되고 역할군 패시브로 대체되었습니다.", "'방어하며 빈틈을 노린다'를 연속으로 선택하면 방어 효율이 점점 떨어집니다.", "피해를 거의 주지 않는 라운드에서는 숙련도 경험치를 적게 얻습니다.", "원거리 딜러 공격력 소폭 상향, 받는 피해 소폭 감소.", "근접 전사 공격력과 방어력 소폭 상향.", "암살자 공격력 소폭 하향."]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 동작하지 않던 문제를 수정했습니다."]]]], ["v2.1", "2026.10.28", [["지도 개편", ["루미아 섬 지도가 실제 지형에 맞게 새로 그려졌습니다. 일부 구역의 위치와 구역 간 이동 경로가 변경됩니다.", "신규 구역 '주유소'가 추가되었습니다. 주유소에서만 발생하는 전용 이벤트가 준비되어 있습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]]], ["v2.0", "2026.10.28", [["연구소 봉쇄와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄되어 진입할 수 없습니다.", "마지막 날에는 무작위로 선정된 구역 하나만 최종 안전지대로 지정되며, 나머지 구역은 모두 폐쇄됩니다."]], ["신규 히든 실험체 JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 시스템 암호 코드를 완성해 봉쇄된 연구소를 열 수 있습니다.", "연구소 중앙 컴퓨터에 암호 코드를 입력하면 '해킹 승리'로 실험을 끝낼 수 있습니다.", "연구소가 열리면 모든 실험체가 침입자를 막기 위해 연구소로 모여듭니다.", "엔딩 5개를 수집하면 해금됩니다."]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 새로운 무기로 교체됩니다.", "에키온의 VF 의수는 제작할 수 없는 대신 무기 숙련도에 따라 진화합니다. 진화 방향은 직접 선택할 수 있습니다.", "역할군 상성이 추가되었습니다. 상성이 유리하면 피해량이 증가하고, 불리하면 감소합니다.", "모든 실험체에게 고유 패시브와 필드 스킬이 추가되었습니다. 필드 스킬은 전투 외 상황에서 사용할 수 있으며 재사용 대기시간이 있습니다.", "역할군별 전용 행동이 추가되었습니다. 암살자는 밤에 잠든 실험체를 기습할 수 있지만, 정면 교전에서는 약해집니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재합니다. 우호도는 직접 표시되지 않으며, 대화와 행동을 통해 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다. 조우 시 상대의 성장 상태(도태·평범·성장·괴물)와 처치 수를 확인할 수 있습니다.", "우호적인 실험체와 식량, 재료, 붕대 등을 교환할 수 있습니다."]], ["밸런스 조정", ["동맹이 하향되었습니다. 동료의 피해량이 감소하며, 페이즈마다 식량을 나눠야 합니다.", "동료와 함께 도주할 경우 동료가 남겨질 수 있습니다. 살아남은 동료는 이후 적으로 돌아올 수 있습니다.", "정신력이 더 쉽게 감소합니다. 정신력이 40 미만이면 다양한 정신 붕괴 이벤트가 발생하며, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다.", "전반적인 난이도가 재조정되었습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다. 일부 엔딩은 특정 실험체로만 볼 수 있습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다. 스토리에서의 선택에 따라 결말이 달라집니다.", "지도 탭에서 섬 전체 지도를 확인할 수 있습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 식량이 음수가 되던 문제를 수정했습니다."]]]], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "조건을 만족해야만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]]], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["같은 선택이라도 결과가 달라질 수 있습니다. 대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 대폭 늘어났습니다. 실험체 전용 이벤트도 추가되었습니다.", "식량 획득과 체력 회복 관련 이벤트가 추가되었습니다."]]]], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다. 사냥과 교전으로 숙련도를 올릴 수 있으며, 숙련도가 오르면 피해량이 증가합니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 동일한 체력으로 시작하며, 시간이 지날수록 강해집니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]]], ["v1.0", "2026.10.27", [["정식 오픈", ["루미아 섬 생존 일지가 공개되었습니다. 24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]]]];
 function patchSheet(){openSheet(`<h4>패치 노트</h4>${PATCH.map(([v,d,secs],i)=>`<section class="pn"><div class="pn-h"><b>${v}</b><span class="muted">${d}</span>${i===0?'<span class="badge gold">최신</span>':''}</div>${secs.map(([t,l])=>`<h5>${esc(t)}</h5><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</section>`).join('')}`)}
 
 /* ---------- select ---------- */
@@ -3398,7 +4086,7 @@ function selectScreen(){
       <div class="eyebrow">Lumia Island · Hardcore · ${PROF.filter(p=>!p.hiddenChar).length} subjects</div>
       <h1>루미아 섬<br><em>생존 일지</em></h1>
       <p>텍스트 어드벤처입니다. 매 턴 장면이 하나씩 무작위로 펼쳐지고, 그 안에서 어떻게 할지 고릅니다. 24명 중 최후의 1인이 되면 섬을 나갈 수 있습니다. 섬 한가운데 연구소는 봉쇄돼 있고, 마지막 날엔 단 한 구역만 안전지대로 남습니다. 배고픔, 출혈, 정신 소모가 매 턴 쌓이고, 동료는 언제든 등을 돌립니다. 우승까지 보통 100번 안팎을 고르게 됩니다.</p>
-      <div class="hero-acts"><button class="btn-main" id="rand">무작위 실험체로 참가</button><button class="btn-sub" id="gal">엔딩 도감 ${got}/52</button><button class="btn-sub" id="pn">패치 노트 ${PATCH[0][0]}</button></div>
+      <div class="hero-acts"><button class="btn-main" id="rand">무작위 실험체로 참가</button><button class="btn-sub" id="gal">엔딩 도감 ${got}/57</button><button class="btn-sub" id="paci" aria-pressed="${PACIFIST}">불살 모드 ${PACIFIST?'켬':'끔'}</button><button class="btn-sub" id="pn">패치 노트 ${PATCH[0][0]}</button></div>
     </header>
     <div class="search"><input id="q" type="search" placeholder="실험체 이름 검색" autocomplete="off" aria-label="실험체 이름 검색"></div>
     <ul class="roster" id="roster"></ul>
@@ -3412,23 +4100,24 @@ function selectScreen(){
   document.getElementById('roster').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.id)profileSheet(b.dataset.id,true)};
   document.getElementById('rand').onclick=()=>start(pick(PROF.filter(p=>!p.hiddenChar)).id);
   document.getElementById('gal').onclick=()=>gallerySheet();
+  document.getElementById('paci').onclick=()=>{PACIFIST=!PACIFIST;selectScreen()};
   document.getElementById('pn').onclick=()=>patchSheet();
 }
 function gallerySheet(){
   const got=new Set(loadEndings());
-  const tiers=[[1,19,'우승 엔딩'],[20,31,'실험체 엔딩'],[32,52,'사망 엔딩']];
-  openSheet(`<h4>엔딩 도감 · ${got.size}/52</h4><p class="muted">고른 선택과 실험체에 따라 다른 결말이 열린다. 실험체 엔딩은 특정 실험체로만 볼 수 있다.</p>${tiers.map(([a,b,t])=>`<h4>${t}</h4><ul class="gal">${Array.from({length:b-a+1},(_,i)=>a+i).map(n=>`<li class="${got.has(n)?'on':''}"><span>#${String(n).padStart(2,'0')}</span><b>${got.has(n)?esc(ENDINGS[n]):'???'}</b></li>`).join('')}</ul>`).join('')}`);
+  const rg=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);const tiers=[[[...rg(1,19),53,54,55],'우승 엔딩'],[[...rg(20,31),56,57],'실험체 엔딩'],[rg(32,52),'사망 엔딩']];
+  openSheet(`<h4>엔딩 도감 · ${got.size}/57</h4><p class="muted">고른 선택과 실험체에 따라 다른 결말이 열린다. 실험체 엔딩은 특정 실험체로만 볼 수 있다.</p>${tiers.map(([L,t])=>`<h4>${t}</h4><ul class="gal">${L.map(n=>`<li class="${got.has(n)?'on':''}"><span>#${String(n).padStart(2,'0')}</span><b>${got.has(n)?esc(ENDINGS[n]):'???'}</b></li>`).join('')}</ul>`).join('')}`);
 }
 function profileCard(p){
   const tr=traitsText(p),rel=relText(p);
   return `<div class="prof">
-    <div class="prof-h"><h3>${esc(p.n)}</h3><span class="pw">전투력 ${'●'.repeat(p.pow)}${'○'.repeat(5-p.pow)}</span></div>
+    <div class="prof-h"><h3>${esc(p.n)}</h3><span class="pw">${diffText(p)}</span></div>
     <p>${esc(p.d)}</p>
     <dl class="kit">
       <div><dt>무기</dt><dd>${esc(p.w)} · ${esc(wname(p,0))}</dd></div><div><dt>역할</dt><dd>${esc(ROLE[p.role].n)}</dd></div>
       <div class="w"><dt>역할 패시브 「${esc(p.pas.n)}」</dt><dd>${esc(p.pas.d)}</dd></div>${p.trait?`<div class="w"><dt>고유 특성 「${esc(p.trait.n)}」</dt><dd>${esc(p.trait.d)}</dd></div>`:''}
       <div class="w"><dt>필드 스킬 「${esc(p.act.n)}」 · 재사용 ${p.act.cd||5}턴</dt><dd>${esc(p.act.desc||'')}</dd></div>
-      <div class="w"><dt>전투 스킬 「${esc(p.sk.n)}」</dt><dd>${esc(SKT[p.sk.t])}</dd></div>
+      <div class="w"><dt>전투 스킬 「${esc(p.sk.n)}」</dt><dd>${esc(SKT[p.sk.t])}</dd></div><div class="w"><dt>무기 특성</dt><dd>${esc(wTraitText(p.w))}</dd></div>
       <div><dt>시작 숙련도</dt><dd>${MG[p.m0]}</dd></div><div><dt>상성</dt><dd>${esc(ctrText(p.role))}</dd></div>
     </dl>
     <p class="muted">${esc(ROLE[p.role].perk)} ${esc(ROLEMOVE[p.role]||'')}</p>
@@ -3472,9 +4161,9 @@ function hud(){
   extra.push(`<span class="chip skill">「${esc(m.p.act.n)}」 <b>${m.fcd>0?m.fcd+'턴':'준비'}</b></span>`);
   document.getElementById('hud').innerHTML=`
   <div class="h1"><b class="ph">${phaseName(G.phase)}${G.phase>=FINAL?' · 최종':''}</b><span class="sp"></span><span>선택 <b>${G.choices}</b></span><span>생존 <b>${tot}</b>/24</span></div>
-  <div class="h2"><span class="me">${esc(m.p.n)}</span><span class="loc">${esc(m.area)}</span>${zone}${m.bleed?'<span class="badge red">출혈</span>':''}${m.san<40?'<span class="badge red">정신 불안</span>':''}${m.drunk>0?'<span class="badge amber">취함</span>':''}</div>
+  <div class="h2"><span class="me">${esc(m.p.n)}</span><span class="loc">${esc(m.area)}</span>${zone}${m.bleed?'<span class="badge red">출혈</span>':''}${Object.keys(m.inj||{}).map(k=>`<span class="badge red">${INJN[k]}</span>`).join('')}${G.rep&&G.rep.bounty?'<span class="badge red">현상금</span>':''}${G.pacifist?'<span class="badge cyan">불살</span>':''}${m.san<40?'<span class="badge red">정신 불안</span>':''}${m.drunk>0?'<span class="badge amber">취함</span>':''}</div>
   <div class="bars">${bar('체력',m.hp,m.max,'var(--ok)',35)}${bar('정신',m.san,100,'var(--violet)',40)}${bar('포만',m.full,100,'var(--amber)',25)}</div>
-  <div class="chips"><span class="chip">무기 <b class="g${m.wg}">${esc(myWname())}</b></span><span class="chip">방어구 <b class="g${m.ag}">${GR[m.ag]}</b></span><span class="chip">숙련 <b>${MG[m.ml]}</b></span><span class="chip">처치 <b>${m.kills}</b></span>${extra.join('')}${al.map(a=>`<span class="chip ally">동맹 ${esc(nm(a))} <b>${Math.max(0,Math.round(a.hp))}</b></span>`).join('')}</div>`;
+  <div class="chips"><span class="chip">무기 <b class="g${m.wg}">${esc(myWname())}</b></span><span class="chip">방어구 <b class="g${m.ag}">${GR[m.ag]}</b></span><span class="chip">숙련 <b>${MG[m.ml]}</b></span><span class="chip">처치 <b>${m.kills}</b></span>${WT_GUN.includes(m.p.w)?`<span class="chip">탄약 <b>${m.ammo}</b></span>`:''}${G.goal?`<span class="chip">목표 <b>${GOALN[G.goal]}</b></span>`:''}${extra.join('')}${al.map(a=>`<span class="chip ally">동맹 ${esc(nm(a))} <b>${Math.max(0,Math.round(a.hp))}</b></span>`).join('')}</div>`;
 }
 const LINE_CLS={'crit-bad':'crit-bad','crit-good':'crit-good','crit-win':'crit-win',pick:'pick',news:'news',warn:'warn',bad:'bad',good:'good',phase:'phase',dead:'dead',win:'win'};
 function render(){
@@ -3525,7 +4214,7 @@ function infoSheet(k){
   document.querySelector('.tabs').onclick=e=>{const b=e.target.closest('button');if(b)infoSheet(b.dataset.t)};
   const pb=document.getElementById('pbody');
   if(k==='dex')pb.onclick=e=>{const b=e.target.closest('[data-id]');if(b){const d=b.nextElementSibling;d.hidden=!d.hidden}};
-  if(k==='bag')pb.onclick=e=>{const b=e.target.closest('[data-use]');if(b&&!G.over&&G.mode==='card'){useItem(b.dataset.use);clampInv();render();infoSheet('bag')}};
+  if(k==='bag')pb.onclick=e=>{const gb=e.target.closest('[data-goal]');if(gb){G.goal=gb.dataset.goal||null;render();infoSheet('bag');return}const b=e.target.closest('[data-use]');if(b&&!G.over&&G.mode==='card'){const k2=b.dataset.use;if(k2==='herb')treatHerb();else useItem(k2);clampInv();render();infoSheet('bag')}};
   if(k==='log')pb.scrollTop=pb.scrollHeight;
 }
 function sheetBody(k){
@@ -3533,12 +4222,13 @@ function sheetBody(k){
   if(k==='bag'){
     const sp=Object.entries(m.sp).filter(([,v])=>v>0);
     const canUse=G.mode==='card'&&!G.over;
-    const use=[['food','식량 먹기','포만감 +22',m.inv.food],['meal','음식 먹기','체력 +10 · 포만감 +35',m.it.meal],['bandage','붕대 감기','체력 +20 · 출혈 멈춤',m.it.bandage],['sedative','진정제 먹기','정신 +18',m.it.sedative]];
-    return `<h4>바로 쓰기${canUse?'':' · 장면을 넘긴 뒤 쓸 수 있다'}</h4><div class="use">${use.map(([k2,l,d,n])=>`<button data-use="${k2}" ${!n||!canUse?'disabled':''}><b>${l}</b><span>${d} · ${n}개</span></button>`).join('')}</div>
+    const use=[['food','식량 먹기','포만 +22 · 체력 +3',m.inv.food],['snack','주전부리','포만 +15 · 체력 +6',m.it.snack],['meal','음식 먹기','포만 +35 · 체력 +14',m.it.meal],['feast','특제 요리','포만 +55 · 체력 +30',m.it.feast],['bandage','붕대 감기','체력 +12 · 출혈 멈춤',m.it.bandage],['sedative','진정제','정신 +18',m.it.sedative],['splint','부목','골절 치료',m.it.splint],['herb','약초 바르기','화상·감염 치료',(m.inj.burn||m.inj.infection)?m.inv.herb:0]];
+    return `<h4>바로 쓰기${canUse?'':' · 장면을 넘긴 뒤 쓸 수 있다'}${m.eatCd>0?` · 다음 식사까지 ${m.eatCd}턴`:''}</h4>${Object.keys(m.inj).length?`<p class="muted">부상: ${Object.keys(m.inj).map(k=>`${INJN[k]}(${INJD[k]})`).join(' / ')}</p>`:''}<div class="use">${use.map(([k2,l,d,n])=>`<button data-use="${k2}" ${!n||!canUse?'disabled':''}><b>${l}</b><span>${d} · ${n}개</span></button>`).join('')}</div>
     <h4>무기</h4><p><b class="g${m.wg}">[${GR[m.wg]}] ${esc(myWname())}</b> <span class="muted">${esc(m.p.w)} · 숙련 ${MG[m.ml]}${m.p.id==='echion'?' · 숙련도에 따라 진화':''}</span></p>
     <h4>재료</h4><div class="grid">${Object.entries(MATN).map(([key,l])=>`<div class="cell"><span>${l}</span><b>${m.inv[key]}</b></div>`).join('')}</div>
     <h4>덫</h4><p>${m.it.trap}개 · 교전 중이나 특정 장면에서 쓸 수 있다.</p>
     <h4>특수 재료</h4><p class="muted">${sp.length?sp.map(([s,v])=>`${esc(s)} ×${v}`).join(', '):'없음. 운석·생명의 나무는 방송된 지역에서, 미스릴·포스 코어·VF 혈액 샘플은 알파·감마·오메가·위클라인에게서 얻는다.'}</p>
+    <h4>제작 목표 · 이동할 때 필요한 재료가 있는 구역이 선택지에 나온다</h4><div class="use">${['weapon','armor','both',null].map(g=>`<button data-goal="${g||''}" ${G.goal===g?'class="on"':''}><b>${g?GOALN[g]:'목표 해제'}</b><span>${g&&G.goal===g?'설정됨':''}</span></button>`).join('')}</div>${G.goal?`<p class="muted">${(()=>{const N=goalNeeds();return N.done?'목표 등급을 모두 달성했다.':N.mats.length||N.sp?`부족: ${N.mats.map(k=>MATN[k]).join('·')}${N.sp?' · 특수 재료':''}`:'재료가 모두 모였다. 작업대에서 만들 수 있다.'})()}</p>`:''}
     <h4>제작법 · 작업대 장면에서 만든다</h4><ul class="rec">${recipes().map(r=>`<li class="${canPay(r)?'ok':''}"><b>${esc(r.l)}</b><span>${esc(costText(r))}</span></li>`).join('')}</ul>`;
   }
   if(k==='map'){
@@ -3548,7 +4238,7 @@ function sheetBody(k){
       if(G.zones.has(a))t.push('<span class="badge red">금지구역</span>');else if(G.next.includes(a))t.push('<span class="badge amber">곧 금지</span>');
       if(G.finalArea===a)t.push('<span class="badge cyan">안전지대</span>');
       if(G.specials[a])t.push(`<span class="badge gold">${esc(G.specials[a])}</span>`);if(G.drop===a)t.push('<span class="badge gold">보급 상자</span>');if(G.boss&&G.boss.area===a)t.push(`<span class="badge red">${esc(G.boss.name)}</span>`);
-      if(G.ptraps[a])t.push(`<span class="badge">내 덫 ${G.ptraps[a]}</span>`);
+      if(G.ptraps[a])t.push(`<span class="badge">내 덫 ${G.ptraps[a]}</span>`);(G.rumors||[]).filter(r=>r.area===a).forEach(r=>t.push(`<span class="badge amber">소문: ${{strong:'강자',food:'식량',boss:'보스',lab:'보안 해제',escape:'탈출',drop:'보급'}[r.t]}</span>`));
       const seen=others().filter(n=>n.seen&&n.seen.area===a&&n.seen.phase>=G.phase-1).map(nm);
       return `<li class="${a===m.area?'cur':''} ${G.zones.has(a)?'z':''}"><div><b>${esc(a)}</b>${t.join('')}</div><span class="muted">재료 ${AREA_MATS[a].map(x=>MATN[x]).join('·')}${seen.length?` · 목격 ${esc(seen.join(', '))}`:''}</span></li>`}).join('')}</ul>`;
   }
@@ -3582,7 +4272,7 @@ function endCard(){
     <table class="breakdown"><tbody>${S.rows.map(r=>`<tr><th>${r[0]}</th><td>${esc(r[1])}</td><td class="num">+${Math.round(r[2]).toLocaleString()}</td></tr>`).join('')}</tbody></table>
     ${m.killed.length?`<p><span class="muted">처치한 실험체</span><br>${esc(m.killed.join(', '))}</p>`:''}
     ${m.allyHist.length?`<p><span class="muted">함께했던 동맹</span><br>${esc(m.allyHist.join(', '))}</p>`:''}
-    <p class="muted">엔딩 도감 ${loadEndings().length}/52${!jpUnlocked()&&loadEndings().length>=5?'':''}</p>
+    <p class="muted">엔딩 도감 ${loadEndings().length}/57${!jpUnlocked()&&loadEndings().length>=5?'':''}</p>
     <div class="acts"><button class="again" id="again">${esc(J(m.p.n,'으로'))} 다시</button><button id="pickagain">다른 실험체 선택</button></div>
     <button class="copy" id="cp">결과 복사</button><div class="copied" id="cpm"></div>
   </section>`;
