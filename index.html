@@ -2238,8 +2238,8 @@ const BONUS=[
  ()=>{if(G.me.bleed){G.me.bleed=false;log('그러다 보니 피가 멎었다.','good')}else{full(8);log('뜻밖에 배가 든든해졌다. (포만감 +8)','good')}},
 ];
 const JACKPOT=[
- ()=>{if(G.me.wg<4){G.me.wg++;log(`쓸 만한 부품이 손에 걸렸다. 무기가 ${GR[G.me.wg]} 등급이 됐다!`,'win')}else{G.me.it.meal+=2;log('운이 터졌다. 음식 두 개를 찾았다!','win')}},
- ()=>{if(G.me.ag<4){G.me.ag++;log(`숨겨진 방어구를 찾았다. 방어구가 ${GR[G.me.ag]} 등급이 됐다!`,'win')}else{G.me.it.bandage+=2;log('붕대 묶음을 찾았다!','win')}},
+ ()=>{if(G.me.wg<4){G.me.inv.metal+=2;G.me.inv.powder++;log('쓸 만한 부품이 손에 걸렸다. 무기 제작 재료를 챙겼다! (금속 +2, 화약 +1)','win')}else{G.me.it.meal+=2;log('운이 터졌다. 음식 두 개를 찾았다!','win')}},
+ ()=>{if(G.me.ag<4){G.me.inv.cloth+=2;G.me.inv.leather++;log('숨겨진 옷감 더미를 찾았다. 방어구 제작 재료를 챙겼다! (천 +2, 가죽 +1)','win')}else{G.me.it.bandage+=2;log('붕대 묶음을 찾았다!','win')}},
  ()=>{const b=G.me.hp;heal(30);san(10);log(`행운의 여신이 미소 지었다. (체력 +${G.me.hp-b}, 정신 +10)`,'win')},
 ];
 function rollTwist(o,tag){
@@ -12614,11 +12614,11 @@ loot=function(n){const me=G.me;let got=0;
   if(n.g>me.ag&&me.ag<5){G.gradeOK=1;me.ag=n.g;got=1;log(`${nm(n)}의 방어구를 벗겨 입었다. (방어구 ${GR[me.ag]})`,'good')}
   log(`${nm(n)}의 가방을 챙겼다. (${gain({[pick(['metal','cloth','powder','food'])]:2,bandage:ch(.35)?1:0})})`)};
 /* 인카운터·이벤트로는 등급이 오르지 않는다: 제작, 필드 스킬, 교전 중 효과, 처치 노획만 허용 */
-{const po=pickOpt;pickOpt=function(o){const me=G.me;if(!me)return po(o);const w0=me.wg,a0=me.ag,inFight=!!G.fight,tag=G.card&&G.card.tag;G.gradeOK=0;
+{const po=pickOpt;pickOpt=function(o){const me=G.me;if(!me)return po(o);const w0=me.wg,a0=me.ag,inFight=!!G.fight,tag=G.card&&G.card.tag;G.gradeOK=0;const L0=G.log.length;
   po(o);const m=G.me;if(!m||m!==me)return;
   const ok=G.gradeOK||inFight||tag==='제작'||(o&&o.skill);if(ok)return;
   let back=0;if(m.wg>w0&&m.p.id!=='echion'){m.wg=w0;m._wg=w0;back++}if(m.ag>a0){m.ag=a0;back++}
-  if(back){m.inv.metal+=back;log(`…손에 넣은 장비는 몸에 맞지 않았다. 분해해서 재료로 챙겼다. (금속 +${back}) ※ 장비 등급은 제작과 처치 노획으로만 오른다`,'news')}}}
+  if(back){m.inv.metal+=back;const RE=/등급이 (됐|되)|등급으로|무기 교체|등급 (무기|방어구)|\(무기 |\(방어구 /;G.log=G.log.filter((e,i)=>i<L0||!RE.test(e.t||''));log(`쓸 만한 장비를 손에 넣었지만 몸에 맞지 않아 분해했다. (금속 +${back})`,'news')}}}
 
 /* ===================== 서브스토리 정합성: 이름이 나온 적은 실제로 그 실험체가 나온다 ===================== */
 const everIn=id=>G.npcs.some(n=>n.c.id===id);
