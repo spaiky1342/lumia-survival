@@ -2898,7 +2898,7 @@ function atkOf(s){
 }
 function dmgTo(t,raw){
   const v=.85+rnd()*.3;
-  if(t==='me'){const m=G.me;let x=raw*(1-m.ag*.08)*ROLE[m.p.role].def*v;if(m.p.role==='tank'){x*=.9;if(m.hp<m.max*.3)x*=.85}if(hasP('guardian')&&allies().length)x*=.85;if(m.fort>0){m.fort--;x*=.5}x*=1.2;return Math.max(2,Math.round(x))}
+  if(t==='me'){const m=G.me;let x=raw*(1-m.ag*.08)*ROLE[m.p.role].def*v;if(m.p.role==='tank'){x*=.9;if(m.hp<m.max*.3)x*=.85}if(hasP('guardian')&&allies().length)x*=.85;if(m.fort>0){m.fort--;x*=.5}x*=.96;return Math.max(2,Math.round(x))}
   if(t.kind==='boss')return Math.max(2,Math.round(raw*v));
   const n=t.n||t;return Math.max(2,Math.round(raw*(1-n.g*.05)*ROLE[n.c.role].def*v));
 }
