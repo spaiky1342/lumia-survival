@@ -711,7 +711,6 @@ function tick(){
   }
   if(me.inv.food>1&&ch(.06)){me.inv.food--;log('가방 속 식량 하나가 상해 버렸다. (식량 -1)','bad')}
   if(ch(.02)){const ks=Object.keys(MATN).filter(k=>me.inv[k]>0);if(ks.length){const k=pick(ks);me.inv[k]--;log(`잠깐 한눈판 사이 누군가 가방을 뒤졌다. (${MATN[k]} -1)`,'bad')}}
-  if(me.wg>=2&&ch(.008)){me.wg--;log(`무기에 금이 갔다. 등급이 ${GR[me.wg]}로 떨어졌다.`,'bad')}
   if(me.exposed>0){me.exposed--;if(ch(.5))pullNpc('아글라이아 드론이 당신의 위치를 방송했다. 누군가 오고 있다.')}
   if(me.san<=0)queue(()=>madnessCard());
   else{
@@ -2563,7 +2562,6 @@ function tick(){
   }
   if(me.inv.food>1&&ch(.07)){me.inv.food--;log('가방 속 식량 하나가 상해 버렸다. (식량 -1)','bad')}
   if(ch(.02)){const ks=Object.keys(MATN).filter(k=>me.inv[k]>0);if(ks.length){const k=pick(ks);me.inv[k]--;log(`잠깐 한눈판 사이 누군가 가방을 뒤졌다. (${MATN[k]} -1)`,'bad')}}
-  if(me.wg>=2&&me.p.id!=='echion'&&ch(.008)){me.wg--;log(`무기에 금이 갔다. 등급이 ${GR[me.wg]}로 떨어졌다.`,'bad')}
   if(me.exposed>0){me.exposed--;if(ch(hasP('hacker')?.35:.5))pullNpc('아글라이아 드론이 당신의 위치를 방송했다. 누군가 오고 있다.')}
   if(me.san<=0)return die('mad','머릿속 목소리가 가라고 하는 쪽으로 걸었다. 손목 장치가 비명을 지를 때까지 멈추지 않았다. 금지구역 한가운데에서 섬광이 터졌다.');
   const k=others().length;
@@ -2867,8 +2865,8 @@ function benchCard(){
 }
 function recipesBase(){
   const m=G.me,R=[];
-  const wc=[{metal:1},{metal:2},{metal:2,powder:1},{metal:2}];
-  const ac=[{cloth:1},{cloth:1,leather:1},{cloth:2,leather:1},{cloth:1}];
+  const wc=[{metal:2},{metal:3,powder:1},{metal:4,powder:2},{metal:4,powder:2}];
+  const ac=[{cloth:2},{cloth:2,leather:2},{cloth:3,leather:2},{cloth:3,leather:2}];
   if(m.p.id==='jp'&&m.frag>=5&&!m.code)R.push({l:'시스템 암호 코드 조립',cost:{metal:2,powder:2},f:()=>{m.code=true;log('조각난 데이터를 엮어 시스템 암호 코드를 완성했다. 이제 연구소 중앙 컴퓨터만 남았다.','crit-win')}});
   if(m.p.id!=='echion'&&m.wg<4)R.push({l:`무기 강화 · ${GR[m.wg+1]} ${wname(m.p,m.wg+1)}`,cost:wc[m.wg],sp:m.wg===3?SPW:null,f:()=>{m.wg++}});
   if(m.ag<4)R.push({l:`방어구 제작 · ${GR[m.ag]} → ${GR[m.ag+1]}`,cost:ac[m.ag],sp:m.ag===3?SPA:null,f:()=>{m.ag++;log(`방어구를 ${GR[m.ag]} 등급으로 만들었다.`,'good')}});
@@ -3189,7 +3187,7 @@ const ARC_TXT={
  jp:['아글라이아 서버에 처음 침입한 날. 루미아라는 폴더를 열었다. 그리고 이 섬에 끌려왔다.','데이터 조각에 내 이름이 있다. "침입자 JP · 실험체 전환 완료."','시스템 안에서 끝낸다. 이 실험의 규칙을, 내 손으로.'],
 };
 const ARC_TH=[1,4,7];
-function storyDue(){const s=G.me.arcStage;return s<3&&G.phase>=ARC_TH[s]}
+function storyDue(){return false}
 function storyCard(){
   const me=G.me,p=me.p,s=me.arcStage;const T=ARC_TXT[p.id];
   const generic=[`문득 섬에 오기 전의 기억이 밀려온다. ${p.d}`,`아글라이아 서류철에서 ${p.n}의 이름을 발견했다. "적합도 양호. 정서적 결함이 관찰 가치 있음." 나를 이 섬에 보낸 이유가 거기 적혀 있다.`,'마지막 밤이 다가온다. 손목 장치의 숫자가 줄어든다. 무엇을 위해 여기까지 왔는지, 이제는 정해야 한다.'];
@@ -3275,11 +3273,11 @@ function decideEndingBase(){
     if(p.id==='jackie'&&m.kills>=5)return 23;
     if(p.id==='estelle'&&m.killedIds.has('adriana'))return 24;
     if(p.id==='blair'&&m.vfKill)return 25;
-    if(p.id==='fenrir'&&domArc()==='r')return 26;
+    if(p.id==='fenrir'&&m.kills>=3)return 26;
     if(p.id==='echion'&&m.wg>=4)return 27;
     if(p.id==='martina'&&m.film>=100)return 28;
     if(p.id==='xiukai'&&m.cooked>=5)return 29;
-    if(p.id==='mirka'&&domArc()==='s')return 30;
+    if(p.id==='mirka'&&allies().length)return 30;
     if(m.cursed||p.id==='cliver')return 31;
     if(m.chickenKing)return 16;
     if(m.nadja==='power')return 17;
@@ -3291,7 +3289,7 @@ function decideEndingBase(){
     if(m.kills>=8)return 5;
     if(m.st.spare>=3)return 9;
     if(m.kills<=1)return 6;
-    const a=domArc();if(a==='r')return 2;if(a==='s')return 3;if(a==='n')return 4;
+    if(m.kills>=5)return 2;if(allies().length)return 3;if(!G.sub||!G.sub.done||G.sub.end==='quit')return 4;
     return 1;
   }
   if(k==='isekai')return 15;
@@ -10575,7 +10573,7 @@ setSk('tsubame');
 
 /* ---------- 카티야 ---------- */
 setD('katja',{d:'실수를 만회하려고 섬에 들어온 청부살인업자. 자신이 남들보다 특별하다고 굳게 믿는 종잡을 수 없는 소녀. 간호사 어머니와 군인 아버지 사이에서 전쟁 중에 태어나 군 병원에서 사랑받으며 자랐다. 포격이 모든 것을 앗아 갔다. 살기 위해 총을 들었고, 정신을 차려 보니 곁에는 시체와 총, 직접 개조한 드론뿐이었다. 전장에서는 「잿빛 사신」이라 불렸다. 높은 곳과 간편식을 좋아하고, 언젠가 그랜드 피아노를 갖는 게 꿈이라고 한다(거짓말일 수도 있다). 개활지와 두꺼운 매뉴얼, 그리고 실수를 싫어한다. 가끔 드론에게 말을 건다. "전원 타겟이라고 했지? 알았어."'});
-ALIGN_OF.katja='neutral';
+ALIGN_OF.katja='psycho';
 PASSIVE.katja={c:'청부살인업자 · 드론으로 목표물을 포착하고(필드), 조준 사격과 정밀 조준으로 끝낸다(전투)',n:'잿빛 사신',
   d:'먼저 건 교전의 첫 라운드 피해 +30%. 전투 스킬을 쓴 뒤 다음 기본 공격이 추가 피해(12 + 무기 등급×3). 교전마다 한 번, 드론이 스캔한 적 최대 셋에게 「정밀 조준」. 처치하면 수당으로 재료 +1. 실수하면(공격이 막히면) 정신이 깎인다.',
   start(F){if(F.opener==='me')FX(F).nextHit=1.3;F.ktR=0},
@@ -11292,11 +11290,11 @@ setSk('felix');
 
 if(typeof resInfo==='function'){const ri=resInfo;resInfo=function(){const m=G.me;
   if(m&&m.p.id==='mirka')return{l:(m.mkG||0)>=mkCap()?'리펄스 게이지 · 최대':'리펄스 게이지',v:m.mkG||0,max:mkCap(),c:'#e0884f'};
-  if(m&&m.p.id==='cliver'&&G.fight)return{l:'탄환',v:m.cvB??6,max:6,c:'#c9b07a'};
+  if(m&&m.p.id==='cliver'&&G.fight)return{l:'탄환',v:m.cvB??6,max:Math.max(6,m.cvB??6),c:'#c9b07a'};
   return ri()}}
 {const fc=fightCardBase;fightCardBase=function(){const c=fc();const F=G.fight,m=G.me;if(!c||!F||!c.opts)return c;const i=c.opts.findIndex(o=>/^스킬 「/.test(o.l));
   if(m.p.id==='cliver'&&i>=0&&(m.cvB??6)===1)c.opts.splice(i+1,0,{l:'마탄 · 마지막 한 발 (피해 260%)',f:()=>{m.cvM=1;m.cvCd0=m.cd;skName('마탄','');fightRound('skill')}});
-  if(m.p.id==='cliver')c.text+=`\n탄환 ${'●'.repeat(Math.max(0,m.cvB??6))}${'○'.repeat(6-Math.max(0,m.cvB??6))}`;
+  if(m.p.id==='cliver')c.text+=`\n탄환 ${'●'.repeat(Math.max(0,m.cvB??6))}${'○'.repeat(Math.max(0,6-Math.max(0,m.cvB??6)))}`;
   if(m.p.id==='mirka')c.text+=`\n리펄스 ${m.mkG||0}/${mkCap()}`;
   if(m.p.id==='fenrir')c.text+=`${F.frU>0?`\n최후의 발악 ${F.frU}라운드`:''}${m.frC?`\n손톱 ${m.frC}/2`:''}`;
   if(m.p.id==='felix')c.text+=`\n연계 ${(m.fxC||0)+1}/3 · 연계 공격 ${m.fxS||0}`;
@@ -11855,6 +11853,711 @@ addStory('mt',{dlg:[
    O('혼자 계속한다',()=>{gainXp(6);subEnd('side')})]})}});
 rebuildAchSub();
 
+/* ===================== V3.4 · SHOICHI REWORK + STORIES: ISAAC, HAZE ===================== */
+/* ---------- 쇼이치 ---------- */
+setD('shoichi',{d:'평범한 회사원이었다. 몇 년을 짝사랑한 소꿉친구와 결혼했고, 딸이 태어났다. 아내는 선천적인 심장 기형으로 딸을 낳은 지 얼마 되지 않아 세상을 떠났다. 돈이 없어 제대로 된 수술을 받지 못했다고, 쇼이치는 믿는다. 딸마저 같은 병을 앓기 시작하자, 그는 손에 피를 묻히더라도 돈을 모으기로 했다. 손익 계산에 철저해졌고 절대 손해 보지 않는다. 뒷세계의 심부름꾼이 되었다. 아무렇지 않은 얼굴로 속물적인 이야기를 잘한다. 향이 진하고 씁쓸한 차를 좋아하지만 남들 앞에서는 커피를 마신다. 혼자 있을 땐 올드 팝을 듣는다. 가난과 병, 돈 안 되는 의뢰를 싫어한다. "그래서, 돈은 얼마나 주실 건가요?"'});
+ALIGN_OF.shoichi='evil';
+PASSIVE.shoichi={c:'심부름꾼 · 협상으로 상대를 속이고(필드), 부당거래로 단검을 깔아 뜯어낸다(전투)',n:'부당거래',
+  d:'공격 다섯 번마다 확정 치명타(125%). 전투 스킬이 맞으면 부당거래 2중첩, 기본 공격은 1중첩(최대 5). 5중첩이면 다음 기본 공격이 추가 피해(8 + 무기 등급×3)를 주고 상대 뒤에 단검을 떨어뜨린다. 단검은 다음 라운드에 협상 표식이 있는 적에게 우선 던져진다(피해 40%, 표식 대상 +25%). 협상 표식 대상을 쓰러뜨리면 스킬 대기 시간이 초기화된다.',
+  start(F){const m=G.me;m.shS=0;F.shD=0;m.shQ=0;skName(SKX.shoichi[0],SKX.shoichi[1]);if(F.nf.shMark){const x=F.foes.find(foeUp);if(x){x.shM=1;log(`협상 성립. ${foeName(x)}에게 협상 표식.`,'good')}}},
+  atk(x,F){const m=G.me;m.shHits=(m.shHits||0)+1;let k=1;if(m.shHits%5===0){acc('sh5');log('무자비. 확정 치명타! (125%)','crit-good');k=1.25}
+    if(F&&x){if((m.shS||0)>=5){m.shS=0;x.post_=t=>{const d=8+m.wg*3;log(`부당거래! (추가 피해 ${d}) 단검이 바닥에 떨어졌다.`,'good');dmgFoe(t,d,'me');F.shD=(F.shD||0)+1}}else m.shS=Math.min(5,(m.shS||0)+1)}return k},
+  round(F){if(F.shD>0){const up=F.foes.filter(foeUp);const x=up.find(f=>f.shM)||pick(up);if(x){hitOn(x,x.shM?.5:.4,F,'단검 투척!')}F.shD--}},
+  kill(n){const F=G.fight;if(F&&F.foes.some(f=>f.shM&&f.kind==='npc'&&f.n===n)){G.me.cd=0;log('협상 결렬. 표식 대상이 쓰러졌다. 다음 수가 바로 준비됐다.','good')}}};
+SKX.shoichi=['표리','날카롭게 찌른다. 피해 110%와 부당거래 2중첩, 대상에게 협상 표식. 맞히면 바로 다음 라운드에 강화된 표리(모든 적 피해 75%)를 쓸 수 있고, 단검을 하나 깐다',c=>{const{t,F,me}=c;
+  if(me.shQ){me.shQ=0;skName(SKX.shoichi[0],SKX.shoichi[1]);F.foes.filter(foeUp).forEach(x=>hitOn(x,.75,F,'표리·강화!'));me.shS=Math.min(5,(me.shS||0)+2);return{mult:0,cd:3}}
+  const d=hitOn(t,1.1,F,'표리!');if(d){me.shS=Math.min(5,(me.shS||0)+2);if(foeUp(t))t.shM=1;F.shD=(F.shD||0)+1;me.shQ=1;skName('표리 · 강화','넓게 휘두른다. 모든 적 피해 75%, 부당거래 2중첩');return{mult:0,cd:0}}return{mult:0,cd:3}}];
+SKCD.shoichi=3;
+{const f0=FIELDS.shoichi[2];setField('shoichi','협상',14,'협상: 다음에 만나는 실험체는 반드시 손을 내민다. 다음 교전 첫 상대에게 협상 표식을 붙인다',()=>{f0();nf({shMark:1})})}
+setSk('shoichi');
+{const fc=fightCardBase;fightCardBase=function(){const c=fc();const F=G.fight,m=G.me;if(!c||!F||!c.opts)return c;
+  if(m.p.id==='shoichi'){const mk=F.foes.filter(x=>foeUp(x)&&x.shM);c.text+=`\n부당거래 ${m.shS||0}/5 · 단검 ${F.shD||0}${mk.length?` · 협상 표식: ${mk.map(foeName).join(', ')}`:''}`}
+  if(m.p.id==='isaac'){const x=F.foes.find(f=>foeUp(f)&&f.isH);if(x)c.text+=`\n착취: ${foeName(x)} ${x.isH%3}/3`}
+  return c}}
+
+/* ---------- 아이작 · 착취 ---------- */
+setD('isaac',{d:'자기만의 부패한 왕국을 세워 군림하는 비리 경찰. 모든 걸 갖고 태어났지만 만족하지 못했다. 지력, 힘, 카리스마, 화술, 그리고 잔혹함. 왕이 될 자질과 악마가 될 자질을 모두 가졌다. 경찰이 된 건 손해 보지 않으면서 가장 오래 착취할 수 있는 자리이기 때문이다. 말 잘 듣는 자에게는 합리적이고, 대드는 자는 일가친척까지 소리 소문 없이 사라진다. 자신이 악하다는 걸 알고 품위 있게 인정한다. 위스키와 시가, 좋은 옷과 잘 통제된 「평화」를 좋아하고, 정의로운 사람과 구차한 변명, 시끄러운 엔진 소리를 싫어한다. "누가 이 구역의 왕인지 알려 주지."'});
+{const P=PASSIVE.isaac,a0=P.atk;P.n='착취';P.c='부패 경찰 · 누명을 씌워 서로 싸우게 하고(필드), 같은 상대를 세 번 쳐서 착취한다(전투)';
+  P.d='같은 적에게 세 번째 공격마다 착취: 추가 피해(10 + 대상 최대 체력의 5%)와 그 절반만큼 체력 회복. 표식이 있는 적에게 피해 +15%. 처치하면 식량 +1.';
+  P.atk=function(x,F){const k=a0?a0(x,F):1;if(F&&x){x.isH=(x.isH||0)+1;if(x.isH%3===0)x.post_=t=>{const d=10+Math.round(foeMax(t)*.05);log(`착취. (추가 피해 ${d})`,'good');dmgFoe(t,d,'me');heal(Math.round(d/2))}}return k}}
+setSk('isaac');
+
+Object.assign(ACH_FLAV,{shoichi:'"그래서, 돈은 얼마나 주실 건가요?" 계산은 끝났다. 딸에게 갈 시간이다.'});
+ACH_C.shoichi=ACH_C.shoichi||['협상 성립','「협상」을 6번 한다',achF(6)];
+
+D(`
+so01*0.35|휴식|p:shoichi,night|차|아무도 없는 찻집. 진한 홍차 잎이 남아 있다.|혼자 우린다 => san+12 :: 씁쓸하고 진하다. 이게 좋다.;;커피를 탄다 => san+4 :: 남들 앞에선 이게 편하다.
+so02*0.3|조우|p:shoichi,n:darko|피 묻은 돈|다르코가 웃는다. "피 묻은 돈 만지는 처지는 같은데, 왜 그리 기분 나빠하실까?"|거래한다 => ?60 metal+2 aff+10 ! aff-10 :: 손해는 아니었다. // 한 수 밀렸다.;;웃어넘긴다 => san+2 :: 같은 처지는 아니다. 이유가 다르다.
+so03*0.3|조우|p:shoichi,n:laura|약점|라우라가 고개를 갸웃한다. "너무 예민하게 반응하지 마. 약점을 머리에 써 붙이고 다니는 꼴이잖니?"|가격을 묻는다 => aff+5 san+2 :: 정보에도 값이 있다.;;표정을 지운다 => san-4 :: 딸 이야기는 아무도 몰라야 한다.
+so04*0.3|회상|p:shoichi|사진|품속의 낡은 사진. 아내와 어린 딸.|본다 => san+8 :: 조금만 더.;;넣어 둔다 => san+2 :: 일할 때는 꺼내지 않는다.
+so05*0.3|휴식|p:shoichi|올드 팝|부서진 라디오에서 올드 팝이 흘러나온다.|끝까지 듣는다 => san+10 :: 아내가 좋아하던 곡.;;끈다 => san-2 :: 취향은 드러내지 않는다.
+iz01*0.35|휴식|p:isaac|위스키|고급 호텔 바. 위스키와 시가가 남아 있다.|한 잔 한다 => san+12 :: 품위 있는 휴식.;;시가만 챙긴다 => san+4 :: 나중에.
+iz02*0.3|조우|p:isaac,n:mirka|자존심|미르카가 침을 뱉는다. "이딴 놈한테 조아릴 바엔 뒈지는 게 낫지."|웃는다 => san+4 aff-10 :: 본보기가 하나 늘겠군.;;정중히 제안한다 => ?30 aff+10 ! aff-15 :: 의외로 받아들였다. // 망치가 날아왔다.
+iz03*0.3|조우|p:isaac,n:hyejin|업보|혜진이 눈을 감는다. "끝없는 업보가 보여요. 바닥조차 보이지 않을 만큼 깊군요."|"그래서?" => san+2 :: 업보는 왕의 장식이다.;;부적을 사 준다 => metal-1 aff+10 :: 나쁜 투자는 아니다.
+iz04*0.3|위험|p:isaac|엔진 소리|어디선가 시끄러운 오토바이 엔진 소리가 울린다.|소리 쪽으로 간다 => xp+4 san-4 :: 품위를 모르는 놈이다.;;자리를 뜬다 => san+2 :: 상대할 가치가 없다.
+iz05*0.3|탐색|p:isaac|경찰서|무너진 경찰서. 증거물 보관함이 열려 있다.|압수품을 챙긴다 => metal+2 powder+1 :: 원래 내 거였다.;;서류를 태운다 => san+6 :: 흔적은 남기지 않는다.
+hz01*0.35|식량|p:haze|파나마 커피|고급 카페에 파나마산 원두가 남아 있다.|내린다 => san+12 :: 좋은 원두다.;;평범한 믹스커피만 남았다 => san-4 :: 사양이다.
+hz02*0.3|조우|p:haze,n:rozzi|좋은 거래|로지가 손을 흔든다. "좋은 거래였어."|한 번 더 거래한다 => ?60 powder+2 aff+10 ! metal-1 :: 계약대로. // 손실은 내가 배상한다.;;고개만 끄덕인다 => aff+5 :: 비즈니스다.
+hz03*0.3|조우|p:haze,n:yumin|한량|유민이 웃는다. "그리 한량 보듯 쳐다보지 말아 주겠어? 즐길 때 즐길 줄 아는 건 피차 비슷한데."|술을 권한다 => aff+15 san+8 :: 의외로 말이 통했다.;;"비즈니스 외엔 관심 없어." => san+2 :: 유민이 어깨를 으쓱했다.
+hz04*0.3|위험|p:haze|불량품|누군가 버린 총이 녹슬어 있다. 내 라벨이 붙어 있다.|분해해서 확인한다 => xp+5 san-4 :: 위조품이다. 누가 내 이름을 쓰고 있다.;;버린다 => san-2 :: 기분 나쁘다.
+hz05*0.3|회상|p:haze|빈민가|무너진 빈민가 골목. 어릴 적 차창 너머로 보았던 풍경과 닮았다.|오래 본다 => san-8 :: 한순간에 저렇게 될 수 있다.;;지나친다 => san+2 :: 미래는 깊게 생각하지 않는다.
+`,.4);
+
+/* ======================================================================
+   서브스토리 · 왕(아이작) / 라벨(헤이즈)
+   ====================================================================== */
+SUBS.iz={n:'이 구역의 왕',cast:[],pov:['isaac'],ally:false,meetCh:0,
+ onStart(s){const pool=G.npcs.filter(n=>n.alive&&n.team!=='me');const v=pick(pool);if(v)s.vid=v.c.id},
+ ends:{king:['왕','섬을 손에 넣었다','협박과 이간질로 섬의 실험체들을 줄 세운다'],example:['본보기','대드는 자를 치웠다','반항하는 자를 본보기로 만든다'],deal:['비즈니스','이익을 나눴다','서로의 영역을 존중하는 거래를 맺는다']},
+ ch:[
+  fl=>({title:'왕국',text:T('무너진 경찰서. 의자 하나가 아직 멀쩡하다. 앉는다. 왕좌로는 초라하지만, 시작으로는 나쁘지 않다.'),opts:[
+   O('규칙을 정한다',fl=>{fl.rule=1;gainXp(4)}),O('위스키를 찾는다',fl=>{fl.drink=1;san(6)})]}),
+  fl=>({title:'상납',text:T(`${subVn()}이(가) 지나간다. 이 구역에서 움직이는 자는 대가를 치러야 한다.`),opts:[
+   O('정중하게 상납을 요구한다',fl=>{fl.tax=1;G.me.inv.metal+=1}),O('누명을 씌운다',fl=>{fl.frame=1;const v=subV();if(v)aff(v,-20)}),O('보내 준다',fl=>{fl.free=1})]}),
+  fl=>({title:'반항',cls:'bad',text:T(`${subVn()}이(가) 거부한다. "이딴 놈한테 조아릴 바엔 죽는 게 낫지."`),opts:[
+   O('본보기로 삼는다',fl=>{fl.punish=1;gainXp(6);san(4)}),O('조건을 바꿔 제안한다',fl=>{fl.offer=1})]}),
+  fl=>({title:'경위 H',text:T('손목 장치에 낯익은 수사 기록. 「아이작. 수뢰, 협박, 실종 사건 다수. 증거 불충분.」 누군가 아직 나를 쫓는다.'),opts:[
+   O('기록을 지운다',fl=>{fl.erase=1}),O('수사관을 매수할 계획을 세운다',fl=>{fl.bribe=1;gainXp(4)})]}),
+  fl=>({title:'평화',text:T('잘 통제된 구역. 아무도 소리 지르지 않는다. 이것이 평화다.'),opts:[
+   O('더 넓힌다',fl=>{fl.expand=1}),O('지킨다',fl=>{fl.keep=1;san(6)})]}),
+  fl=>{if(fl.punish&&(fl.frame||fl.erase))return{title:'본보기',cls:'hidden',text:`${subVn()}은(는) 더 이상 이 구역에 보이지 않는다. 수많은 본보기 중 하나가 되었을 뿐. 이제 아무도 대들지 않는다. 그럴 필요도 없고.`,opts:[O('시가에 불을 붙인다',()=>{const v=subV();if(v&&v.alive){v.hp=Math.max(1,v.hp-40);v.hostile=true}gainXp(14);subEnd('example')})]};
+   if(fl.offer||fl.free)return{title:'비즈니스',text:`"서로의 영역을 존중하는 건 비즈니스의 기본 소양이지." ${subVn()}이(가) 마지못해 손을 잡는다. 손해 보지 않는 거래. 왕은 강요하지 않는다. 받아들이게 만든다.`,opts:[O('악수한다',()=>{const v=subV();if(v)aff(v,15);G.me.inv.metal+=2;san(8);subEnd('deal')})]};
+   return{title:'왕',text:'"누가 이 구역의 왕인지 알려 주지." 섬 곳곳에서 고개가 숙여진다. 아무도 대들지 않는다. 평화롭다.',opts:[O('왕좌에 앉는다',()=>{san(12);gainXp(8);subEnd('king')})]}},
+ ]};
+SUBS.hz={n:'라벨',cast:[],pov:['haze'],ally:false,meetCh:0,
+ onStart(s){const pool=G.npcs.filter(n=>n.alive&&n.team!=='me');const v=pick(pool);if(v)s.vid=v.c.id},
+ ends:{refund:['배상','손실은 끝까지 책임졌다','불량 무기로 피해를 본 거래처에 끝까지 배상한다'],luxury:['프리미엄','현재를 즐겼다','계산을 멈추고 사치를 즐긴다'],trace:['라벨의 주인','위조범을 찾아냈다','내 라벨을 도용한 자를 끝까지 추적한다']},
+ ch:[
+  fl=>({title:'라벨',text:T('녹슨 총 한 자루. 손잡이에 붙은 라벨. 내 라벨이다. 하지만 이건 내가 판 물건이 아니다.'),opts:[
+   O('분해한다',fl=>{fl.check=1;gainXp(4)}),O('라벨만 떼어 간다',fl=>{fl.tag=1})]}),
+  fl=>({title:'고객',cls:'warn',text:T(`${subVn()}이(가) 화가 나 있다. "네 라벨 붙은 총이 불발됐어. 덕분에 죽을 뻔했다고."`),opts:[
+   O('"손실은 직접 배상하겠습니다."',fl=>{fl.pay=1;const v=subV();if(v)aff(v,15);G.me.inv.metal=Math.max(0,G.me.inv.metal-2)}),O('"내 물건이 아닙니다."',fl=>{fl.deny=1}),O('무시한다',fl=>{fl.ignore=1})]}),
+  fl=>({title:'빈민가',cls:'bad',text:T('무너진 골목. 어릴 적 차창 너머로 본 풍경. 한순간에 저렇게 될 수 있다는 두려움.'),opts:[
+   O('눈을 돌린다',fl=>{fl.away=1;san(-4)}),O('끝까지 본다',fl=>{fl.look=1;san(-8)})]}),
+  fl=>({title:'정보상 T',text:T('「시장엔 꾸준히 라벨이 붙은 무기가 나오더군요. 다른 유통처라도 구한 걸까요?」 정보상의 말이 떠오른다.'),opts:[
+   O('유통 경로를 추적한다',fl=>{fl.track=1;gainXp(4)}),O('신경 쓰지 않는다',fl=>{fl.skip=1})]}),
+  fl=>({title:'요트',text:T('항구에 버려진 요트 한 척. 프라이빗한 공간. 양주와 달지 않은 디저트가 남아 있다.'),opts:[
+   O('하루쯤 즐긴다',fl=>{fl.enjoy=1;san(10)}),O('일을 계속한다',fl=>{fl.work=1})]}),
+  fl=>{if(fl.pay&&fl.check)return{title:'배상',text:'"어디까지나 프로답게." 불량은 내 책임이다. 내 물건이 아니어도, 내 라벨이 붙었다면. 손해는 싫다. 하지만 신용을 잃는 건 더 큰 손해다.',opts:[O('계약서에 서명한다',()=>{san(14);const v=subV();if(v)aff(v,20);subEnd('refund')})]};
+   if(fl.track&&(fl.deny||fl.tag))return{title:'라벨의 주인',cls:'hidden',text:'경로의 끝. 내 라벨을 찍어 내는 자. 계산 밖의 변수는 제거한다. 수단과 방법은 가리지 않는다. 죄책감도 없다.',opts:[O('소총을 장전한다',()=>{gainXp(14);G.me.ammo=(G.me.ammo||0)+20;subEnd('trace')})]};
+   return{title:'프리미엄',text:'요트 갑판. 파나마산 커피. 미래는 깊게 생각하지 않는다. 지금을 최대한 즐긴다. 그게 내가 번 돈의 쓸모다.',opts:[O('잔을 든다',()=>{san(18);heal(10);subEnd('luxury')})]}},
+ ]};
+Object.assign(RELICS,{
+ iz_king:['왕의 시가','주는 피해 +15%',{atk:1.15}],iz_example:['본보기 명단','주는 피해 +15%',{atk:1.15}],iz_deal:['영역 계약서','받는 피해 -10%',{def:.9}],
+ hz_refund:['배상 계약서','받는 피해 -10%',{def:.9}],hz_luxury:['요트 열쇠','정신력 감소량 -30%',{san:.7}],hz_trace:['위조 라벨','주는 피해 +15%',{atk:1.15}],
+});
+addStory('iz',{dlg:[
+  ['무너진 경찰서. 먼지 쌓인 서장실.','아이작: "……"','의자 하나가 아직 멀쩡하다. 앉는다.','지력, 힘, 카리스마, 화술, 그리고 잔혹함. 왕이 될 자질과 악마가 될 자질.','경찰이 된 건 손해 보지 않으면서 가장 오래 해 먹을 수 있는 자리였기 때문이다.','아이작: "섬이라. 왕국으로는 나쁘지 않군."'],
+  ['{v}이(가) 경찰서 앞을 지나간다.','아이작: "잠깐."','{v}: "…뭐야."','아이작: "이 구역에서 움직이려면 대가가 필요하다. 합리적인 금액이지."','말 잘 듣고 시키는 대로만 하면 능력을 인정해 준다. 친절하게.','{v}의 얼굴이 굳는다.'],
+  ['{v}: "이딴 놈한테 조아릴 바엔 죽는 게 낫지."','아이작: "……"','받아들이기 어렵다면 차라리 도망치는 게 낫다.','납작 엎드려 있다면 밟고 지나가기라도 할 테니까.','아이작: "본보기가 필요하겠군."','톤파를 쥔 손이 느긋하다.'],
+  ['손목 장치에 오래된 수사 기록이 떠올랐다.','「아이작. 수뢰, 협박, 다수의 실종 사건 연루 의혹. 증거 불충분으로 불기소.」','「담당: 경위 H.」','아이작: "아직도 쫓고 있나. 끈질기군."','정의와 정의로운 사람. 가장 싫어하는 것.','아이작: "구차한 정의보다는 솔직한 악이 낫지."'],
+  ['구역이 조용하다.','아무도 소리 지르지 않는다. 아무도 대들지 않는다.','잘 통제된 상황. 이것이 평화다.','위스키 한 잔. 시가 한 대.','아이작: "평화롭군."','왕은 강요하지 않는다. 받아들이게 만들 뿐.'],
+ ],fin:['경찰서 창밖으로 해가 진다.','아이작: "누가 이 구역의 왕인지 알려 주지."','자신이 악하다는 걸 안다. 품위 있게 인정한다.','왕국을 어떻게 다스릴지, 정할 때다.'],
+ br:{at:1,b:[2],side:['관대한 왕','그냥 보내 줬다','지나가는 자를 그냥 보내고 왕좌에서 내려온다'],relic:['낡은 경찰 배지','받는 피해 -10%',{def:.9}],
+  alt:fl=>({title:'관대한 왕',text:T('보내 줬다. {v}이(가) 의아한 얼굴로 돌아본다.','아이작: "……"','관대함도 왕의 도구다. 빚을 지운 셈이니까.','{v}: "…왜 그냥 보내?"','아이작: "언젠가 갚을 테니까."','{v}이(가) 걸음을 멈췄다.'),opts:[
+   O('"이리 와. 할 얘기가 있다."',fl=>{R0(fl);fl.offer=1;log('"서로 손해 볼 일은 없을 거다."')}),
+   O('왕좌를 비운다',()=>{san(-4);subEnd('side')})]})}});
+addStory('hz',{dlg:[
+  ['창고 구석. 녹슨 총 한 자루가 버려져 있다.','헤이즈: "……"','손잡이에 붙은 라벨. 내 라벨이다.','만 개를 팔아도 하나가 불량일까 말까 한 물건. 그게 내 라벨의 의미다.','이건 불량이다. 그리고 내가 판 물건이 아니다.','헤이즈: "누가 내 이름을 쓰고 있군."'],
+  ['{v}이(가) 다가왔다. 표정이 험악하다.','{v}: "너 헤이즈지? 네 라벨 붙은 총이 불발됐어. 덕분에 죽을 뻔했다고."','헤이즈: "……"','손해와 손실. 계산 밖의 변수. 가장 싫어하는 것.','그래도 원칙은 원칙이다. 손실이 발생한다면 직접 배상한다.','헤이즈: "어디까지나 프로답게, 처리하죠."'],
+  ['무너진 빈민가 골목.','헤이즈: "……"','부유한 집에서 자랐다. 어느 날 차창 너머로 빈민가를 보았다.','쓰레기 더미, 맨발의 아이들, 텅 빈 눈.','한순간에 나도 저렇게 될 수 있다. 그 두려움을 안고 살았다.','그래서 최고의 효율을 추구한다. 이 생활이 계속될 수 있도록.'],
+  ['손목 장치에 오래된 메시지.','정보상 T: "지금은 무슨 일인지 거래를 전부 끊어 버렸다면서요."','정보상 T: "그런데 시장엔 꾸준히 라벨이 붙은 무기가 나오더군요."','정보상 T: "다른 유통처라도 구한 걸까요?"','헤이즈: "……"','거래는 끊었다. 그럼 이 라벨은 누가 찍고 있는 거지.'],
+  ['항구. 버려진 요트 한 척.','헤이즈: "오, 나쁘지 않은데."','갑판 위 테이블에 양주와 달지 않은 디저트.','요트나 펜트하우스. 호화롭고 프라이빗한 공간.','미래는 깊게 생각하지 않는다. 현재를 최대한 즐긴다.','헤이즈: "일은… 내일 해도 되나."'],
+ ],fin:['요트 너머로 해가 진다.','헤이즈: "어디까지나 프로답게."','손해는 싫다. 계약은 지킨다.','이번 거래를 어떻게 마무리할지, 정할 때다.'],
+ br:{at:1,b:[2],side:['무시','고객을 무시했다','항의하는 고객을 무시하고 창고를 떠난다'],relic:['웨폰 케이스 열쇠','주는 피해 +12%',{atk:1.12}],
+  alt:fl=>({title:'무시',text:T('무시하고 지나쳤다. 등 뒤에서 욕설이 들린다.','헤이즈: "……"','손해 볼 일은 아니다. 내 물건이 아니니까.','그런데 그 욕설이 시장에 퍼지면? 라벨의 신용이 떨어진다.','신용을 잃는 건 가장 큰 손실이다.','헤이즈: "…잠깐. 이야기 좀 하죠."'),opts:[
+   O('돌아선다',fl=>{R0(fl);fl.pay=1;const v=subV();if(v)aff(v,10);log('"손실은 제가 배상합니다."')}),
+   O('그대로 간다',()=>{san(-4);subEnd('side')})]})}});
+rebuildAchSub();
+
+/* ===================== V3.4 · 유물 전면 개편: 전용 유물 / 공용 유물, 전부 고유 효과 ===================== */
+const RLX={};
+const rxOnly=id=>RLX[id]&&RLX[id].only;
+const rxOn=id=>{const r=RLX[id];if(!r||!r.only)return true;return !!(G&&G.me&&r.only.includes(G.me.p.id))};
+function rxActive(){return((G&&G.me&&G.me.relics)||[]).filter(id=>RLX[id]&&rxOn(id)).map(id=>RLX[id])}
+/* rx(id, 전용 실험체 배열 | null, 설명, 훅) */
+function rx(id,only,desc,h){if(!RELICS[id])return;{const nm0=RELICS[id][0]+': ';if(desc.startsWith(nm0))desc=desc.slice(nm0.length);const c=desc.indexOf(': ');if(c>0&&c<12&&!/[0-9%]/.test(desc.slice(0,c)))desc=desc.slice(c+2)}RLX[id]=Object.assign({only:only&&only.length?only:null,desc},h||{});
+  const tag=RLX[id].only?`[전용 · ${RLX[id].only.map(i=>BY[i]?BY[i].n:i).join('·')}] `:'[공용] ';RELICS[id][1]=tag+desc;RELICS[id][2]=(h&&h.fx)||{}}
+/* 서브스토리 하나: 엔딩 유물 = 전용, 갈림길(side) 유물 = 공용 */
+function rxStory(sid,defs){const S=SUBS[sid];if(!S)return;const own=S.common?null:(S.pov&&S.pov.length?S.pov:(S.cast||[]));
+  for(const [e,v] of Object.entries(defs)){const id=sid+'_'+e;if(e==='rift'&&RELICS[id])RELICS[id][0]='갈라선 길의 표식 · '+S.n;const common=S.common||e==='side'||v.common;rx(id,common?null:own,v.d,v)}}
+/* ---- 기존 능력치 파이프라인은 활성 유물만 ---- */
+relicFx=function(k){let v=null;for(const id of (G&&G.me&&G.me.relics)||[]){if(!rxOn(id))continue;const R=RELICS[id];if(!R)continue;const x=R[2][k];if(x==null)continue;v=v==null?x:(typeof x==='number'&&!['jsCost','gRegen','adCrit','alexIntel','kFire','flee'].includes(k)?v*x:x)}return v};
+{const gr=giveRelic;giveRelic=function(id){const me=G.me;const had=me&&(me.relics||[]).includes(id);
+  if(RLX[id]&&!rxOn(id)){if(!me||had||!RELICS[id])return gr(id);(me.relics=me.relics||[]).push(id);log(`[유물 획득] 「${RELICS[id][0]}」 · ${RELICS[id][1]} — 이 실험체로는 힘을 쓰지 못한다.`,'news');return}
+  gr(id);if(!had&&RLX[id]&&RLX[id].init&&me.relics.includes(id))RLX[id].init(me)}}
+/* ---- 훅 연결 ---- */
+const rxEach=(k,...a)=>{for(const r of rxActive())if(typeof r[k]==='function')try{r[k](...a)}catch(e){}};
+{const ph=pHook;pHook=function(name,...a){ph(name,...a);rxEach(name,...a)}}
+{const pa=pAtk;pAtk=function(x,F){let k=pa(x,F);for(const r of rxActive())if(r.atk)k*=r.atk(x,F)||1;return k}}
+{const pd=pDef;pDef=function(f,F){let k=pd(f,F);for(const r of rxActive())if(r.def)k*=r.def(f,F)||1;return k}}
+{const ao=atkOf;atkOf=function(w,...a){let v=ao(w,...a);if(w==='me'&&G&&G.me)for(const r of rxActive())if(r.dmg)v*=r.dmg(G.fight)||1;return v}}
+{const hm=hurtMod;hurtMod=function(d,kind){d=hm(d,kind);for(const r of rxActive())if(r.hurt)d=r.hurt(d,kind);return d}}
+{const ph=pHeal;pHeal=function(v){v=ph(v);for(const r of rxActive())if(r.heal)v=r.heal(v);return v}}
+{const ps=pSan;pSan=function(v){v=ps(v);for(const r of rxActive())if(r.san)v=r.san(v);return v}}
+{const pn=pNum;pNum=function(k){let v=pn(k);for(const r of rxActive())if(r.num&&r.num[k])v+=typeof r.num[k]==='function'?r.num[k]():r.num[k];return v}}
+{const fr=fightRound;fightRound=function(act){const F=G.fight;fr(act);if(act==='skill'&&F&&G.me&&!G.over)rxEach('skill',F)}}
+{const uf=useField;useField=function(){uf();if(G.me&&!G.over)rxEach('field')}}
+/* 공통 도구 */
+const rxF=()=>G.fight;const rxUp=F=>F?F.foes.filter(foeUp):[];
+function rxHit(x,d,label){if(!x||!foeUp(x))return;d=Math.max(1,Math.round(d));log(`${label} ${foeName(x)}에게 피해 ${d}`,'good');dmgFoe(x,d,'me')}
+function rxShield(v,label){const m=G.me;m.rxSh=(m.rxSh||0)+Math.round(v);if(label)log(`${label} (보호막 ${Math.round(v)})`,'good')}
+{const hm=hurtMod;hurtMod=function(d,kind){d=hm(d,kind);const m=G.me;if(G.fight&&kind==='kill'&&m&&m.rxSh>0&&d>0){const a=Math.min(m.rxSh,d);m.rxSh-=a;d-=a;if(a)log(`유물의 보호막이 피해 ${a}를 막았다.`,'good')}return d}}
+{const ir=initRun;initRun=function(pid){ir(pid);if(G.me){G.me.rxSh=0;const eq=G.me.startRelic;if(eq&&RLX[eq]&&!rxOn(eq))log(`[시작 유물] 「${RELICS[eq][0]}」은(는) ${RLX[eq].only.map(i=>BY[i].n).join('·')} 전용이라 힘을 쓰지 못한다.`,'warn')}}}
+{const ef=endFightClean;endFightClean=function(){if(G.me)G.me.rxSh=0;return ef()}}
+
+/* ===================== 유물 데이터 1 · 초기 서브스토리 / 공용 ===================== */
+const m_=()=>G.me;
+rxStory('mm',{
+ best:{d:'동료 한 명당 받는 피해 -7%, 동료가 공격받으면 그 다음 공격 +20%',def:()=>1-.07*allies().length,round:F=>{if(allies().some(a=>a.hp<npcMax(a)*.6))FX(F).nextHit=Math.max(FX(F).nextHit||1,1.2)}},
+ bike:{d:'이동 직후 시작한 교전에서 첫 두 라운드 받는 피해 -30%, 이동할 때마다 정신 +1',def:(f,F)=>F&&F.round<=2&&m_().moved<=1?.7:1,arrive:()=>san(1)},
+ quiet:{d:'교전 첫 라운드는 말없이 버틴다: 첫 라운드 받는 피해 -40%, 이후 최대 체력 +12',def:(f,F)=>F&&F.round<=1?.6:1,init:me=>{me.max+=12;me.hp+=12}},
+ light:{d:'동료가 없으면 주는 피해 +18%, 도주 시 받는 피해 -10%',dmg:()=>allies().length?1:1.18,num:{flee:.1}},
+ lost:{d:'동료를 잃으면 다음 교전 3라운드 동안 피해 +30%',phase:()=>{if(G.me.mmLost)nf({mult:1.3,multRounds:3})},init:me=>{me.mmLost=1}},
+ rift:{d:'배신당한 상대에게 주는 피해 +25%',atk:x=>x&&x.kind==='npc'&&(x.n.betrayedMe||MEM(x.n).betrayedBy)?1.25:1},
+ side:{d:'혼자 싸우는 교전마다 보호막(최대 체력의 8%)',start:F=>{if(!allies().length)rxShield(m_().max*.08,'혼자 남은 등이 단단해졌다.')}},
+});
+rxStory('ls',{
+ happy:{d:'동화 읽기(필드)마다 정신 +6, 다음 교전 첫 공격 +25%',field:()=>{san(6);nf({mult:1.25,multRounds:1})}},
+ truth:{d:'세레스(또는 루치아)가 곁에 있으면 매 라운드 고정 피해 5를 무작위 적에게',round:F=>{if(allies().some(a=>['seres','lucia'].includes(a.c.id))){const x=pick(rxUp(F));rxHit(x,5,'총사의 일격!')}}},
+ order:{d:'명령을 거부한 손목: 기절에 걸린 적에게 주는 피해 +30%',atk:x=>x&&x.stunned?1.3:1},
+ blank:{d:'칼집에서 뽑는 첫 공격 피해 +45%, 이후 라운드마다 -5%',atk:(x,F)=>F?Math.max(1,1.45-(F.round-1)*.05):1},
+ lost:{d:'사망자가 늘수록 정신력 감소량 감소 (최대 -40%)',san:v=>v<0?v*(1-Math.min(.4,(G.dead||[]).length*.02)):v},
+ rift:{d:'금지구역에서 버틸 수 있는 시간 +1턴',init:me=>{me.zt+=1},phase:()=>{G.me.zt+=1}},
+ side:{d:'글씨를 쓰듯 침착하게: 정신 70 이상이면 받는 피해 -12%',def:()=>G.me.san>=70?.88:1},
+});
+rxStory('kg',{
+ home:{d:'교전이 끝날 때마다 잃은 체력의 15% 회복',end:()=>{const m=m_();heal(Math.round((m.max-m.hp)*.15))}},
+ scar:{d:'공격을 받을 때마다 다음 공격 +8% (최대 +40%)',hurt:(d,k)=>{if(G.fight&&k==='kill'){const m=m_();m.kgS=Math.min(5,(m.kgS||0)+1)}return d},atk:()=>{const m=m_();const k=1+(m.kgS||0)*.08;m.kgS=0;return k}},
+ ash:{d:'체력 30% 이하에서 불길이 치솟는다: 주는 피해 +35%',dmg:()=>hpR()<=.3?1.35:1},
+ lost:{d:'화상·불 피해 -60%',hurt:(d,k)=>k==='fire'||k==='burn'?Math.round(d*.4):d},
+ rift:{d:'처치할 때마다 체력 +10',kill:()=>heal(10)},
+ side:{d:'불씨: 교전마다 첫 라운드에 모든 적에게 고정 피해 6',start:F=>{rxUp(F).forEach(x=>rxHit(x,6,'불씨가 튄다.'))}},
+});
+rxStory('eb',{
+ hero:{d:'에레보스 장비: 유스티나는 교전마다 에너지 +40, 에이든은 과전하에 들어갈 때마다 예비 과전하 탄환 2발 추가, 알렉스는 교전 첫 공격 +30%',
+  start:F=>{const m=m_();if(m.p.id==='justyna')m.jsE=Math.min(140,(m.jsE||100)+40);if(m.p.id==='alex')FX(F).nextHit=1.3;m.adRes=0},
+  round:()=>{const m=m_();if(m.p.id!=='aiden')return;if(m.adOver>0&&!m.adRes){m.adRes=1;m.adOver+=2;log('예비 과전하 탄환 장전. (+2발)','crit-good')}if(!m.adOver)m.adRes=0}},
+ ember:{d:'과전하·재충전·잠입이 끝날 때 체력 +12',round:F=>{const m=m_();const k=(m.adOver||0)+'|'+(m.jsRech?1:0);if(m.ebK&&m.ebK!==k&&(!m.adOver||m.jsRech))heal(12);m.ebK=k}},
+ cold:{d:'적의 의도를 절대 잘못 읽지 않는다, 기습당하지 않는다',fx:{noMis:1}},
+ lost:{d:'무전이 끊긴 뒤: 혼자일 때 정신력 감소량 -30%',san:v=>v<0&&!allies().length?v*.7:v},
+ rift:{d:'동료였던 자에게 주는 피해 +30%',atk:x=>x&&x.kind==='npc'&&x.n.wasAlly?1.3:1},
+ side:{d:'도청: 교전마다 첫 상대의 다음 스킬을 끊는다',start:F=>{const x=rxUp(F)[0];if(x)noSkill(x,3)}},
+});
+rxStory('bb',{
+ battery:{d:'형제가 함께라면: 윌리엄·로살리오가 동료면 피해 +20%, 아니면 캐치볼 1개로 교전 시작',dmg:()=>allies().some(a=>['william','rosalio'].includes(a.c.id))?1.2:1,start:()=>{const m=m_();if(m.p.id==='william')m.wmC=Math.max(m.wmC||0,1)}},
+ strikeout:{d:'세 번째 공격마다 상대를 기절시킨다',atk:(x,F)=>{const m=m_();m.bbK=(m.bbK||0)+1;if(m.bbK%3===0&&x){x.stunned=true;log('스트라이크 아웃!','good')}return 1}},
+ walkoff:{d:'교전의 마지막 적에게 주는 피해 +35%',atk:(x,F)=>F&&rxUp(F).length===1?1.35:1},
+ lost:{d:'빈 마운드: 교전 밖에서 턴마다 체력 +0.4',tick:()=>{if(!G.fight){const m=m_();m.hp=Math.min(m.max,m.hp+.4)}}},
+ rift:{d:'첫 라운드 받는 피해 -25%',def:(f,F)=>F&&F.round<=1?.75:1},
+ side:{d:'방망이 그립: 기본 공격 피해 +10%, 처치하면 정신 +3',atk:()=>1.1,kill:()=>san(3)},
+});
+rxStory('ap9',{
+ human:{d:'낚시·사냥으로 얻는 식량 +1, 음식을 먹으면 정신 +5',eat:()=>san(5),field:()=>{if(['lenox'].includes(G.me.p.id)){G.me.inv.food++;log('빙어가 한 마리 더 걸렸다. (식량 +1)')}}},
+ dawn:{d:'푸른뱀·보호막이 더 단단해진다: 교전 시작 시 보호막(최대 체력의 12%)',start:()=>rxShield(m_().max*.12,'새벽의 낚싯대가 빛난다.')},
+ revenge:{d:'나를 크게 다치게 한 상대에게 주는 피해 +30%',atk:x=>x&&x===G.lastKiller?1.3:1},
+ lost:{d:'위령: 처치할 때마다 정신 +5',kill:()=>san(5)},
+ rift:{d:'액운이 비켜 간다: 받는 피해의 8%를 무시',hurt:(d,k)=>k==='kill'?Math.round(d*.92):d},
+ side:{d:'연못가에서 받는 피해 -15%, 물가에서 정신 +1/턴',def:()=>WATER.has(G.me.area)?.85:1,tick:()=>{if(WATER.has(G.me.area))san(1)}},
+});
+rxStory('ap11',{
+ together:{d:'동료가 둘 이상이면 매 라운드 체력 +4',round:()=>{if(allies().length>=2)heal(4)}},
+ apart:{d:'1대1 교전에서 주는 피해 +22%',dmg:F=>F&&rxUp(F).length===1?1.22:1},
+ pit:{d:'덫을 만들면 하나 더, 덫 피해 +40%',fx:{trapBonus:1.4},field:()=>{G.me.it.trap++}},
+ lost:{d:'멧돼지·짐승에게 받는 피해 -40%',def:f=>f&&f.kind==='beast'?.6:1},
+ rift:{d:'공격을 흘려 낼 확률 +6%',num:{evade:.06}},
+ side:{d:'엄니: 교전 첫 공격에 출혈(4)을 남긴다',atk:(x,F)=>{if(F&&F.round<=1&&x)x.dot=Math.max(x.dot||0,4);return 1}},
+});
+rxStory('ap12',{
+ singularity:{d:'체력이 절반 이하이면 공격마다 체력 +4',atk:()=>{if(hpR()<=.5)heal(4);return 1}},
+ change:{d:'교전이 길어질수록 받는 피해 감소 (라운드당 -4%, 최대 -24%)',def:(f,F)=>F?1-Math.min(.24,(F.round-1)*.04):1},
+ rival:{d:'재키·현우와 싸울 때 피해 +35%, 그 외 처치 시 숙련 +4',atk:x=>x&&x.kind==='npc'&&['jackie','hyunwoo'].includes(x.n.c.id)?1.35:1,kill:()=>gainXp(4)},
+ lost:{d:'멈춘 시합: 도주 성공률 +12%',num:{flee:.12}},
+ rift:{d:'갈라선 길: 교전 첫 상대에게 받는 피해 -15%',def:(f,F)=>F&&f===F.foes[0]?.85:1},
+ side:{d:'찢어진 장갑: 맨손·글러브 공격 피해 +15%',atk:()=>['글러브','맨손','톤파'].includes(G.me.p.w)?1.15:1},
+});
+rxStory('ap13',{
+ bless:{d:'회복 효과 +35%, 밤에 받는 피해 -10%',heal:v=>v*1.35,def:()=>night()?.9:1},
+ sleep:{d:'마리의 자장가: 교전 첫 라운드에 적 하나를 잠재운다',start:F=>{F.sleep=Math.max(F.sleep||0,1)}},
+ doll:{d:'나무 다리: 최대 체력 +18, 도주 시 받는 피해 -15%',init:me=>{me.max+=18;me.hp+=18},num:{flee:.15}},
+ lost:{d:'꺼진 촛불: 성당·묘지에서 정신 +2/턴',tick:()=>{if(['성당','묘지'].includes(G.me.area))san(2)}},
+ rift:{d:'흡혈: 기본 공격 피해의 10%만큼 회복',atk:()=>{heal(3);return 1}},
+ side:{d:'양산: 낮에 받는 피해 -12%',def:()=>night()?1:.88},
+});
+rxStory('ap5',{
+ footage:{d:'촬영이 끝난 영상: 처치할 때마다 숙련 +6, 정신 +3',kill:()=>{gainXp(6);san(3)}},
+ share:{d:'음식을 먹을 때마다 동료 체력 +10, 내 포만감 +10',eat:()=>{allies().forEach(a=>a.hp=Math.min(npcMax(a),a.hp+10));full(10)}},
+ party:{d:'동료가 있으면 매 라운드 정신 +1, 피해 +10%',round:()=>{if(allies().length)san(1)},dmg:()=>allies().length?1.1:1},
+ lost:{d:'꺼진 화면: 실내에서 받는 피해 -10%',def:()=>INDOOR.has(G.me.area)?.9:1},
+ rift:{d:'특수 재료를 가지고 있으면 받는 피해 -10%',def:()=>Object.values(G.me.sp||{}).some(v=>v>0)?.9:1},
+ side:{d:'녹화 버튼: 교전 첫 라운드 피해 +18%',dmg:F=>F&&F.round<=1?1.18:1},
+});
+rxStory('ap8',{
+ thrill:{d:'이동한 턴에 시작한 교전에서 피해 +25%',dmg:F=>F&&m_().moved<=1?1.25:1},
+ plan:{d:'폭탄·덫·화살로 기절시킨 적에게 피해 +30%, 덫 하나 지급',atk:x=>x&&x.stunned?1.3:1,init:me=>{me.it.trap++}},
+ cat:{d:'화살깃: 기본 공격 피해 +8%, 공격이 적의 다음 스킬을 1턴 늦춘다',atk:x=>{if(x)noSkill(x,1);return 1.08}},
+ lost:{d:'주인 잃은 스카프: 정신 50 이하에서 받는 피해 -15%',def:()=>G.me.san<=50?.85:1},
+ rift:{d:'첫 두 라운드 회피 +10%',start:F=>{FX(F).dodge={v:.1,r:3};FX(F).dodgeName='스카프'}},
+ side:{d:'자전거 체인: 이동할 때마다 연료·피로 회복 — 포만 감소 -30%',fx:{}, tick:()=>{if(ch(.3))full(1)}},
+});
+rxStory('ty',{
+ hunt:{d:'처치할 때마다 영구히 피해 +2% (최대 +20%)',kill:()=>{const m=m_();m.tyH=Math.min(10,(m.tyH||0)+1)},dmg:()=>1+(m_().tyH||0)*.02},
+ accomplice:{d:'동료가 있으면 받는 피해 -10%, 동료가 처치하면 정신 +4',def:()=>allies().length?.9:1},
+ other:{d:'남겨진 무기: 무기 제작 재료 금속 -1',fx:{}, init:me=>{me.inv.metal+=2}},
+ side:{d:'낡은 운동화: 도주 시 받는 피해 -20%',num:{flee:.2}},
+});
+rxStory('cs_sig',{
+ rescue:{d:'녹음기: 동료가 합류할 때마다 정신 +8',init:()=>{},tick:()=>{const m=m_();const n=allies().length;if(n>(m.csN||0))san(8);m.csN=n}},
+ hoard:{d:'은신처 열쇠: 페이즈마다 식량 +1',phase:()=>{G.me.inv.food++}},
+ relay:{d:'구겨진 메모: 보급 상자에서 붕대 +1',phase:()=>{if(ch(.5))G.me.it.bandage++}},
+ side:{d:'고장 난 수신기: 매복·기습 피해 -30%',def:(f,F)=>F&&F.opener!=='me'&&F.round<=1?.7:1},
+});
+rxStory('cs_log',{
+ truth:{d:'연구원의 일지: 아글라이아 몬스터(보스)에게 주는 피해 +30%',atk:x=>x&&x.kind==='boss'?1.3:1},
+ burn:{d:'일지의 재: 화약 +2, 폭발 피해 +15%',init:me=>{me.inv.powder+=2},dmg:()=>1.03},
+ trade:{d:'거래 영수증: 처치하면 재료 하나를 더 챙긴다',kill:()=>{log(`영수증대로. (${gain({[pick(['metal','cloth','powder'])]:1})})`)}},
+});
+rxStory('tyr',{
+ throne:{d:'수배지: 현상금이 걸려 있으면 피해 +25%',dmg:()=>G.me.bounty?1.25:1},
+ fall:{d:'찢어진 망토: 체력 25% 이하에서 받는 피해 -30%',def:()=>hpR()<=.25?.7:1},
+ atone:{d:'내려놓은 무기: 살려 보낼 때마다 체력 +12, 정신 +6',spare:()=>{heal(12);san(6)}},
+});
+rxStory('bh',{
+ champ:{d:'샅바: 신력이 100이 되면 도깨비 불이 한 라운드 더 탄다',round:F=>{const m=m_();if(m.bhF>0&&!m.bhX){m.bhF++;m.bhX=1}if(!m.bhF)m.bhX=0}},
+ sister:{d:'곰 젤리: 배가 든든할 때(포만 70 이상) 받는 피해 -12%, 음식 회복 +20%',def:()=>G.me.full>=70?.88:1,heal:v=>v*1.1},
+ jar:{d:'깨진 단지: 공격마다 신력 +10 추가',atk:(x,F)=>{if(F&&typeof bhGain==='function')bhGain(10,F);return 1}},
+ lost:{d:'장난감 총: 첫 라운드 피해 +20%',dmg:F=>F&&F.round<=1?1.2:1},
+ rift:{d:'내기에서 지지 않는다: 행운 +5%',num:{luck:.05}},
+ side:{d:'감투: 혼자일 때 회피 +8%',num:{evade:()=>allies().length?0:.08}},
+});
+rxStory('vy',{
+ free:{d:'몽환 나비가 4개 쌓일 때 보호막이 두 배',round:F=>{const m=m_();if((m.vSh||0)>(m.vyPrev||0))m.vSh+=m.vSh-(m.vyPrev||0);m.vyPrev=m.vSh}},
+ change:{d:'꿈 일기: 공상이 2라운드마다 찾아온다',round:F=>{const m=m_();if(F.round%2===0)m.vyDay=3}},
+ silent:{d:'곰 젤리 한 알: 잠든 적에게 피해 +30% 추가',atk:(x,F)=>F&&F.sleep>0?1.3:1},
+ lost:{d:'흩어진 나비: 혼자일 때 정신 감소 -25%',san:v=>v<0&&!allies().length?v*.75:v},
+ rift:{d:'잠든 적은 깨어나도 1라운드 더 둔해진다',round:F=>{if(F.sleep>0)FX(F).weak={v:.9,r:2}}},
+ side:{d:'나비 베개: 휴식할 때 체력 +6',pick:tag=>{if(tag==='휴식')heal(6)}},
+});
+rxStory('ln',{
+ child:{d:'뿅망치: 동료 한 명당 곰돌이 추가 피해 +3',round:F=>{const n=allies().length;if(n){const x=pick(rxUp(F));rxHit(x,3*n,'뿅!')}}},
+ helena:{d:'헬레나의 이름표: 교전마다 첫 피해를 한 번 무시',start:()=>{m_().lnH=1},hurt:(d,k)=>{const m=m_();if(G.fight&&k==='kill'&&m.lnH){m.lnH=0;log('이름표가 대신 맞았다.','good');return 0}return d}},
+ alone:{d:'고장 난 장난감: 혼자일 때 피해 +20%',dmg:()=>allies().length?1:1.2},
+ lost:{d:'윌슨: 정신 30 이하에서 매 턴 정신 +1',tick:()=>{if(G.me.san<=30)san(1)}},
+ rift:{d:'스킬 대기 시간이 교전 시작 시 1 줄어 있다',start:()=>{const m=m_();if(m.cd>0)m.cd--}},
+ side:{d:'찌그러진 장난감 총: 교전 첫 상대를 1라운드 혼란',start:F=>{FX(F).confuse={v:.25,r:2}}},
+});
+rxStory('rz',{
+ bella:{d:'인식표: 동료가 있으면 주는 피해 +12%, 동료가 쓰러지면 즉시 체력 +20',dmg:()=>allies().length?1.12:1},
+ last:{d:'타다 남은 묵주: 배신당해도 정신이 깎이지 않는다, 배신자에게 피해 +30%',atk:x=>x&&x.kind==='npc'&&x.n.betrayedMe?1.3:1},
+ shadow:{d:'조준경: 교전 첫 공격 피해 +40%',atk:(x,F)=>F&&F.round<=1?1.4:1},
+ lost:{d:'타 버린 묵주: 초콜릿·주전부리로 정신 +4',eat:()=>san(4)},
+ side:{d:'식은 탄피: 탄약 +10',init:me=>{me.ammo=(me.ammo||0)+10}},
+});
+rxStory('em',{
+ show:{d:'CheerUP 카드가 빛날 때 보호막이 1.5배',round:()=>{const m=m_();if((m.emS||0)>(m.emP||0))m.emS+=Math.round((m.emS-(m.emP||0))*.5);m.emP=m.emS}},
+ fooled:{d:'쇼이치의 쪽지: 교전마다 첫 상대에게서 재료 하나를 훔친다',start:F=>{const x=rxUp(F)[0];if(x&&x.kind==='npc')log(`카드 속에서 무언가 나왔다. (${gain({[pick(['metal','cloth','powder'])]:1})})`)}},
+ spade:{d:'스페이드 에이스: 세 번째 라운드마다 다음 공격 +50%',round:F=>{if(F.round%3===2)FX(F).nextHit=1.5}},
+ lost:{d:'띠아의 붓: 근처에 실험체가 있으면 정신 감소 -20% 추가',san:v=>v<0&&near().length?v*.8:v},
+ rift:{d:'관객이 있으면 피해 +10%',dmg:()=>near().length?1.1:1},
+ side:{d:'비둘기 깃털: 도주 성공률 +10%',num:{flee:.1}},
+});
+rxStory('sh',{
+ bill:{d:'계약서: 부당거래가 5중첩이 될 때마다 단검 하나 추가',skill:F=>{if(G.me.shS>=5)F.shD=(F.shD||0)+1}},
+ settle:{d:'깨끗한 장부: 처치할 때마다 금속 +1, 교전 첫 라운드 받는 피해 -20%',kill:()=>{G.me.inv.metal++},def:(f,F)=>F&&F.round<=1?.8:1},
+ promise:{d:'아즈코의 사진: 체력 30% 이하에서 공격마다 체력 +5',atk:()=>{if(hpR()<=.3)heal(5);return 1}},
+ lost:{d:'찢어진 수첩: 협상 성공률 상승 — 동료가 쉽게 배신하지 않는다',fx:{}, num:{luck:.03}},
+ rift:{d:'표식 대상에게 주는 피해 +15%',atk:x=>x&&(x.shM||(x.mark&&x.mark.r>0))?1.15:1},
+ side:{d:'닫힌 수첩: 정신력 감소량 -15%',san:v=>v<0?v*.85:v},
+});
+rxStory('hn',{
+ move:{d:'회중시계: 시차 균열 타이머가 1.5배 터진다',round:F=>{rxUp(F).forEach(x=>{if(x.hnT&&!x.hnB){x.hnB=1;x.hnX=1}})},atk:x=>x&&x.hnX?1.15:1},
+ rewind:{d:'과열된 연산 장치: 교전마다 한 번, 체력 20% 아래로 떨어지면 체력 +25',start:()=>{m_().hnR=1},hurt:(d,k)=>{const m=m_();if(G.fight&&m.hnR&&m.hp-d<m.max*.2){m.hnR=0;heal(25);log('시간이 되감긴다.','good')}return d}},
+ smile:{d:'빛바랜 사진: 정신 60 이상이면 피해 +12%',dmg:()=>G.me.san>=60?1.12:1},
+ lost:{d:'멈춘 초침: 연못에서도 정신이 흔들리지 않는다, 물가에서 받는 피해 -10%',def:()=>WATER.has(G.me.area)?.9:1},
+ rift:{d:'두 라운드마다 다음 공격 +20%',round:F=>{if(F.round%2===0)FX(F).nextHit=Math.max(FX(F).nextHit||1,1.2)}},
+ side:{d:'드라이버: 덫과 재료 제작 — 페이즈마다 금속 +1',phase:()=>{G.me.inv.metal++}},
+});
+rxStory('tz',{
+ forget:{d:'바다 유리: 유리 조각이 3개만 모여도 깨진다',atk:(x,F)=>{if(x&&(x.tz||0)>=3)x.tz=4;return 1}},
+ audience:{d:'유리새: 스파다로 강화된 동안 받는 피해 -15%',def:()=>G.me.tzSword?.85:1},
+ paradiso:{d:'유리 대검 파편: 공황 상태(체력 30% 이하) 피해가 +20% 더 오른다',dmg:()=>hpR()<=.3?1.2:1},
+ lost:{d:'빈 오르골: 휴식 장면에서 정신 +5',pick:tag=>{if(tag==='휴식')san(5)}},
+ rift:{d:'공격받을 때 15% 확률로 유리 파편 반사(피해 6)',hurt:(d,k)=>{if(G.fight&&k==='kill'&&ch(.15)&&G.lastKiller)rxHit(G.lastKiller,6,'유리가 튄다.');return d}},
+ side:{d:'불투명 유리: 교전 첫 라운드 회피 +15%',start:F=>{FX(F).dodge={v:.15,r:2};FX(F).dodgeName='불투명 유리'}},
+});
+rxStory('cr',{
+ judge:{d:'업경 조각: 거짓말쟁이(흑)를 업경으로 비추면 피해 +20% 추가',atk:x=>x&&x.kind==='npc'&&typeof crBlack==='function'&&crBlack(x.n)?1.2:1},
+ white:{d:'하얀 손수건: 백경일 때 매 라운드 체력 +4',round:()=>{if(G.me.crM==='w')heal(4)}},
+ lemon:{d:'핑크 레몬에이드: 표식이 터질 때마다 정신 +3',round:F=>{const m=m_();const n=rxUp(F).reduce((s,x)=>s+(x.crK||0),0);if(n<(m.crPrev||0))san(3);m.crPrev=n}},
+ lost:{d:'금 간 손거울: 출혈 중에도 정신이 깎이지 않는다, 출혈 피해 -50%',hurt:(d,k)=>k==='bleed'?Math.round(d*.5):d},
+ rift:{d:'처치하면 다음 교전 첫 공격 +30%',kill:()=>nf({mult:1.3,multRounds:1})},
+ side:{d:'깨진 거울 테: 받는 피해의 5%를 반사',hurt:(d,k)=>{if(G.fight&&k==='kill'&&G.lastKiller&&d>=8)rxHit(G.lastKiller,d*.05,'거울이 비춘다.');return d}},
+});
+rxStory('ly',{
+ owner:{d:'감싼 천 조각: 잠식이 더 빨리 차 빙의가 쉬워진다(잠식 획득 +50%)',atk:()=>{const m=m_();if(m.lyM==='h'&&typeof lyGain==='function')lyGain(10);return 1}},
+ prison:{d:'낡은 단검 칼집: 빙의 중 매 라운드 잠식 감소량이 절반',round:()=>{const m=m_();if(m.lyM==='p')m.lyS=Math.min(200,(m.lyS||0)+7)}},
+ smile:{d:'요한의 묵주: 인간 상태로 돌아올 때 체력 +20',round:()=>{const m=m_();if(m.lyPrevM==='p'&&m.lyM==='h')heal(20);m.lyPrevM=m.lyM}},
+ lost:{d:'멎은 묵주: 정신 40 이하에서 받는 피해 -12%',def:()=>G.me.san<=40?.88:1},
+ rift:{d:'처치할 때마다 체력 +8',kill:()=>heal(8)},
+ side:{d:'구속구의 고리: 기절·속박에 걸린 적에게 피해 +18%',atk:x=>x&&x.stunned?1.18:1},
+});
+
+/* ===================== 유물 데이터 2 · v3.2~3.3 실험체 서브스토리 ===================== */
+rxStory('ay',{
+ arrest:{d:'낡은 경찰 배지: 정의가 쌓일 때마다 다음 공격 +6% (최대 5중첩)',atk:()=>1+(m_().ayJ||0)*.06},
+ trigger:{d:'빈 탄피: 2연발의 두 번째 탄이 반드시 다른 적을 노린다, 교전 첫 라운드 피해 +20%',dmg:F=>F&&F.round<=1?1.2:1},
+ light:{d:'히카루의 사진: 정의 보호막이 1.5배',hurt:(d,k)=>{if(G.fight&&k==='kill'&&ch(.5))return Math.round(d*.9);return d}},
+ side:{d:'공포탄 탄창: 교전 첫 상대를 1라운드 위축(적 공격력 -15%)',start:F=>{FX(F).weak={v:.85,r:2}}},
+});
+rxStory('zh',{
+ judge:{d:'피 묻은 차크람: 처단의 추가 피해 상한 +10',atk:x=>x&&x.kind==='npc'&&(x.n.kills||0)>=3?1.15:1},
+ falls:{d:'폭포 사진: 페이즈마다 정신 +6 추가, 정신 70 이상이면 받는 피해 -8%',phase:()=>san(6),def:()=>G.me.san>=70?.92:1},
+ doubt:{d:'새의 깃털: 사신의 눈 표식이 1라운드 더 오래간다, 회피 +5%',num:{evade:.05}},
+ side:{d:'무거운 패물: 시체를 뒤져도 정신이 깎이지 않고 재료 +1',kill:()=>{G.me.inv.metal++}},
+});
+rxStory('nd',{
+ pack:{d:'늑대 송곳니: 야성 1마다 피해 증가량 +0.5%p 추가',dmg:()=>1+Math.min(.2,(typeof ndWild==='function'?ndWild():0)*.005)},
+ home:{d:'양어머니의 편지: 사냥에 성공하면 체력 +6 추가, 정신 +3',kill:()=>{heal(6);san(3)}},
+ wild:{d:'늑대 가죽: 야생 구역에서 받는 피해 추가 -10%, 밤에 피해 +10%',def:()=>INDOOR.has(G.me.area)?1:.9,dmg:()=>night()?1.1:1},
+ lost:{d:'끊긴 울음: 혼자일 때 회피 +7%',num:{evade:()=>allies().length?0:.07}},
+ rift:{d:'처치하면 다음 교전 첫 두 라운드 피해 +15%',kill:()=>nf({mult:1.15,multRounds:2})},
+ side:{d:'부러진 화살깃: 교전 첫 공격이 적을 1라운드 둔화(적 공격력 -10%)',start:F=>{FX(F).weak={v:.9,r:2}}},
+});
+rxStory('ht',{
+ polaris:{d:'POLARIS 피크: 음파가 하나 더 날아간다',atk:(x,F)=>{if(x)x.post_=x.post_||(t=>rxHit(t,2+G.me.wg,'음파!'));return 1}},
+ duet:{d:'꽃 장식 기타끈: 프리야가 곁에 있으면 매 라운드 체력 +5, 아니면 회복 효과 +15%',round:()=>{if(allies().some(a=>a.c.id==='priya'))heal(5)},heal:v=>v*1.15},
+ midnight:{d:'민트 목캔디: 정신이 30 아래로 떨어져도 피해가 줄지 않는다, 밤에 정신 감소 -30%',san:v=>v<0&&night()?v*.7:v,dmg:()=>G.me.san<30?1.11:1},
+ lost:{d:'끊어진 기타 줄: 정신 50 이하에서 피해 +12%',dmg:()=>G.me.san<=50?1.12:1},
+ rift:{d:'불협화음이 적의 다음 스킬을 1턴 늦춘다',skill:F=>rxUp(F).forEach(x=>noSkill(x,1))},
+ side:{d:'닫힌 기타 케이스: 받는 피해 -6%, 휴식 시 정신 +4',def:()=>.94,pick:t=>{if(t==='휴식')san(4)}},
+});
+rxStory('dl',{
+ tiger:{d:'삼촌의 띠: 취기 40 이상이면 받는 피해 -12%',def:()=>(G.me.drunk||0)>=40?.88:1},
+ bottle:{d:'빈 호리병: 술을 마실 때 취기 +15 추가, 만취해도 정신이 깎이지 않는다',skill:()=>{const m=m_();if(m.dlDrink)m.drunk=Math.min(100,(m.drunk||0)+15)}},
+ road:{d:'삼촌의 편지: 맹호청권 추가 공격이 50%→70%',atk:x=>(G.me.drunk||0)>=40?1.12:1},
+ side:{d:'낡은 도복 띠: 기본 공격 피해 +7%, 체력 +8',atk:()=>1.07,init:me=>{me.max+=8;me.hp+=8}},
+});
+rxStory('yk',{
+ mask:{d:'흐트러짐 없는 단추: 교전마다 단추 1개를 더 채운다',start:()=>{const m=m_();m.ykB=(m.ykB||4)+1}},
+ tears:{d:'젖은 소매: 체력 80% 미만에서도 받는 피해 -8% 유지',def:()=>hpR()<.8?.92:1},
+ spring:{d:'종이학: 오리가미(필드) 후 다음 교전 첫 라운드 피해 +30%',field:()=>nf({mult:1.3,multRounds:1})},
+ side:{d:'벚나무 목검: 머리치기가 기절시킨 적에게 다음 공격 +15%',atk:x=>x&&x.stunned?1.15:1},
+});
+rxStory('xk',{
+ feast:{d:'거장의 웍: 요리할 때마다 최대 체력 +1 추가(열정)',field:()=>{const m=m_();m.max+=1;m.hp+=1}},
+ dumpling:{d:'만두 찜기: 음식을 가지고 있으면 매 라운드 체력 +2 추가',round:()=>{if(G.me.inv.food>0||G.me.it.meal>0)heal(2)}},
+ spice:{d:'그 재료: 뜨거운 맛이 적을 화상(4)에 빠뜨린다',skill:F=>rxUp(F).forEach(x=>x.dot=Math.max(x.dot||0,4))},
+ side:{d:'낡은 앞치마: 음식으로 회복할 때 정신 +3',eat:()=>san(3)},
+});
+rxStory('chs',{
+ light:{d:'토끼털: 낙인 하나마다 받는 피해 증가량 +1%p',atk:x=>1+Math.min(.06,(x&&x.chB||0)*.01)},
+ judge:{d:'검은 깃털: 폭주 중 매 라운드 회복량 +6',round:F=>{if(F.chR>0)heal(6)}},
+ grave:{d:'작은 십자가: 밤에도 정신이 깎이지 않는다',san:v=>v<0&&night()?v*.5:v},
+ lost:{d:'빈 모자: 정신 30 이하에서 받는 피해 -12%',def:()=>G.me.san<=30?.88:1},
+ rift:{d:'처치하면 정신 +6',kill:()=>san(6)},
+ side:{d:'찢어진 묵주: 체력 절반 이하에서 피해 +12%',dmg:()=>hpR()<=.5?1.12:1},
+});
+rxStory('ss',{
+ trip:{d:'파란 바다 사진: 고통 하나마다 받는 피해 감소량 +0.5%p',hurt:(d,k)=>k==='kill'?Math.round(d*(1-Math.min(.06,(G.me.ssP||0)*.01))):d},
+ friend:{d:'딸기맛 사탕: 정신 40 이하에서 정신 +1/턴 추가',tick:()=>{if(G.me.san<=40)san(1)}},
+ wilson:{d:'윌슨의 실밥: 윌슨! 도와줘가 체력이 낮을수록 더 강해진다(최대 +35%)',dmg:()=>1+Math.min(.35,(1-hpR())*.4)},
+ side:{d:'접힌 사진: 병원에서도 정신이 깎이지 않는다, 받는 피해 -5%',def:()=>.95},
+});
+rxStory('ad',{
+ ember:{d:'꺼지지 않는 파이프: 화상 피해 +3',round:F=>rxUp(F).forEach(x=>{if(x.dot>0)rxHit(x,3,'불길이 번진다.')})},
+ rain:{d:'빌린 우산: 비 오는 날에도 정신이 깎이지 않는다, 받는 피해 -8%',def:()=>.92,san:v=>v<0&&G.weather==='rain'?v*.4:v},
+ blaze:{d:'그을린 성냥갑: 불을 지른 구역에서 받는 피해 -15%',def:()=>G.adFire===G.me.area?.85:1},
+ lost:{d:'꺼진 소화기 핀: 화상에 걸린 적에게 피해 +10%',atk:x=>x&&x.dot>0?1.1:1},
+ rift:{d:'교전 첫 라운드 피해 +16%, 화상·불 피해 무효',dmg:F=>F&&F.round<=1?1.16:1,hurt:(d,k)=>k==='burn'||k==='fire'?0:d},
+ side:{d:'식은 재: 좁은 곳에서도 정신이 덜 깎인다(-40%)',san:v=>v<0&&INDOOR.has(G.me.area)?v*.6:v},
+});
+rxStory('lk',{
+ clean:{d:'더블 엘 작업복: 손이 빨라지는 횟수 +4',atk:(x,F)=>{if(F){F.lkS=Math.min(12,(F.lkS||0)+.5)}return 1}},
+ rest:{d:'퀴즈 카드: 청소 완료 5개마다 피해 증가 +1%p 추가',dmg:()=>1+Math.min(.05,Math.floor((m_().lkC||0)/5)*.01)},
+ father:{d:'의부의 쪽지: 처치 후 회복량 +10%p',kill:()=>{const m=m_();heal(Math.round((m.max-m.hp)*.1))}},
+ side:{d:'쌍안경: 교전 첫 라운드 기습당하지 않는다(받는 피해 -25%)',def:(f,F)=>F&&F.round<=1?.75:1},
+});
+rxStory('ct',{
+ cure:{d:'완치 기록: 회복 효과 +15% 추가, 부상이 낫을 때 체력 +6',heal:v=>v*1.15},
+ chart:{d:'관찰 일지: 외상이 2개만 쌓여도 치명적 외상',atk:x=>{if(x&&(x.ctT||0)>=2)x.ctT=3;return 1}},
+ surgery:{d:'피 묻은 메스: 치명적 외상 피해 +4%p(최대 체력 비례)',atk:x=>x&&x.ctT>=2?1.15:1},
+ side:{d:'미개봉 붕대: 붕대 +2',init:me=>{me.it.bandage+=2}},
+});
+rxStory('adl',{
+ mate:{d:'흑의 킹: 수가 쌓이는 속도 +50%',atk:()=>{const m=m_();m.adHits=(m.adHits||0)+.5;return 1}},
+ draw:{d:'스테일메이트 기보: 교전 첫 라운드 피해 +20% 추가, 대실패 면역',dmg:F=>F&&F.round<=1?1.2:1},
+ fun:{d:'니아의 컨트롤러: 사이코패스·전투광과 싸워도 정신이 깎이지 않는다, 그들에게 피해 +15%',atk:x=>x&&x.kind==='npc'&&['psycho','battle'].includes(alignOf(x.n.c))?1.15:1},
+ side:{d:'상자 속 체스 말: 체크메이트 처형 기준 +5%p',atk:x=>x&&lowHp(x,.35)?1.12:1},
+});
+rxStory('bn',{
+ beast:{d:'사슴뿔 조각: 짐승에게 주는 피해 +30%, 사냥 후 체력 +6',atk:x=>x&&x.kind==='beast'?1.3:1},
+ letter:{d:'부치지 못한 편지: 사람을 먼저 덮쳐도 정신이 깎이지 않는다, 정신 감소 -15%',san:v=>v<0?v*.85:v},
+ second:{d:'두 번째 탄피: 산탄 추가 피해 한 발 더',atk:(x,F)=>{if(x&&F)x.post_=x.post_||(t=>rxHit(t,2+G.me.wg,'산탄!'));return 1}},
+ side:{d:'밀렵꾼의 덫: 덫 +2',init:me=>{me.it.trap+=2}},
+});
+rxStory('bbs',{
+ done:{d:'BT-Mk1 코어: 신체 개조 한도 +2',round:()=>{const m=m_();if((m.bbM||0)>=5&&!m.bbX){m.bbX=1;m.bbM=7}}},
+ brake:{d:'브레이크 패드: 짝수 라운드에도 과부하 공격이 터진다',atk:(x,F)=>{if(F&&x&&F.round%2===0&&F.round%3!==0&&F.rxB!==F.round){F.rxB=F.round;x.post_=x.post_||(t=>rxHit(t,8+G.me.wg*3,'과부하!'))}return 1}},
+ scrap:{d:'로봇 팔: 페이즈마다 금속 +1 추가, 받는 피해 -6%',phase:()=>{G.me.inv.metal++},def:()=>.94},
+ side:{d:'찢어진 설계도: 습한 곳에서도 정신이 깎이지 않는다',san:v=>v<0&&WATER.has(G.me.area)?v*.4:v},
+});
+rxStory('sa',{
+ tale:{d:'손때 묻은 동화책: 마음의 양식 최대 3→5',skill:()=>{const m=m_();m.suF=Math.min(5,(m.suF||0)+1)}},
+ truth:{d:'덮은 상담 기록: 재키 같은 폭력적인 상대에게 받는 피해 -20%',def:f=>f&&f.kind==='npc'&&['evil','psycho'].includes(alignOf(f.n.c))?.8:1},
+ quixote:{d:'종이 랜스: 돈키호테를 읽을 때 첫 공격 +40%',dmg:F=>F&&F.round<=1&&G.me.suBook==='q'?1.4:1},
+ side:{d:'접힌 책갈피: 실내에서 정신 +1/턴',tick:()=>{if(INDOOR.has(G.me.area))san(1)}},
+});
+rxStory('le',{
+ open:{d:'유리 유니콘: 물웅덩이가 한 라운드 더 남는다',round:F=>{if(F.lnW>0&&!F.lnX){F.lnW++;F.lnX=1}if(!F.lnW)F.lnX=0}},
+ mask:{d:'무표정 가면: 폭발음에도 흔들리지 않는다, 받는 피해 -8%',def:()=>.92},
+ water:{d:'수경: 물가가 아니어도 인간 어뢰 추가 피해의 절반',atk:(x,F)=>{if(x&&!WATER.has(G.me.area))x.post_=x.post_||(t=>rxHit(t,2+G.me.wg,'물보라!'));return 1}},
+ side:{d:'조개껍데기: 탐색할 때 재료 +1 (네 번에 한 번)',pick:t=>{if(t==='탐색'&&ch(.25))log(`(${gain({cloth:1})})`)}},
+});
+rxStory('nk',{
+ sorry:{d:'친구의 사과: 다혈질이 끝나면 체력 +15',round:F=>{const m=m_();if(m.nkPrev>0&&!(F.nkR>0))heal(15);m.nkPrev=F.nkR||0}},
+ gentle:{d:'붕대 글러브: 받은 피해 → 분노 변환 ×5',hurt:(d,k)=>{if(G.fight&&k==='kill'){const m=m_();m.nkA=Math.min(100,(m.nkA||0)+d)}return d}},
+ rage:{d:'찢어진 글러브: 다혈질 중 피해 +15% 추가',dmg:F=>F&&F.nkR>0?1.15:1},
+ side:{d:'조여 맨 끈: 받아치기 확률 +10%',start:F=>{F.nf.counter=(F.nf.counter||0)+.1}},
+});
+rxStory('nt',{
+ remember:{d:'낡은 SD 카드: 오래 쉬어도 기억이 흐려지지 않는다, 정신 감소 -20%',san:v=>v<0?v*.8:v},
+ photo:{d:'둘이 찍은 사진: 실비아가 동료면 피해 +20%, 피사체 최대 +1',dmg:()=>allies().some(a=>a.c.id==='silvia')?1.2:1},
+ forget:{d:'빈 필름: 기절한 적에게 피해 +15% 추가',atk:x=>x&&x.stunned?1.15:1},
+ lost:{d:'빈 프레임: 혼자일 때 받는 피해 -8%',def:()=>allies().length?1:.92},
+ rift:{d:'교전 첫 공격이 적을 피사체로 만든다(피해 +8%)',atk:(x,F)=>F&&F.round<=1?1.08:1},
+ side:{d:'녹음기: 처치할 때 숙련 +4',kill:()=>gainXp(4)},
+});
+rxStory('jn',{
+ clean:{d:'챔피언 벨트: 열혈의 의지가 4만 쌓여도 강화',atk:()=>{const m=m_();if((m.jnW||0)===4)m.jnW=5;return 1}},
+ fixed:{d:'더러운 돈봉투: 처치할 때마다 금속 +1, 화약 +1',kill:()=>{G.me.inv.metal++;G.me.inv.powder++}},
+ brother:{d:'동생의 붕대: 기절한 적에게 피해 +15% 추가, 체력 +10',atk:x=>x&&x.stunned?1.15:1,init:me=>{me.max+=10;me.hp+=10}},
+ side:{d:'낡은 마우스피스: 첫 라운드 받는 피해 -18%',def:(f,F)=>F&&F.round<=1?.82:1},
+});
+rxStory('ev',{
+ normal:{d:'빌린 머플러: 바이탈 포스가 교전 밖에서 턴마다 +2 추가',tick:()=>{if(!G.fight){const m=m_();m.evV=Math.min(100,(m.evV||0)+2)}}},
+ monster:{d:'깨진 연구소 팔찌: VF 방출 최소 조건 40→25',round:()=>{const m=m_();if((m.evV||0)>=25&&m.evV<40)m.evV=40}},
+ secret:{d:'웃는 얼굴: VF를 써도 정신이 깎이지 않는다, 통각 둔화 받는 피해 -6% 추가',def:()=>.94,san:v=>v<0&&G.fight?v*.6:v},
+ side:{d:'찢어진 영화표: 도주 성공률 +14%',num:{flee:.14}},
+});
+rxStory('dn',{
+ masterpiece:{d:'그림자 가위: 걸작 처형 기준 25%→32%',atk:x=>x&&lowHp(x,.32)?1.25:1},
+ letter:{d:'오스카의 편지: 예술적 소재에게 주는 피해 +15% 추가',atk:x=>x&&x.dnArt?1.15:1},
+ mirror:{d:'손거울: 밤에 받는 피해 증가가 사라진다',def:()=>night()?.93:1},
+ side:{d:'무광 바니쉬: 출혈이 2 더 깊다',skill:F=>rxUp(F).forEach(x=>{if(x.dot>0)x.dot+=2})},
+});
+rxStory('cl',{
+ nina:{d:'니나의 리본: 니나가 두 번째 공격마다가 아니라 매 공격 30% 확률로도 찌른다',atk:x=>{if(x&&ch(.3))x.post_=x.post_||(t=>rxHit(t,atkOf('me')*.3,'니나!'));return 1}},
+ promise:{d:'약속의 쪽지: 마리오네트가 2라운드 더 움직인다',start:F=>{if(F.clDoll>0)F.clDoll+=2}},
+ payback:{d:'칼날 자수: 나를 다치게 한 상대에게 되갚는 피해 +12% 추가',atk:x=>x&&x===G.lastKiller?1.12:1},
+ side:{d:'니나의 칼날 다리: 니나가 막을 때마다 체력 +4',hurt:(d,k)=>{if(G.fight&&k==='kill'&&d===0)heal(4);return d}},
+});
+rxStory('ce',{
+ reed:{d:'리드의 인식표: 동료가 있으면 기폭 피해 +25%',skill:F=>{if(allies().length&&G.me.ceArm)FX(F).nextHit=Math.max(FX(F).nextHit||1,1.25)}},
+ boom:{d:'그을린 신관: 플라즈마 폭탄 최대 3→4',skill:F=>rxUp(F).forEach(x=>{if((x.ceB||0)>=3&&ch(.5))x.ceB=4})},
+ defuse:{d:'뽑은 신관 핀: 형상변환 피해 보너스 상한 +10%p',dmg:()=>1+Math.min(.1,Math.max(0,((m_().ceC||0)-8))*.03)},
+ side:{d:'그을린 공구 벨트: 화약 +2, 페이즈마다 화약 +1 추가',init:me=>{me.inv.powder+=2},phase:()=>{G.me.inv.powder++}},
+});
+
+/* ===================== 유물 데이터 3 · v3.3~3.4 실험체 서브스토리 ===================== */
+rxStory('ec',{
+ survive:{d:'누군가의 부탁: VF 폭주가 끝나면 체력 +15, 폭주 중 받는 피해 -15%',def:(f,F)=>F&&F.ecRage>0?.85:1,round:F=>{const m=m_();if(m.ecPR>0&&!(F.ecRage>0))heal(15);m.ecPR=F.ecRage||0}},
+ beast:{d:'VF 의수 파편: VF 게이지가 50에서 시작한다',start:()=>{const m=m_();m.ecV=Math.max(m.ecV||0,50)}},
+ name:{d:'이름표: VF 폭주가 4라운드 지속',round:F=>{if(F.ecRage>0&&!F.rxE){F.ecRage++;F.rxE=1}if(!(F.ecRage>0))F.rxE=0}},
+ side:{d:'식은 고기 꼬치: 고기를 먹으면 체력 +8 추가',eat:()=>heal(8)},
+});
+rxStory('ma',{
+ couture:{d:'다비드 라벨: 공격마다 패턴 +1 추가',atk:()=>{const m=m_();m.maiP=Math.min(40,(m.maiP||0)+1);return 1}},
+ mend:{d:'은빛 바늘: 오뜨꾸뛰르가 동료 호감 +8 추가, 동료가 있으면 받는 피해 -8%',field:()=>allies().forEach(a=>aff(a,8)),def:()=>allies().length?.92:1},
+ cut:{d:'재단 가위: 오뜨꾸뛰르 추가 피해 +최대 체력 3%',atk:x=>{if(x)x.post_=x.post_||(t=>rxHit(t,G.me.max*.03,'재단!'));return 1}},
+ side:{d:'낡은 줄자: 사람을 쓰러뜨려도 정신이 덜 흔들린다(+3 회복)',kill:()=>san(3)},
+});
+rxStory('la',{
+ heist:{d:'예고장 카드: 예고장이 6라운드 지속',skill:F=>rxUp(F).forEach(x=>{if(x.laT===4)x.laT=6})},
+ happy:{d:'레몬 사탕: 예고장 타겟 공격 시 회복 +4 추가',atk:x=>{if(x&&x.laT>0)heal(4);return 1}},
+ detective:{d:'찌그러진 탄두: 휘감기 피해 40%→60%',atk:(x,F)=>{if(F&&x&&G.me.laArm)rxUp(F).filter(f=>f!==x).forEach(f=>rxHit(f,atkOf('me')*.2,'채찍 끝!'));return 1}},
+ side:{d:'검은 장갑: 살려 보낸 상대에게서 하나 더 챙긴다',spare:()=>{log(`(${gain({[pick(['metal','cloth'])]:1})})`)}},
+});
+rxStory('ti',{
+ promise:{d:'아이들의 그림: 축복의 다람쥐 회복 +10',round:()=>{}, heal:v=>G.fight?v+3:v},
+ paint:{d:'다람쥐 붓: 성난 다람쥐가 한 번 더 문다',skill:F=>rxUp(F).forEach(x=>{if(x.tiCs&&!Object.keys(x.tiCs).length&&x.rxTi!==F.round){x.rxTi=F.round;rxHit(x,atkOf('me')*.22,'다람쥐!')}})},
+ hide:{d:'호박색 물감: 도주 성공률 +10% 추가, 교전 첫 라운드 받는 피해 -20%',num:{flee:.1},def:(f,F)=>F&&F.round<=1?.8:1},
+ side:{d:'남의 스케치북: 정신 70 이상 보너스가 60부터',dmg:()=>G.me.san>=60&&G.me.san<70?1.1:1},
+});
+rxStory('ir',{
+ loved:{d:'방울 목걸이: 매혹 확률 30%→45%',skill:F=>{if(!G.me.irC)rxUp(F).forEach(x=>{if(!x.stunned&&ch(.15)){x.stunned=true;log(`${J(foeName(x),'이')} 방울 소리에 홀렸다.`,'good')}})}},
+ stray:{d:'아홉 번째 목숨: 교전마다 한 번, 쓰러질 피해를 체력 1로 버틴다',start:()=>{m_().irL=1},hurt:(d,k)=>{const m=m_();if(G.fight&&k==='kill'&&m.irL&&m.hp-d<=0){m.irL=0;log('아홉 번째 목숨. 아슬아슬하게 버텼다.','crit-good');return Math.max(0,m.hp-1)}return d}},
+ truth:{d:'말소된 이름표: 물고기 표식 최대 2→3, 냥냥 펀치 표식당 +5%p',skill:F=>{const m=m_();if(!m.irC&&(m.irFish||0)>=2)m.irFish=3}},
+ side:{d:'물고 온 생선: 생선을 먹으면 체력 +8',eat:()=>heal(8)},
+});
+rxStory('th',{
+ rescue:{d:'부대원의 낙서: 에너지 포 동료 회복 +8',skill:()=>allies().forEach(a=>a.hp=Math.min(npcMax(a),a.hp+8))},
+ pitch:{d:'벤슨의 사인볼: 선제 사격 확률 30%→60%',start:F=>{const x=rxUp(F)[0];if(x&&ch(.3))hitOn(x,.8,F,'선제 사격!')}},
+ order:{d:'파면 통지서: 에너지 보호막 10%→18%',start:()=>{const m=m_();m.thSh=Math.round(m.max*.18)}},
+ side:{d:'조준경 덮개: 증폭 스크린 없이도 에너지 포 30% 확률로 한 번 더',skill:F=>{if(!F.nf.thScr&&ch(.3)){const x=pick(rxUp(F));if(x)hitOn(x,.6,F,'반사광!')}}},
+});
+rxStory('dm',{
+ together:{d:'나눠 먹은 사탕: 교대할 때 체력 +6',skill:()=>{const m=m_();if(m.dmFprev&&m.dmFprev!==m.dmF)heal(6);m.dmFprev=m.dmF}},
+ apart:{d:'한쪽 귀걸이: 블루&레드 폭발 피해 +50%',atk:x=>{const c=G.me.dmF==='m'?'r':'b';if(x&&x.dmB&&x.dmB.c!==c)rxHit(x,x.dmB.n*3,'엇갈린 색이 한 번 더 터진다!');return 1}},
+ shield:{d:'아쿠아비트 병: 데비 상태 받는 피해 -8% 추가, 마를렌 상태 피해 +6% 추가',def:()=>G.me.dmF==='d'?.92:1,dmg:()=>G.me.dmF==='m'?1.06:1},
+ side:{d:'반쪽 머리끈: 추가 공격 확률 15%→22%',start:F=>{F.nf.extraHit=Math.max(F.nf.extraHit||0,.22)}},
+});
+rxStory('ab',{
+ promise:{d:'Dr. N의 수첩: 티어링 블레이드 주기 3→2라운드',round:F=>{if(F.abT>1)F.abT--}},
+ sea:{d:'젖은 그림: 깊은 물가에서도 능력이 흔들리지 않는다, 물가에서 피해 +10%',dmg:()=>WATER.has(G.me.area)?1.1:1},
+ gap:{d:'빗방울 브로치: 공간 절단(필드) 후 다음 교전 받는 피해 -20%(2라운드)',field:()=>nf({rxGap:1}),start:F=>{if(F.nf.rxGap)FX(F).armor={v:.8,r:3}}},
+ side:{d:'베어 낸 공간 조각: 이동 직후 교전 피해 +10% 추가',dmg:()=>G.me.moved<=1?1.1:1},
+});
+rxStory('al',{
+ atone:{d:'맥주병 뚜껑: 기절시킬 때 회복 +6 추가',atk:x=>{if(x&&x.alLink)heal(6);return 1}},
+ mask:{d:'기이한 가면: 원거리 적에게 받는 피해 -10% 추가',def:f=>f&&['gun','ranger','mage'].includes(roleOf(f))?.9:1},
+ dog:{d:'떠돌이 개들의 목줄: 마그네틱 펀치 연결 폭발 피해 8%→13%',atk:x=>{if(x&&x.alLink)x.post_=x.post_||(t=>rxHit(t,foeMax(t)*.05,'자력 증폭!'));return 1}},
+ side:{d:'건틀릿 나사: 오래 싸워도 허리가 버틴다, 고철 주울 때 금속 +1',field:()=>{G.me.inv.metal++}},
+});
+rxStory('ts',{
+ firefly:{d:'고로의 그릇: 생사 각인이 터질 때 체력 +6',atk:x=>{if(x&&(x.tsM||0)===2)heal(6);return 1}},
+ revenge:{d:'일륜회 표식 조각: 생사 각인 피해 +5%p(최대 체력 비례)',atk:x=>{if(x&&(x.tsM||0)===2)x.post_=x.post_||(t=>rxHit(t,foeMax(t)*.05,'일륜회의 기술!'));return 1}},
+ promise:{d:'부치지 못한 편지: 동료가 있으면 회피 +8%',num:{evade:()=>allies().length?.08:0}},
+ side:{d:'차륜수리검: 수리검 전개 피해 50%→65%',skill:F=>rxUp(F).forEach(x=>{if(ch(.5))rxHit(x,atkOf('me')*.15,'수리검!')})},
+});
+rxStory('kt',{
+ piano:{d:'피아노 건반 하나: 정밀 조준이 교전당 두 번',round:F=>{if(F.ktR&&!F.rxKt){F.rxKt=1;F.ktR=0}}},
+ reaper:{d:'잿빛 탄피: 잿빛 사신 추가 피해 +8',atk:x=>{if(x&&G.me.ktArm)x.post_=x.post_||(t=>rxHit(t,8,'잿빛 탄!'));return 1}},
+ drone:{d:'드론 부품: 목표물 포착 후 다음 교전 첫 라운드 받는 피해 -30%',field:()=>nf({rxDr:1}),start:F=>{if(F.nf.rxDr)FX(F).armor={v:.7,r:2}}},
+ side:{d:'찌그러진 조준경: 실수(막힌 공격)해도 정신이 덜 깎인다',san:v=>v<0&&G.fight?v*.7:v},
+});
+rxStory('cs',{
+ hope:{d:'튤립 화환: 고결한 마음 최대 3→5',hurt:(d,k)=>{const m=m_();if(G.fight&&k==='kill'&&d>=m.max*.12&&(m.chN||0)>=3&&m.chN<5)m.chN++;return d}},
+ firm:{d:'백합 반지: 기적 실현 회복 40%→55%',skill:()=>{const m=m_();if(m.chMir===0&&m.rxCh!==G.fight.round){m.rxCh=G.fight.round}}, heal:v=>v>=G.me.max*.35?v*1.35:v},
+ dark:{d:'꺼진 촛불: 어두운 밤에도 정신 감소 -15% 추가',san:v=>v<0&&night()?v*.85:v},
+ side:{d:'식은 촛대: 치유의 빛 회복 +4',skill:()=>heal(4)},
+});
+rxStory('dr',{
+ collect:{d:'피 묻은 골프채: 추심 피해 +최대 체력 4%',atk:x=>x&&x.drM?1.1:1,skill:F=>rxUp(F).forEach(x=>{if(x.stunned&&!x.drM)rxHit(x,foeMax(x)*.04,'이자까지!')})},
+ repay:{d:'탕감 증서: 압류 주기 2라운드→매 라운드',start:F=>{F.drT=-9},round:F=>{F.drT=-9}},
+ father:{d:'타다 남은 차용증: 처치 시 정신 +5 추가, 수금 재료 +1',kill:()=>{san(5);G.me.inv.metal++}},
+ side:{d:'압류 딱지: 표식이 있는 적에게 받는 피해 -10%',def:f=>f&&(f.drM||(f.mark&&f.mark.r>0))?.9:1},
+});
+rxStory('lnr',{
+ swan:{d:'끊어진 E현: 비명 최대 10→15, 비명 3개마다 대기 -1',skill:()=>{const m=m_();if(m.lnS>=10)m.lnS=Math.min(15,m.lnS+1)}},
+ silence:{d:'송진 조각: 불협화음 피해 6→10',round:F=>{if(FX(F).sound&&FX(F).sound.r>0)rxUp(F).forEach(x=>rxHit(x,4,'♪'))}},
+ friend:{d:'콩쿠르 참가증: 동료가 있으면 고통의 선율 회복(피해의 20%)',skill:()=>{if(allies().length)heal(5)}},
+ side:{d:'공연 팸플릿: 맑은 날 피해 +8%',dmg:()=>G.weather!=='rain'?1.08:1},
+});
+rxStory('ym',{
+ dao:{d:'조부의 편지: 바람 지대가 5라운드 지속',round:F=>{if(F.ymW>0&&!F.rxY){F.ymW+=2;F.rxY=1}if(!(F.ymW>0))F.rxY=0}},
+ help:{d:'바람 부적: 바람 보호막 2배',skill:F=>{const m=m_();if(F.ymW>0&&m.ymSh>0)m.ymSh*=2}},
+ drift:{d:'빈 호리병: 사람을 쓰러뜨려도 괴로움이 덜하다(정신 +3), 도주 +8%',kill:()=>san(3),num:{flee:.08}},
+ side:{d:'구름 한 조각: 결계 후 정신 +4 추가',field:()=>san(4)},
+});
+rxStory('hs',{
+ blade:{d:'야이바의 타도: 거합 첫 라운드 배율 2→2.5',dmg:F=>F&&F.round<=1?1.25:1},
+ doubt:{d:'찢어진 명부: 검의 기억 최대 2→3',skill:()=>{const m=m_();m.hsM=3}},
+ loyal:{d:'감자칩 봉지: 동료가 있으면 받는 피해 -12%, 잠을 잘 잔다(휴식 체력 +6)',def:()=>allies().length?.88:1,pick:t=>{if(t==='휴식')heal(6)}},
+ side:{d:'이 빠진 칼날: 처음 보는 무기를 든 상대에게 피해 +10%',atk:x=>x&&x.kind==='npc'&&x.n.c.w!==G.me.p.w?1.1:1},
+});
+rxStory('iv',{
+ observe:{d:'관측 노트: 연산 4→3회',atk:()=>{const m=m_();if((m.isN||0)===3)m.isN=4;return 1}},
+ branch:{d:'갈라진 세계선: 다른 가능성 회복량 25%→40%',skill:()=>{const m=m_();if(m.isN===0)heal(Math.round((m.max-m.hp)*.15))}},
+ loop:{d:'깨진 거짓말 탐지기: 교전 장기화 보너스 상한 30%→45%',dmg:F=>F&&F.round>7?1.12:1},
+ side:{d:'격리 장치: 생각을 방해받지 않는다 — 정신 감소 -10%, 숙련 +10%',san:v=>v<0?v*.9:v,num:{xp:.1}},
+});
+rxStory('ni',{
+ party:{d:'2P 컨트롤러: 동료가 있으면 K.O. 중첩 2배',atk:(x,F)=>{if(x&&allies().length&&typeof niKO==='function')x.koN=(x.koN||0)+1;return 1}},
+ logout:{d:'꺼진 게임기: 1UP으로 일어날 때 체력 30%→50%',hurt:(d,k)=>{const F=G.fight,m=m_();if(F&&k==='kill'&&F.niUp&&m.hp-d<=0)heal(Math.round(m.max*.2));return d}},
+ world:{d:'세이브 파일: 교전마다 1UP이 자동으로 걸린다(게임당 2번)',start:F=>{const m=m_();if((m.rxSave||0)<2&&!F.niUp){F.niUp=1;m.rxSave=(m.rxSave||0)+1}}},
+ side:{d:'게이밍 껌: 교전 첫 라운드 피해 +15%',dmg:F=>F&&F.round<=1?1.15:1},
+});
+rxStory('xl',{
+ master:{d:'공명하는 검 장식: 유운잔영검 3→2중첩',atk:()=>{const m=m_();if((m.xlS||0)===2)m.xlS=3;return 1}},
+ keeper:{d:'사원의 향: 회전하는 어검이 1라운드 더',skill:F=>{F.xlSpin=(F.xlSpin||0)+1}},
+ tea:{d:'찻잔: 교전이 끝날 때 체력 +8 추가, 정신 +3',end:()=>{heal(8);san(3)}},
+ side:{d:'검집 매듭: 무진검결이 공격을 막을 때 체력 +5',hurt:(d,k)=>{if(G.fight&&k==='kill'&&d===0)heal(5);return d}},
+});
+rxStory('bl',{
+ revenge:{d:'XMS-5 빈 앰플: XMS-5 활성화 피해 +30%→+45%, 정신 소모 없음',skill:F=>{const fx=FX(F);if(fx.buff&&fx.buff.v===1.3&&fx.buff.r===5){fx.buff.v=1.45;san(5)}}},
+ truth:{d:'아글라이아 진료 차트: VF 실험체에게 피해 +15% 추가',atk:x=>x&&x.kind==='npc'&&x.n.c.tags.includes('vf')?1.15:1},
+ father:{d:'아버지의 라이터: 밤에도 정신이 덜 깎인다, 불면 해소(휴식 체력 +8)',san:v=>v<0&&night()?v*.7:v,pick:t=>{if(t==='휴식')heal(8)}},
+ side:{d:'쌍날검 연결쇠: 쌍검 연격 40%→55%',atk:(x,F)=>{if(x&&F&&G.me.blF!=='d'&&ch(.5))x.rxBl=1;return x&&x.rxBl?1.05:1}},
+});
+rxStory('mk',{
+ sister:{d:'동생의 머리끈: 리펄스 게이지 축적 40%→60%',hurt:(d,k)=>{const m=m_();if(G.fight&&k==='kill'&&d>0)m.mkG=Math.min(mkCap(),(m.mkG||0)+Math.round(d*.2));return d}},
+ queen:{d:'여왕의 망치: 동료 한 명당 받는 피해 -4% 추가, 동료가 있으면 크래시 해머 피해 +15%',def:()=>1-.04*allies().length,dmg:()=>allies().length?1.08:1},
+ payback:{d:'찢어진 흰 가운: 강화 크래시 해머 여진 35%→55%',skill:F=>{if((m_().mkG||0)===0)rxUp(F).forEach(x=>rxHit(x,atkOf('me')*.2,'여진!'))}},
+ side:{d:'피 묻은 망치 손잡이: 리펄스 게이지가 교전 밖에서 줄지 않는다',tick:()=>{const m=m_();if(!G.fight)m.mkG=Math.min(mkCap(),(m.mkG||0)+1)}},
+});
+rxStory('fr',{
+ sea:{d:'바닷물에 젖은 모래: 최후의 발악 2→3라운드',hurt:(d,k)=>{const F=G.fight;if(F&&F.frU===2&&!F.rxFr){F.rxFr=1;F.frU=3}return d}},
+ keeper:{d:'연구원의 메모: 찢는 손톱 VF 흡수 10%→16%',skill:()=>{const m=m_();if(!m.frC)heal(Math.round(m.max*.06))}},
+ chain:{d:'끊어진 사슬: 밤 피해 +15% 추가',dmg:()=>night()?1.15:1},
+ side:{d:'물어뜯은 목줄: 체력 30% 이하 받는 피해 -10% 추가',def:()=>hpR()<=.3?.9:1},
+});
+rxStory('cv',{
+ owner:{d:'빈 탄창: 탄환 6→8발',start:()=>{G.me.cvB=8}},
+ endless:{d:'무법자의 모자: 마탄·재장전 직후 다음 공격 +50%',skill:F=>{if((G.me.cvB??0)>=6)FX(F).nextHit=1.5}},
+ bet:{d:'원념의 탄환: 원념 축적 상한 +40%→+60%',dmg:()=>cs()>=10?1.14:1,kill:()=>{const m=m_();m.rxCv=(m.rxCv||0)+1}},
+ side:{d:'녹슨 박차: 재장전 라운드에도 피해가 절반으로 떨어지지 않는다',atk:()=>(G.me.cvB??6)===6?1.4:1},
+});
+rxStory('fx',{
+ home:{d:'생일 초: 연계 공격 최대 8→12',atk:()=>{const m=m_();if((m.fxC||0)>0&&m.fxS>=8)m.fxS=Math.min(12,m.fxS+1);return 1}},
+ badge:{d:'시드니의 배지: 동료가 체력 40% 이하일 때 그 동료 회복 +10(라운드당 1회)',round:()=>{const a=allies().find(a=>a.hp<npcMax(a)*.4);if(a)a.hp=Math.min(npcMax(a),a.hp+10)}},
+ relic:{d:'스승의 유물 조각: 반월참 흡혈 25%→40%',skill:()=>{const m=m_();if(m.fxC===0)heal(6)}},
+ side:{d:'찢어진 만화책: 체력 40% 이하에서 피해 +10% 추가',dmg:()=>hpR()<=.4?1.1:1},
+});
+rxStory('el',{
+ rink:{d:'스케이트 날: 링크 위에서 피해 +8% 추가, 받는 피해 -6% 추가',dmg:()=>G.me.elLink===G.me.area?1.08:1,def:()=>G.me.elLink===G.me.area?.94:1},
+ queen:{d:'얼음 왕관: 냉기 축적 +50%',atk:(x,F)=>{if(x&&F&&typeof elChill==='function'&&!x.elFz)x.elC=(x.elC||0)+10;return 1}},
+ rival:{d:'동료의 응원 편지: 동료가 쓰러지거나 배신해도 정신이 덜 흔들린다(-30%)',san:v=>v<0&&v<=-8?v*.7:v},
+ side:{d:'깨진 스케이트 케이스: 빙결된 적 추가 피해 +6',atk:x=>{if(x&&x.elFz)x.post_=x.post_||(t=>rxHit(t,6,'얼음 파편!'));return 1}},
+});
+rxStory('pr',{
+ free:{d:'사라스바티의 꽃: 꽃이 핀 채로 교전을 시작한다',start:F=>{F.prFl=1}},
+ grand:{d:'할머니의 시타르 줄: 개화의 선율 지속 회복 6→9',round:F=>{const r=FX(F).regen;if(r&&r.r>0&&r.name==='개화의 선율')heal(3)}},
+ wall:{d:'별채 열쇠: 실내에서도 답답하지 않다, 실내에서 받는 피해 -10%',def:()=>INDOOR.has(G.me.area)?.9:1},
+ side:{d:'담쟁이 반지: 야외 회복 0.5→1/턴',tick:()=>{if(!INDOOR.has(G.me.area)){const m=m_();m.hp=Math.min(m.max,m.hp+.5)}}},
+});
+rxStory('adn',{
+ guide:{d:'수정구 조각: 별 천체의 회복 12→20, 막기 1회 추가',skill:F=>{if(G.me.adLast==='star'){heal(8)}}},
+ fate:{d:'불길한 카드: 컨정션 확률 증가(천체를 채울 때 같은 천체가 둘 이상)',field:()=>{const m=m_();if(m.adQ&&m.adQ.length)m.adQ[1]=m.adQ[0]}},
+ will:{d:'석류청 병: 해 천체 피해 +25%',dmg:()=>G.me.adQ&&G.me.adQ[0]==='sun'?1.25:1},
+ side:{d:'접힌 별자리표: 흐린 날에도 집중한다(정신 감소 -20%)',san:v=>v<0?v*.8:v},
+});
+rxStory('kr',{
+ secret:{d:'할머니의 해도: 바다 근처 피해 +10% 추가, 물가에서 정신 +1/턴',dmg:()=>WATER.has(G.me.area)?1.1:1,tick:()=>{if(WATER.has(G.me.area))san(1)}},
+ crew:{d:'선원의 금화: 동료가 위기면 즉시 뛰어든다 — 동료가 있으면 받는 피해 -10%',def:()=>allies().length?.9:1},
+ revenge:{d:'피 묻은 작살: 장전 게이지 3→2에서 완충',round:()=>{const m=m_();if((m.krG||0)===2)m.krG=3}},
+ side:{d:'녹슨 닻 장식: 작살 회수 피해 +15%',skill:F=>{}, atk:x=>x&&x.krH?1.15:1},
+});
+rxStory('es',{
+ rescue:{d:'그을린 방화 헬멧: 사명감 라운드 회복 2%→4%',round:()=>{const m=m_();heal(Math.max(1,Math.round(m.max*.02)))}},
+ michael:{d:'미하엘의 이름표: 응급처치를 교전당 두 번',round:F=>{if(F.esR&&!F.rxEs){F.rxEs=1;F.esR=0}}},
+ retreat:{d:'꺼진 무전기: 진압 기절 + 다음 라운드 적 공격력 -15%',skill:F=>{FX(F).weak={v:.85,r:2}}},
+ side:{d:'찌그러진 소화기: 화상 면역, 불 피해 -80%',hurt:(d,k)=>k==='fire'||k==='burn'?Math.round(d*.2):d},
+});
+rxStory('po',{
+ teacher:{d:'스승의 편지: 단련의 성과 추가 피해 +6',atk:x=>{if(x&&G.me.poArm)x.post_=x.post_||(t=>rxHit(t,6,'스승의 가르침!'));return 1}},
+ gym:{d:'체육관 열쇠: 단련의 성과 최대 5→8',tick:()=>{const m=m_();if(!G.fight&&(m.poT||0)>=5&&ch(.3))m.poT=Math.min(8,m.poT+1)}},
+ gap:{d:'나눠 먹은 도시락: 교전 후 줍는 확률 35%→70%',end:()=>{if(ch(.35))log(`(${gain({[pick(['metal','cloth','food'])]:1})})`)}},
+ side:{d:'낡은 쌍절곤 끈: 쌍절난격 끊기 2→3턴',skill:F=>rxUp(F).forEach(x=>noSkill(x,3))},
+});
+rxStory('mt',{
+ scoop:{d:'송출 테이프: 방송 중 피해 +45%→+60%',dmg:()=>G.me.filmDone?1.1:1},
+ protect:{d:'모자이크 편집본: 약한 실험체가 동료면 받는 피해 -12%',def:()=>allies().some(a=>['good'].includes(alignOf(a.c)))?.88:1},
+ tape:{d:'봉인된 테이프: 촬영 진행도 획득 +50%',field:()=>{const m=m_();m.film=Math.min(100,(m.film||0)+12)}},
+ side:{d:'위장 카메라: 소형 카메라 최대 2→3',field:()=>{const m=m_();m.mtCam=Math.min(3,(m.mtCam||0)+1)}},
+});
+rxStory('iz',{
+ king:{d:'왕의 시가: 착취 회복 50%→80%',atk:x=>{if(x&&x.isH&&x.isH%3===0)heal(4);return 1}},
+ example:{d:'본보기 명단: 처치할 때마다 근처 실험체 호감 -10, 다음 교전 피해 +20%',kill:()=>{near().forEach(n=>aff(n,-10));nf({mult:1.2,multRounds:2})}},
+ deal:{d:'영역 계약서: 누명 씌우기 후 그 상대에게 피해 +20%',atk:x=>x&&x.kind==='npc'&&(x.n.aff||0)<-20?1.2:1},
+ side:{d:'낡은 경찰 배지: 경찰서에서 받는 피해 -15%',def:()=>G.me.area==='경찰서'?.85:1},
+});
+rxStory('hz',{
+ refund:{d:'배상 계약서: 죽음의 상인 피해 +45%→+60%',atk:()=>G.me.hzNext?1.1:1},
+ luxury:{d:'요트 열쇠: 창고 호출 탄약 +10 추가, 정신 +4',field:()=>{G.me.ammo=(G.me.ammo||0)+10;san(4)}},
+ trace:{d:'위조 라벨: 화력 전개 피해 +15%',skill:F=>{const x=pick(rxUp(F));if(x)rxHit(x,atkOf('me')*.15,'라벨 탄!')}},
+ side:{d:'웨폰 케이스 열쇠: 탄약이 떨어져도 공격이 약해지지 않는다, 탄약 +15',init:me=>{me.ammo=(me.ammo||0)+15}},
+});
+
 /* ===================== V3.3 · RELIC COLLECTION + STARTING RELIC ===================== */
 const RELIC_KEY='lumia_relics_v1',RELIC_EQ='lumia_relic_eq';
 function relicOwned(){let s;try{s=new Set(JSON.parse(localStorage.getItem(RELIC_KEY)||'[]'))}catch(e){s=new Set()}
@@ -11867,21 +12570,70 @@ function relicSetEq(id){try{id?localStorage.setItem(RELIC_EQ,id):localStorage.re
 /* which story / ending a relic comes from */
 function relicSrc(id){const i=id.lastIndexOf('_');const sid=id.slice(0,i),e=id.slice(i+1);const S=SUBS[sid];if(!S)return null;
   const E=e==='side'?S.ends.side:e==='rift'?(S.ends.rift||RIFT):S.ends[e];return{sid,S,e,E}}
+let RELIC_OWN=false;
 function relicSheet(){
-  const own=relicOwned(),eq=relicEq();const ids=Object.keys(RELICS).filter(id=>relicSrc(id));
+  const own=relicOwned(),eq=relicEq();const all=Object.keys(RELICS).filter(id=>relicSrc(id));const ids=RELIC_OWN?all.filter(id=>own.has(id)):all;
   const groups={};ids.forEach(id=>{const r=relicSrc(id);(groups[r.sid]=groups[r.sid]||[]).push(id)});
-  const n=ids.filter(id=>own.has(id)).length;
-  const html=`<h4>유물 도감 · ${n}/${ids.length}</h4><p class="muted">서브스토리 엔딩에서 얻은 유물은 도감에 남는다. 얻어 본 유물 중 하나를 골라 두면 다음 게임을 그 유물을 지닌 채 시작한다. 한 번 더 누르면 해제된다.</p>
+  const n=all.filter(id=>own.has(id)).length;
+  const html=`<h4>유물 도감 · ${n}/${all.length}</h4><p><button class="btn-sub" id="relown" style="padding:6px 12px">${RELIC_OWN?'전체 유물 보기':'보유 중인 유물만 보기'}</button></p>${RELIC_OWN&&!ids.length?'<p class="muted">아직 얻은 유물이 없다.</p>':''}<p class="muted">서브스토리 엔딩에서 얻은 유물은 도감에 남는다. 얻어 본 유물 중 하나를 골라 두면 다음 게임을 그 유물을 지닌 채 시작한다. 한 번 더 누르면 해제된다.</p>
   <p class="muted">지금 장착: ${eq&&own.has(eq)&&RELICS[eq]?`<b>「${esc(RELICS[eq][0])}」</b> · ${esc(RELICS[eq][1])}`:'없음'}</p>
   ${Object.entries(groups).map(([sid,list])=>`<h4>${esc(SUBS[sid].n)}</h4><ul class="ach">${list.map(id=>{const r=relicSrc(id);const on=own.has(id);const R=RELICS[id];
     return on?`<li class="on${id===eq?' eqr':''}" data-r="${id}" style="cursor:pointer"><b>${id===eq?'★ ':'✓ '}${esc(R[0])}</b><span>${esc(R[1])}</span><small>${esc(r.E?r.E[0]:'')} 엔딩${id===eq?' · 장착 중':' · 눌러서 장착'}</small></li>`
     :`<li data-rl="${id}"><b>???</b><span>${esc(r.E?(r.E[2]||r.E[1]||''):'')}</span></li>`}).join('')}</ul>`).join('')}`;
   openSheet(html);
-  const sh=document.getElementById('pbody');if(sh)sh.onclick=e=>{const li=e.target.closest('[data-r]');if(!li)return;const id=li.dataset.r;relicSetEq(relicEq()===id?'':id);relicSheet();const b=document.getElementById('relb');if(b)b.textContent=relicBtnText()};
+  const sh=document.getElementById('pbody');if(sh)sh.onclick=e=>{if(e.target.closest('#relown')){RELIC_OWN=!RELIC_OWN;relicSheet();return}const li=e.target.closest('[data-r]');if(!li)return;const id=li.dataset.r;relicSetEq(relicEq()===id?'':id);relicSheet();const b=document.getElementById('relb');if(b)b.textContent=relicBtnText()};
 }
 function relicBtnText(){const own=relicOwned();const tot=Object.keys(RELICS).filter(id=>relicSrc(id)).length;const eq=relicEq();return`유물 도감 ${[...own].filter(id=>relicSrc(id)).length}/${tot}${eq&&own.has(eq)&&RELICS[eq]?` · ${RELICS[eq][0]}`:''}`}
 if(typeof selectScreen==='function'){const ss=selectScreen;selectScreen=function(){ss();const acts=document.querySelector('.hero-acts');if(!acts)return;
   acts.insertAdjacentHTML('beforeend',`<button class="btn-sub" id="relb">${esc(relicBtnText())}</button>`);document.getElementById('relb').onclick=()=>relicSheet()}}
+
+/* ===================== V3.4 · 장비 개편: 노획 규칙, 내구 하락 제거, 혈액팩·초월 등급 ===================== */
+if(GR.length<6)GR.push('초월');
+/* 위클라인은 혈액팩을 떨어뜨린다. 혈액팩은 초월 제작 전용이라 전설 재료 목록에서는 뺀다 */
+Object.values(BOSSES).forEach(b=>{if(b.name==='위클라인')b.drop='혈액팩'});
+{const i=SPW.indexOf('VF 혈액 샘플');if(i>=0)SPW.splice(i,1);const j=SPA.indexOf('VF 혈액 샘플');if(j>=0)SPA.splice(j,1)}
+const TRANS_W={글러브:'블러디 핸즈',톤파:'칼날 톤파',방망이:'로드 오브 하트',망치:'피스브링어',채찍:'혈화구절편',투척:'체이서',암기:'흑련비표',활:'페일노트',석궁:'혈색반월',권총:'하이 눈',돌격소총:'헬파이어',저격총:'위도우 메이커',도끼:'진홍빛 낫',단검:'비색 단검',양손검:'다인슬라이프',쌍검:'환영도',창:'롱기누스의 창',쌍절곤:'히드라',레이피어:'노스페라투',기타:'하트 브레이커',카메라:'비전 플렉스',아르카나:'더 데스',맨손:'블러디 핸즈'};
+const TRANS_A=['버건디 47','붉은 별빛','퀸 오브 하트','흑염룡의 갑주','발할라의 투구','핏빛 왕관','네크로노미콘','혈사조','로즈 스텝'];
+const TRANS_SUF=['','-진홍','-새벽'];
+{const wb=wnameBase;wnameBase=function(p,g,br){if(g>=5){const b=TRANS_W[p.w]||TRANS_W[(p.ws||[])[0]]||'블러디 핸즈';return b+TRANS_SUF[hashStr(p.id+'tw')%3]}return wb(p,Math.min(4,g),br)}}
+const transArmor=p=>TRANS_A[hashStr(p.id+'ta')%TRANS_A.length];
+/* 초월 제작 */
+{const rc=recipes;recipes=function(){const R=rc();const m=G.me;if(!m)return R;
+  if(m.wg===4&&m.p.id!=='echion')R.unshift({l:`무기 초월 · ${wname(m.p,5)}`,cost:{metal:5,powder:3},sp:['혈액팩'],f:()=>{G.gradeOK=1;m.wg=5;log(`혈액팩을 쏟아붓자 무기가 붉게 맥동한다. 초월 등급 「${wname(m.p,5)}」.`,'crit-win')}});
+  if(m.ag===4)R.unshift({l:`방어구 초월 · ${transArmor(m.p)}`,cost:{cloth:4,leather:3},sp:['혈액팩'],f:()=>{G.gradeOK=1;m.ag=5;log(`혈액팩이 섬유 속으로 스며든다. 초월 등급 방어구 「${transArmor(m.p)}」.`,'crit-win')}});
+  return R}}
+/* 처치 노획: 같은 무기군의 더 좋은 무기, 더 좋은 방어구만 */
+function sameWeaponGroup(n){const mine=G.me.p.ws||[G.me.p.w];const theirs=n.c.ws||[n.c.w];return theirs.some(w=>mine.includes(w))}
+loot=function(n){const me=G.me;let got=0;
+  if(me.p.id!=='echion'&&sameWeaponGroup(n)&&n.g>me.wg&&me.wg<5){G.gradeOK=1;me.wg=n.g;got=1;log(`${nm(n)}의 ${wnameOf(n)}을(를) 빼앗아 쥐었다. 같은 무기군이라 손에 맞는다. (무기 ${GR[me.wg]})`,'good')}
+  if(n.g>me.ag&&me.ag<5){G.gradeOK=1;me.ag=n.g;got=1;log(`${nm(n)}의 방어구를 벗겨 입었다. (방어구 ${GR[me.ag]})`,'good')}
+  log(`${nm(n)}의 가방을 챙겼다. (${gain({[pick(['metal','cloth','powder','food'])]:2,bandage:ch(.35)?1:0})})`)};
+/* 인카운터·이벤트로는 등급이 오르지 않는다: 제작, 필드 스킬, 교전 중 효과, 처치 노획만 허용 */
+{const po=pickOpt;pickOpt=function(o){const me=G.me;if(!me)return po(o);const w0=me.wg,a0=me.ag,inFight=!!G.fight,tag=G.card&&G.card.tag;G.gradeOK=0;
+  po(o);const m=G.me;if(!m||m!==me)return;
+  const ok=G.gradeOK||inFight||tag==='제작'||(o&&o.skill);if(ok)return;
+  let back=0;if(m.wg>w0&&m.p.id!=='echion'){m.wg=w0;m._wg=w0;back++}if(m.ag>a0){m.ag=a0;back++}
+  if(back){m.inv.metal+=back;log(`…손에 넣은 장비는 몸에 맞지 않았다. 분해해서 재료로 챙겼다. (금속 +${back}) ※ 장비 등급은 제작과 처치 노획으로만 오른다`,'news')}}}
+
+/* ===================== 서브스토리 정합성: 이름이 나온 적은 실제로 그 실험체가 나온다 ===================== */
+const everIn=id=>G.npcs.some(n=>n.c.id===id);
+function spawnAs(id,near){if(!BY[id]||isMe(id))return null;const live=npcById(id);if(live)return live;if(everIn(id))return null;
+  const castAll=new Set(Object.values(SUBS).flatMap(T=>T.cast||[]));
+  const n=G.npcs.find(x=>x.alive&&x.team!=='me'&&!castAll.has(x.c.id)&&!(x.c.bonds||[]).length&&!x.busy)||G.npcs.find(x=>x.alive&&x.team!=='me'&&!castAll.has(x.c.id));if(!n)return null;
+  const c=BY[id];n.c=c;n.hp=c.role==='tank'?120:100;n.area=near?G.me.area:(pick((c.haunt||[]).filter(a=>a!==LAB&&passable(a)))||n.area);n.aff=Math.round(((c.ally||.5)-.5)*40);n.team=null;n.mem={};n.hostile=false;return n}
+ant=function(ids){const S=G.sub&&SUBS[G.sub.id];for(const id of ids){if(S&&S.cast&&S.cast.includes(id))continue;if(isMe(id))continue;const n=subNpc(id)||spawnAs(id,true);if(n&&n.team!=='me')return n}return null};
+/* 스토리가 이름으로 부르는 조연·적은 시작할 때 섬에 있게 한다 */
+function storyRefs(S){const src=(S.ch||[]).map(f=>String(f)).join('\n');const ids=new Set();
+  for(const m of src.matchAll(/(?:ant|fightAnt)\(\[([^\]]*)\]/g))for(const x of m[1].matchAll(/'(\w+)'/g))ids.add(x[1]);
+  for(const m of src.matchAll(/(?:subNpc|npcById)\('(\w+)'\)/g))ids.add(m[1]);
+  return[...ids].filter(id=>BY[id]&&!(S.cast||[]).includes(id))}
+{const ss=startSub;startSub=function(id,extra){ss(id,extra);const S=SUBS[id];if(!S||!G.sub||G.sub.id!==id)return;try{storyRefs(S).forEach(r=>{if(!isMe(r))spawnAs(r,false)})}catch(e){}}}
+/* 짝 실험체(마커스·매그너스 등)는 재회 인카운터가 먼저 뜬 뒤에 서브스토리가 시작된다 */
+{const sc=subCard;subCard=function(){const s=G.sub;const S=s&&SUBS[s.id];
+  if(S&&s.ch===0&&!s.pairOK&&S.cast){for(const [x,y] of PAIRS){if(!(isMe(x)||isMe(y)))continue;const pid=isMe(x)?y:x;if(!S.cast.includes(pid))continue;const p=npcById(pid);
+    if(p&&p.team!=='me'){if(!G.flags['pj_'+pid]){G.flags['pj_'+pid]=1;s.next=G.choices+2;return pairJoinCard(p)}s.next=G.choices+2;return null}}
+    s.pairOK=1}
+  return sc()}}
 
 /* ===================== UI ===================== */
 const app=document.getElementById('app');
@@ -11892,7 +12644,7 @@ let curPid=null;
 const playable=()=>PROF.filter(p=>!p.hiddenChar||hidUnlocked(p));
 
 
-const PATCH=[["v3.3", "2026.10.29", [["신규 · 유물 도감", ["서브스토리 엔딩에서 얻은 유물이 도감에 영구히 기록됩니다. 실험체 선택 화면의 「유물 도감」에서 확인할 수 있습니다.", "얻어 본 유물 중 하나를 장착해 두면, 다음 게임을 그 유물을 지닌 채 시작합니다. 장착한 유물을 다시 누르면 해제됩니다.", "이전에 달성한 서브스토리 엔딩의 유물도 도감에 반영됩니다."]], ["신규 · 전용 서브스토리 4편", ["「미제 사건」(아야), 「잊혀진 죽음」(자히르), 「늑대의 숲」(나딘), 「POLARIS」(하트)가 추가되었습니다.", "모든 이야기에 중간 갈림길과 전용 엔딩, 도전과제, 유물이 준비되어 있습니다."]], ["실험체 개편 · 아야", ["패시브 「아야의 정의」: 공격받으면 보호막이 생기고, 맞을 때마다 정의가 쌓입니다.", "필드 스킬 「정의」: 쌓인 정의로 체력을 회복하고 부상을 털어 냅니다.", "전투 스킬 「2연발」: 재사용 대기가 짧은 두 발 사격."]], ["실험체 개편 · 자히르", ["패시브 「처단」: 많이 죽인 상대일수록 추가 피해를 줍니다.", "전투 스킬 「나라야나스트라」: 사신의 눈 표식이 있는 적에게 더 큰 피해를 줍니다.", "필드 스킬 「사신의 눈」: 최근 사망자가 쓰러진 곳을 보고, 이 구역의 유품을 찾아냅니다."]], ["실험체 개편 · 나딘", ["패시브 「야성」: 사냥과 처치로 야성이 쌓이며 피해가 늘어납니다.", "전투 스킬 「불스아이」: 야성에 비례해 강해지는 한 발.", "필드 스킬 「천리안」: 야생동물을 찾아 덮쳐 사냥합니다."]], ["실험체 개편 · 하트", ["패시브 「Feedback」: 공격할 때마다 음파가 추가로 날아갑니다.", "전투 스킬 「불협화음」: 상대의 공격력을 떨어뜨리고, 좋은 무기를 든 상대에게 더 큰 피해를 줍니다.", "필드 스킬 「피스메이커」: 구역을 피스존으로 선언해 이번 시간대 습격을 막습니다."]], ["실험체 개편 · 리 다이린", ["취기 게이지가 추가되었습니다. 취기 40 이상이면 맹호청권으로 공격이 한 번 더 들어가고, 100이 되면 만취해 잠시 스킬을 못 쓰는 대신 공격을 흘려 냅니다.", "교전 중 「술 마시기」로 취기를 채우며 피해를 줄일 수 있고, 전투 스킬 「호연각」은 취기를 소모해 강화됩니다."]], ["실험체 개편 · 유키", ["패시브 「완벽한 옷매무새」: 단추를 하나씩 써서 추가 피해를 주고, 체력 80% 이상이면 공격·방어가 오릅니다.", "전투 스킬 「머리치기!」는 단추가 있으면 상대를 굳힙니다. 교전 중 「옷매무새 정리」로 단추를 다시 채웁니다.", "필드 스킬 「오리가미」."]], ["실험체 개편 · 쇼우", ["패시브 「요리사의 열정」: 요리할 때마다 최대 체력이 오릅니다.", "전투 스킬 「뜨거운 맛」: 모든 적을 화염으로 볶아 화상을 입힙니다."]], ["실험체 개편 · 키아라", ["패시브 「낙인」: 낙인이 쌓일수록 상대가 받는 피해가 늘어납니다.", "체력이 절반 아래면 「폭주」로 날개를 펼쳐 매 라운드 모든 적을 휩쓸고, 전투 스킬이 「심판」(낙인 비례 고정 피해)으로 바뀝니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「리화자」(리 다이린), 「봄」(유키), 「만한전석」(쇼우), 「밝음」(키아라+엠마)이 추가되었습니다."]], ["실험체 개편 · 시셀라", ["패시브 「삶은 고통이에요」: 공격받을수록 고통이 쌓여 다음 피해를 줄입니다. 체력이 낮을수록 「윌슨! 도와줘」가 강해집니다."]], ["실험체 개편 · 아드리아나", ["전투 스킬 「방화」: 화염방사기로 모든 적을 세 번 태우고 화상과 방어력 감소를 남깁니다.", "필드 스킬 「방화」로 불을 지른 구역에서 싸우면 피해가 늘어납니다."]], ["실험체 개편 · 루크", ["패시브 「청소 완료」: 연속으로 맞힐수록 손이 빨라지고, 처치하면 잃은 체력을 회복하며 청소 완료가 쌓입니다.", "전투 스킬 「클리닝 서비스」: 세제통을 던진 뒤 상대가 잃은 체력에 비례한 돌진."]], ["실험체 개편 · 캐시", ["패시브 「외과 전문의」: 외상 3개가 쌓이면 치명적 외상으로 고정 피해를 주고 보호막을 얻습니다.", "전투 스킬 「동맥절제술」: 피해와 함께 출혈과 외상을 남깁니다. 성향이 중립으로 변경되었습니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「윌슨」(시셀라), 「반딧불이」(아드리아나+에스텔), 「애프터 서비스」(루크), 「진료 기록」(캐시)이 추가되었습니다."]], ["밸런스 · 난이도 완화", ["탐색으로 얻는 금속·천·식량·가죽·화약·약초가 더 자주 하나씩 더 나옵니다(식량은 특히 더 잘 나옵니다)."]], ["변경 · 도주", ["교전에서 도주에 성공해도 더 이상 엉뚱한 구역으로 밀려나지 않습니다. 그 자리에 남고, 쫓아오던 상대가 흩어집니다.", "지도에서 이동 목표를 정해 가던 중이라면 도주한 뒤에도 그대로 목표를 향해 갑니다."]], ["실험체 개편 · 아델라", ["전투 스킬 「프로모션」: 폰을 세 번 놓으면 다음 수는 퀸(강한 피해 + 기절), 체력 30% 이하 상대는 체크메이트.", "필드 스킬 「프로모션」: 공격으로 쌓은 수로 무기를 한 등급 진급시킵니다(블랙서바이벌 스킬)."]], ["실험체 개편 · 버니스", ["패시브 「산탄」: 공격할 때마다 산탄 추가 피해.", "전투 스킬 「레그샷」: 상대의 도주를 막고 공격력을 떨어뜨리며, 굳어 있는 상대에게 더 큰 피해를 줍니다."]], ["실험체 개편 · 바바라", ["필드 스킬 「원격 드론」: 금속으로 드론을 날려 이웃 구역의 실험체를 폭격하고, 명중할 때마다 신체 개조가 쌓여 공격·방어가 오릅니다(블랙서바이벌 스킬).", "전투 스킬 「BT-Mk2 센트리건」."]], ["실험체 개편 · 수아", ["필드 스킬 「독서」로 읽을 책을 바꾸면 전투 스킬이 바뀝니다: 오딧세이(광역·기절) / 파랑새(보호막·실명) / 돈키호테(돌진·회복).", "패시브 「마음의 양식」: 스킬을 쓰면 다음 공격이 주변까지 울리며 회복합니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「체크메이트」(아델라), 「들꽃」(버니스), 「휴머노이드」(바바라), 「읽지 않은 장」(수아)이 추가되었습니다."]], ["실험체 개편 · 레온", ["패시브 「인간 어뢰」: 물가나 물웅덩이 위에서 피해가 늘고 추가 피해를 줍니다. 세 라운드마다 물웅덩이를 만듭니다. 탐색 네 번에 한 번 재료를 하나 더 찾습니다(블랙서바이벌 「수집욕」).", "전투 스킬 「파도타기」: 모든 적을 휩쓸고 맨 앞의 적을 굳힙니다."]], ["실험체 개편 · 니키", ["패시브 「다혈질」: 받은 피해가 분노로 쌓이고, 가득 차면 3라운드 동안 다혈질로 주변까지 휩쓸어 버립니다.", "전투 스킬 「가드 & 카운터」, 필드 스킬 「스턴트 액션」(피격 피해 고정 감소)."]], ["실험체 개편 · 나타폰", ["필드 스킬 「타임트레일」: 카메라를 세워 두고 4턴 뒤 그 구역에서 회수하면 체력·숙련·정신을 얻습니다(블랙서바이벌 스킬).", "전투 스킬 「셔터 찬스」: 모든 적을 한 라운드 멈추고 피사체를 가득 채웁니다."]], ["실험체 개편 · 얀", ["패시브 「열혈의 의지」: 공격으로 쌓은 의지가 5 이상이면 다음 「니 스트라이크」가 강화됩니다.", "필드 스킬 「옥타곤의 열기」: 다음 교전 피해 증가와 함께 의지를 쥐고 시작합니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「유니콘」(레온), 「아프지 않아」(니키), 「필름」(나타폰+실비아), 「옥타곤」(얀)이 추가되었습니다."]], ["실험체 개편 · 이바", ["바이탈 포스 게이지가 추가되었습니다. 40 이상 모이면 교전 중 「VF 방출」로 모두 쏟아부어 모든 적에게 큰 피해를 줍니다.", "전투 스킬 「빛의 트라이어드」, 필드 스킬 「텔레키네시스」."]], ["실험체 개편 · 다니엘", ["패시브 「고독한 예술가」: 밤에 피해가 늘고, 자신을 몰아붙인 상대를 「예술적 소재」로 삼습니다(블랙서바이벌 스킬).", "전투 스킬 「그림자 가위」: 출혈을 남기고, 약해진 상대는 「걸작」으로 마무리합니다."]], ["실험체 개편 · 클로에", ["패시브 「살아 있는 마리오네트」: 같은 상대를 두 번 공격할 때마다 니나가 따라 찌릅니다.", "필드 스킬 「마리오네트」: 다음 교전에서 마리오네트가 5라운드 동안 적을 찌릅니다(블랙서바이벌 스킬). 전투 스킬 「공격 명령」."]], ["실험체 개편 · 셀린", ["전투 스킬 「플라즈마 폭탄」으로 폭탄을 붙이고, 교전 중 「기폭」으로 쌓인 폭탄을 한꺼번에 터뜨립니다.", "필드 스킬 「형상변환」: 할 때마다 주는 피해가 오릅니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「괴물」(이바), 「걸작」(다니엘), 「니나」(클로에), 「인식표」(셀린)가 추가되었습니다."]], ["실험체 개편 · 에키온", ["VF 게이지가 추가되었습니다. 기본 공격과 「독사의 칼날」로 게이지를 채우면 3라운드 동안 VF 폭주 상태가 되어 주변에 고정 피해를 주고, 「독사의 진노」를 쓸 수 있습니다.", "「독사의 칼날」을 맞히면 다음 라운드에 곧바로 재사용할 수 있습니다. 필드 스킬 「뒤집힌 비늘」."]], ["실험체 개편 · 마이", ["패시브 「오뜨꾸뛰르」: 기본 공격에 추가 피해가 붙고 패턴이 쌓입니다. 패턴 10개로 방어구를 확실히 강화합니다(블랙서바이벌 스킬).", "전투 스킬 「드레이프」, 필드 스킬 「오뜨꾸뛰르」."]], ["실험체 개편 · 라우라", ["전투 스킬 「날카로운 꽃」이 대상에게 예고장을 붙입니다. 예고장이 붙은 상대를 공격하면 체력을 회복합니다.", "스킬을 쓴 뒤 다음 기본 공격이 다른 적까지 휘감습니다. 필드 스킬 「예고장」."]], ["실험체 개편 · 띠아", ["전투 스킬 「브러쉬 스트로크」가 쓸 때마다 노랑, 빨강, 파랑 순으로 색을 바꿉니다. 한 적에게 두 가지 색을 묻히면 다람쥐가 나타납니다.", "필드 스킬 「가라! 다람쥐!」: 다람쥐가 재료를 물어 옵니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「끝까지 살아남아」(에키온), 「다비드」(마이), 「예고장」(라우라), 「다람쥐」(띠아)가 추가되었습니다."]], ["실험체 개편 · 이렘", ["교전 중 「변신」으로 이렘(공격)과 고양이(회피) 상태를 오갑니다. 이렘은 「바운싱 볼」로 적을 매혹하고 물고기 표식을 남기며, 고양이는 표식을 소모해 「냥냥 펀치」를 날립니다.", "같은 구역에 오래 머물면 적응해 더 강해집니다. 필드 스킬 「사뿐~」."]], ["실험체 개편 · 테오도르", ["패시브 「에너지 프로토콜」: 교전 시작 시 보호막을 두르고, 기본 공격으로 스킬 대기 시간을 줄입니다.", "전투 스킬 「에너지 포」가 적을 쏘고 동료를 치유합니다. 「원거리 저격」 후 증폭 스크린으로 한 번 더 발사됩니다."]], ["실험체 개편 · 데비&마를렌", ["교전 중 「교대」로 데비(전열)와 마를렌(후열)을 바꿉니다. 공격마다 블루&레드를 새기고, 다른 색을 새기면 기존 색이 터집니다.", "데비 「하드 슬래시」, 마를렌 「크레센트 댄스」."]], ["실험체 개편 · 아비게일", ["패시브 「티어링 블레이드」: 3라운드마다 기본 공격이 공간을 찢어 추가 피해를 주고 대상이 받는 피해를 올립니다.", "전투 스킬 「바이너리 스핀」: 모든 적을 두 번 벱니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「애완 인간」(이렘), 「사인볼」(테오도르), 「둘이라면」(데비&마를렌), 「약속」(아비게일)이 추가되었습니다."]], ["실험체 개편 · 알론소", ["전투 스킬 「마그네틱 펀치」로 적과 자력으로 연결되고, 다음 기본 공격이 연결을 터뜨려 추가 피해와 기절을 줍니다. 적을 기절시키면 체력을 회복합니다.", "필드 스킬 「바운싱 실드」."]], ["실험체 개편 · 츠바메", ["패시브 「오의 - 생사 각인」: 기본 공격이 각인을 새기고, 3중첩이 되면 베어 추가 피해를 줍니다.", "전투 스킬 「수리검 전개」, 필드 스킬 「제비걸음」."]], ["실험체 개편 · 카티야", ["패시브 「잿빛 사신」: 스킬 뒤 다음 기본 공격이 추가 피해를 줍니다. 처치하면 수당으로 재료를 얻습니다.", "교전마다 한 번 「정밀 조준」으로 최대 셋을 저격합니다. 필드 스킬 「목표물 포착」."]], ["실험체 개편 · 샬럿", ["패시브 「고결한 마음」: 크게 다칠 때마다 회복량이 늘어납니다.", "전투 스킬 「치유의 빛」이 빛무리 공격을 겸합니다. 체력이 절반 아래면 교전마다 한 번 「기적 실현」."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「떠돌이 개」(알론소), 「반딧불 거리」(츠바메), 「잿빛 사신」(카티야), 「한 줄기 빛」(샬럿)이 추가되었습니다."]], ["실험체 개편 · 다르코", ["패시브 「압류」: 2라운드마다 기본 공격이 상대의 방어를 빼앗아 상대는 더 아프게, 다르코는 더 단단하게 만듭니다.", "전투 스킬 「고리대금」이 이자 표식을 남기고, 표식이 있는 상대에게는 「추심」으로 기절시킵니다. 필드 스킬 「수금」."]], ["실험체 개편 · 르노어", ["패시브 「고통의 선율」: 체력이 절반 이하인 적을 스킬로 치면 추가 피해와 함께 비명을 모아 스킬 대기 시간을 줄입니다.", "전투 스킬 「스타카토」, 필드 스킬 「레퀴엠」."]], ["실험체 개편 · 유민", ["교전 중 「경운」으로 바람 지대를 펼칩니다. 바람 지대 위에서 「선풍」을 쓰면 더 큰 바람과 함께 보호막을 얻습니다.", "싸움을 피하는 데 익숙해 도주 성공률이 오릅니다. 필드 스킬 「결계」."]], ["실험체 개편 · 히스이", ["패시브 「검의 기억」: 스킬 뒤 기본 공격이 강해지고 스킬 대기 시간을 줄입니다.", "전투 스킬 「쾌연격」은 교전 첫 라운드에 거합으로 두 배 피해를 줍니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「담보」(다르코), 「스완송」(르노어), 「바람 따라」(유민), 「배신자 명부」(히스이)가 추가되었습니다. 「배신자 명부」는 츠바메가 섬에 있으면 그녀가 표적이 됩니다."]], ["실험체 개편 · 이슈트반", ["패시브 「연산」: 기본 공격과 스킬을 합쳐 4번 쓰면 다음 「관측」이 「다른 가능성」으로 강화되어 모든 적을 베고 잃은 체력을 회복합니다.", "필드 스킬 「경로 적분」."]], ["실험체 개편 · 니아", ["패시브 「K.O.」: 공격마다 중첩을 쌓아 피해를 저장하고, 저장된 피해가 남은 체력을 넘으면 즉시 K.O.시킵니다.", "전투 스킬 「아케이드 드롭」, 필드 스킬 「1UP」: 쓰러질 피해를 한 번 버팁니다."]], ["실험체 개편 · 슈린", ["패시브 「결심응진」: 유운잔영검 3중첩마다 어검이 날아가 추가 피해와 회복을 줍니다.", "전투 스킬 「비검잔위」: 어검이 2라운드 동안 회전하며 적을 베고, 다음 공격 하나를 막습니다."]], ["실험체 개편 · 블레어", ["패시브 「블레이드 시프트」: 스킬을 쓸 때마다 쌍검(연격)과 쌍날검(방어)을 오갑니다. 「이중 참격」과 「칼날폭풍」.", "교전마다 한 번 「XMS-5 활성화」로 4라운드 동안 피해가 오릅니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「다세계」(이슈트반), 「NiaH」(니아), 「검의 주인」(슈린), 「라이터」(블레어)가 추가되었습니다."]], ["편의 · 도감 검색", ["도전과제와 유물 도감에 검색창이 생겼습니다. 초성으로도 찾을 수 있습니다(예: ㅇㅂ → 이바).", "도전과제는 이름과 조건으로, 실험체 이름을 넣으면 그 실험체로 달성할 수 있는 도전과제와 서브스토리 엔딩이 나옵니다.", "유물은 이름과 효과, 해당 서브스토리 실험체 이름으로 찾을 수 있습니다."]], ["실험체 개편 · 미르카", ["패시브 「리펄스 게이지」: 받은 피해가 게이지로 쌓이고, 가득 차면 「크래시 해머」가 강화되어 기절과 여진을 일으킵니다.", "필드 스킬 「구역 장악」."]], ["실험체 개편 · 펜리르", ["패시브 「최후의 발악」: 교전마다 한 번, 쓰러질 피해를 받으면 2라운드 동안 불사 상태가 됩니다.", "전투 스킬 「찢는 손톱」: 2중첩이면 깊게 찢고 VF를 흡수해 회복합니다."]], ["실험체 개편 · 크레이버", ["패시브 「데스페라도」: 탄환 6발로 싸웁니다. 1발이 남으면 「마탄」을 쏠 수 있습니다.", "전투 스킬 「더블 탭」."]], ["실험체 개편 · 펠릭스", ["패시브 「연계 창술」: 「선풍참 → 질풍뇌격 → 반월참」으로 이어지고, 연계 사이의 기본 공격이 마지막 연계를 강화합니다.", "필드 스킬 「무화창」(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「뒷골목의 여왕」(미르카), 「바깥 이야기」(펜리르), 「주인 찾기」(크레이버), 「마을의 영웅」(펠릭스)이 추가되었습니다."]], ["실험체 개편 · 엘레나", ["패시브 「겨울여왕의 영지」: 공격마다 냉기가 쌓이고, 100이 되면 빙결시킵니다. 빙결된 적을 치면 추가 피해.", "필드 스킬 「링크 생성」: 구역을 나만의 무대로 만들어 머무는 동안 강해집니다(블랙서바이벌 스킬). 전투 스킬 「크리스탈 엘레강스」."]], ["실험체 개편 · 프리야", ["전투 스킬 「개화의 선율」이 사라스바티의 꽃을 피우고, 꽃이 핀 상태에서 다시 연주하면 만개해 적을 휩쓸고 동료까지 치유합니다."]], ["실험체 개편 · 아디나", ["패시브 「별읽기」: 수정구의 해·달·별을 차례로 쏘아 보냅니다(해: 큰 피해, 달: 기절, 별: 회복과 방어). 같은 천체가 연달아 나오면 컨정션으로 강화됩니다."]], ["실험체 개편 · 칼라", ["패시브 「작살 장전」: 장전 게이지가 가득 찬 기본 공격이 강해집니다.", "「관통 작살」로 작살을 꽂고, 「회수」로 꽂힌 적을 한꺼번에 당깁니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「빙상의 여왕」(엘레나), 「담장 너머」(프리야), 「불길한 점괘」(아디나), 「할머니의 비밀」(칼라)이 추가되었습니다."]], ["실험체 개편 · 에스텔", ["패시브 「사명감」: 교전 중 매 라운드 체력을 회복하고, 쓰러질 듯한 동료에게 달려가 응급처치합니다.", "전투 스킬 「진압」: 방패를 세워 버티고, 다음 기본 공격으로 강타해 기절시킵니다."]], ["실험체 개편 · 피올로", ["패시브 「단련광」: 교전 밖에서 단련의 성과가 쌓이고, 스킬 뒤 기본 공격에 실려 추가 피해를 줍니다. 싸움이 끝나면 쓸 만한 것을 줍습니다.", "전투 스킬 「쌍절난격」, 필드 스킬 「단련」."]], ["실험체 개편 · 마르티나", ["「취재 중」에서 「방송 중」으로: 촬영 진행도가 다 차면 전투 스킬 「빨리감기」가 강해집니다.", "필드 스킬 「일시정지」: 소형 카메라를 숨겨 다음 교전 첫 상대를 붙잡습니다."]], ["신규 · 전용 서브스토리 3편 (추가)", ["「무너진 건물」(에스텔), 「마음의 틈새」(피올로), 「특종」(마르티나)이 추가되었습니다. 이로써 모든 실험체의 개편이 끝났습니다."]], ["안내", ["앞으로 블랙서바이벌에도 등장했던 실험체는 블랙서바이벌 설정과 스킬도 함께 참고해 개편합니다."]]], "지난 이야기의 흔적을 다음 게임으로 가져갈 수 있습니다. 유물 도감과 함께, 아야·자히르·나딘·하트·리 다이린·유키·쇼우·키아라·시셀라·아드리아나·루크·캐시·아델라·버니스·바바라·수아·레온·니키·나타폰·얀·이바·다니엘·클로에·셀린·에키온·마이·라우라·띠아·이렘·테오도르·데비&마를렌·아비게일·알론소·츠바메·카티야·샬럿·다르코·르노어·유민·히스이·이슈트반·니아·슈린·블레어·미르카·펜리르·크레이버·펠릭스·엘레나·프리야·아디나·칼라·에스텔·피올로·마르티나의 이야기가 시작됩니다."], ["v3.2", "2026.10.29", [["실험체 개편 · 재키", ["패시브 「피의 축제」: 공격마다 출혈이 최대 5중첩까지 쌓이며 매 라운드 피해를 줍니다. 출혈이 가득 차거나 처치에 성공하면 3라운드 동안 아드레날린 상태가 되어 추가 피해와 회복을 얻습니다.", "전투 스킬이 평소엔 「연참」(2연속 베기 + 흡혈), 아드레날린 동안엔 「학살」(잃은 체력 비례 피해, 처치 시 즉시 재사용)으로 바뀝니다.", "필드 스킬 이름이 「습격」으로 변경되었습니다."]], ["실험체 개편 · 피오라", ["역할이 브루저로 변경되었습니다. 이제 낮에도 공격력이 줄지 않습니다.", "패시브 「뚜셰」: 공격마다 표식을 새기고, 4개가 되면 추가 피해·회복과 함께 전투 스킬 재사용 대기가 줄어듭니다.", "전투 스킬 「플레슈」: 세 번 연달아 찌르고 마지막 일격으로 상대를 굳힙니다.", "필드 스킬 「자세 교정」: 동료가 있으면 자세도 바로잡아 줍니다."]], ["실험체 개편 · 아이솔", ["전투 스킬 「셈텍스 폭탄」: 상대에게 폭탄을 붙이고 2라운드 뒤 터뜨립니다. 그동안 공격할수록 폭발 피해가 커집니다.", "패시브 「유격전」: 폭탄이 터지면 3라운드 동안 주는 피해가 증가합니다. 덫 특성은 그대로 유지됩니다.", "필드 스킬 이름이 「Mok제 폭탄」으로 변경되었습니다."]], ["실험체 개편 · 실비아", ["연료 게이지가 추가되었습니다. 필드 스킬 「기동전」으로 바이크에 타고 내릴 수 있으며, 타고 있으면 목적지까지 훨씬 빨리 이동합니다.", "걸을 땐 「스피드건」(피해 + 동료 회복 + 연료 충전), 바이크를 타면 「파워슬라이드」(모든 적 피해 + 회피)로 전투 스킬이 바뀝니다.", "패시브 「그란투리스모」: 처음 밟는 구역마다 주는 피해가 늘어납니다(10개 구역 완주 시 추가 보너스)."]], ["실험체 개편 · 레녹스", ["패시브 「위풍당당」: 적에게 피해를 주면 보호막을 얻습니다.", "전투 스킬 「푸른뱀」: 채찍을 두 번 휘둘러 매 라운드 고정 피해를 주는 표식을 새기고, 상대가 도망치지 못하게 합니다.", "필드 스킬 「낚시」: 식량을 낚고 가끔 재료도 함께 건집니다. 물가에서 더 잘 낚입니다."]], ["실험체 개편 · 일레븐", ["패시브 「힘내자고!」: 전투 스킬이 맞힌 적 수만큼 일레븐 버거가 떨어지고, 체력이 낮으면 라운드마다 주워 먹어 회복합니다.", "전투 스킬 「자~ 집중!」: 모든 적을 도발해 피해를 주고, 받는 피해를 크게 줄이며 동료를 지킵니다.", "필드 스킬 「먹방 라이브」: 근처 실험체와 음식을 나눠 호감을 얻습니다."]], ["실험체 개편 · 리오", ["단궁과 화궁을 바꿔 쥘 수 있습니다. 교전 중 「카에유미」로 활을 바꾸면 카이츄가 가득 찹니다.", "전투 스킬이 활에 따라 바뀝니다: 단궁 「하나레」(모든 적 연사 + 공격력 감소) / 화궁 「하나레」(강한 한 발 + 관통).", "패시브 「카이」: 카이츄 3개가 모이면 다음 공격이 강화됩니다."]], ["실험체 개편 · 윌리엄", ["패시브 「캐치볼」: 공격할 때마다 공을 받아 쌓고, 3개가 모이면 공 두 개를 더 던집니다.", "전투 스킬 「와인드업」: 던진 공과 돌아오는 공에 모두 맞은 적은 한 라운드 굳습니다."]], ["실험체 개편 · 제니", ["패시브 「죽음의 연기」: 게임당 한 번 죽음에 이르는 피해를 받으면 죽은 척 빠져나가고, 체력을 25%까지 되찾습니다.", "필드 스킬 「페르소나」로 레드 와인(공격적)과 블랙 티(회피·도주) 배역을 바꿉니다. 전투 스킬 「레드 카펫」도 배역에 따라 상대를 끌어당기거나 밀어냅니다."]], ["실험체 개편 · 카밀로", ["역할이 브루저로 변경되었습니다.", "패시브 「올레」: 기본 공격과 전투 스킬을 번갈아 쓰면 보호막을 얻고 스킬 재사용 대기가 줄어듭니다.", "전투 스킬 「두엔데」: 춤추며 받는 피해를 절반으로 줄이고 모든 적을 두 번 베며, 두 번 다 맞은 적은 굳습니다."]], ["실험체 개편 · 요한", ["전투 스킬 「찬란한 광휘」: 나와 동료를 회복시키고 상대에게 피해를 줍니다.", "필드 스킬 「미사」: 동료를 치유하고 신성의 향로를 피워, 다음 교전에서 피해가 늘고 「찬란한 광휘」가 상대를 묶습니다.", "패시브 「빛의 가호」: 회복 효과 +20%, 동료가 있으면 매 라운드 동료 체력 회복."]], ["실험체 개편 · 마커스", ["무기가 도끼로 변경되었습니다.", "전투 스킬 「전사의 돌격」으로 상대를 충격 상태로 만들고, 충격 상태의 상대를 공격하면 「일격」이 터집니다.", "필드 스킬 「전투 교범」: 다음 교전에서 받는 피해가 줄고 공격할 때마다 체력을 회복합니다. 쉬는 틈에도 단련해 최대 체력이 조금씩 오릅니다."]], ["실험체 개편 · 아르다", ["전투 스킬 「바빌론의 입방체」: 모든 적에게 피해를 주고, 다음 라운드 입방체가 무너지며 다시 피해를 주고 적을 굳힙니다.", "패시브 「유물 탐구」: 고대의 정수 3개가 모이면 랜턴이 빛나 나와 동료를 회복시킵니다.", "필드 스킬 「발굴 조사」: 절·묘지·성당에서 특수 재료가 더 잘 나옵니다."]], ["실험체 개편 · 루치아", ["패시브 「영애의 소양」: 전투 스킬에 맞은 적에게 수정이 박히고, 수정이 박힌 적을 공격하면 깨뜨리며 추가 피해를 줍니다.", "전투 스킬 「일제 사격!」: 모든 적을 쏘고, 이미 수정이 박혀 있던 적은 굳습니다."]], ["실험체 개편 · 세레스", ["전투 스킬 「쇄도」로 돌진하며 보호막을 두르고, 이어서 「관철」로 상대를 굳힙니다. 보호막이 버티면 폭발합니다.", "패시브 「낭만을 지키는 검」: 공격하면 흑요석 파편이 박혀 매 라운드 피해를 줍니다.", "필드 스킬 「빛에게 바치는 맹세」: 루치아가 곁에 있으면 정신이 회복됩니다."]], ["개선", ["개편된 실험체들의 설명, 성향, 전용 인카운터, 도전과제가 원작 설정에 맞게 새로 작성되었습니다."]]], "원작 설정을 바탕으로 실험체 개편이 이어집니다. 이번에는 재키, 피오라, 아이솔, 실비아, 레녹스, 일레븐, 리오, 윌리엄, 제니, 카밀로, 요한, 마커스, 아르다, 루치아, 세레스입니다."], ["v3.1", "2026.10.29", [["신규 · 명예의 전당", ["우승한 플레이어는 결과 화면에서 이름을 등록해 명예의 전당에 오를 수 있습니다. 실험 점수 상위 10명이 표시됩니다.", "실험체 선택 화면의 「명예의 전당」 버튼으로 언제든 순위를 확인할 수 있습니다."]], ["신규 · 전체 플레이어 통계", ["결과 화면에 이번 판에서 본 엔딩과 서브스토리 엔딩을 전체 플레이어 중 몇 퍼센트가 보았는지 표시됩니다.", "도전과제 화면의 각 항목에 전체 플레이어 달성률이 표시됩니다.", "실험체 선택 화면에 전체 누적 플레이 수와 플레이어 수가 표시됩니다."]], ["신규 · 전용 서브스토리 7편", ["3.0에서 개편된 실험체들에게 전용 서브스토리가 추가되었습니다. 각 이야기는 7장으로 구성되며, 엔딩마다 도전과제와 유물이 준비되어 있습니다.", "「잔치」 · 비형 (레니, 알론소) — 엔딩: 천하제일, 언니, 깨진 단지", "「나비의 꿈」 · 바냐 (레니) — 엔딩: 자유롭게, 바뀐 꿈, 말하지 못한 꿈", "「놀이터」 · 레니 (시셀라) — 엔딩: 영원한 아이, 헬레나, 혼자 남은 놀이터", "「벨라」 · 로지 (아이솔) — 엔딩: 벨라, 마지막 둘, 그림자", "「비기엠마 쇼」 · 엠마 (띠아) — 엔딩: 쇼는 계속된다, 속아 준 마술사, 스페이드 수첩", "「계산서」 · 쇼이치 (캐시) — 엔딩: 청구서, 정산, 약속", "「멈춘 시계」 · 헨리 (이슈트반) — 엔딩: 다시 움직이는 시계, 되감기, 사라의 미소"]], ["실험체 개편 · 이안", ["잠식 게이지(최대 200)가 추가되었습니다. 공격을 맞히면 잠식이 쌓이고, 100이 되면 「빙의」 상태가 되어 잃은 체력의 20%를 회복합니다.", "상태에 따라 전투 스킬이 바뀝니다. 인간 상태는 「미안해요..」(모든 적 피해 + 적 공격력 감소), 빙의 상태는 「피투성이 손톱」(고정 피해 + 회복, 갉아먹기 중첩)을 사용합니다. 빙의되는 순간 빙의 스킬을 바로 쓸 수 있습니다.", "빙의 중 잠식이 100 이상이면 「해방」으로 귀신이 됩니다. 귀신은 받는 피해가 줄고, 공격마다 고정 피해와 회복, 세 번째 공격마다 공포를 겁니다. 잠식이 다하거나 「네 멋대로 설치게 두지 않겠어!!」로 저항하면 인간으로 돌아옵니다.", "필드 스킬 「단검의 목소리」: 인간일 때는 목소리에게 몸을 내주어 바로 빙의하고, 빙의 중에는 저항해 인간으로 돌아옵니다.", "잠식 게이지는 체력 바 아래에 표시되며, 교전 밖에서는 턴마다 줄어듭니다."]], ["실험체 개편 · 타지아", ["역할이 마법사(스킬 딜러)로 변경되었습니다.", "패시브 「아르띠지아나토」: 공격을 맞힌 적에게 유리 조각이 박히고, 4개가 되면 깨지며 고정 피해를 줍니다. 이때 전투 스킬이 「스틸레토」에서 「스파다」(모든 적 관통 + 밀쳐내기)로 강화됩니다.", "필드 스킬 「피아스코」: 유리 벽으로 길목을 막아 다음 교전의 첫 라운드를 봉쇄하고, 상대에게 유리 조각 2개를 박은 채 시작합니다.", "사람이 많은 곳에서는 정신이 깎이고, 바다(항구·모래사장)에서는 정신이 회복됩니다."]], ["실험체 개편 · 코렐라인", ["역할이 마법사(스킬 딜러)로 변경되었습니다.", "패시브 「인과의 이면」: 공격을 맞힌 적에게 표식을 남기고, 3개가 되면 터지며 고정 피해를 줍니다. 거짓말쟁이(흑)에게는 피해가 늘고, 흑을 처치하면 정신이 회복됩니다.", "전투 스킬 「단죄의 섬광」이 쓸 때마다 백경(현재 체력 비례 고정 피해 + 보호막)과 흑경(잃은 체력 비례 고정 피해 + 받는 피해 증가)으로 번갈아 바뀝니다.", "필드 스킬 「업경」: 살아 있는 실험체 중 거짓말쟁이(흑)와 그 위치를 알아냅니다. 교전 화면에는 상대가 흑인지 백인지 표시됩니다."]], ["신규 · 전용 서브스토리 3편", ["「유리 공방」(타지아), 「업경」(코렐라인), 「일곱 개의 목소리」(이안)가 추가되었습니다.", "세 이야기 모두 중간 선택에서 갈라지는 갈림길과 전용 엔딩, 도전과제, 유물이 준비되어 있습니다."]], ["개선", ["성향이 반대인 실험체끼리는 동맹을 잘 맺지 않습니다. 선·정의 성향과 악·사이코패스 성향은 서로 동맹 제안을 거의 받아들이지 않으며, AI 실험체끼리 팀을 꾸릴 때도 같은 규칙이 적용됩니다. 원래 관계가 있는 실험체끼리는 예외입니다.", "서브스토리 진행 중에는 관계 실험체가 다른 실험체나 사고로 사망하지 않습니다. 목숨이 위험해지면 간신히 살아남아 근처로 피신합니다. 단, 플레이어가 직접 쓰러뜨리거나 최종 단계에 들어서면 사망할 수 있습니다.", "공용 서브스토리가 게임 시작 후 30턴(선택 30회)이 지난 뒤부터 등장합니다.", "서브스토리에서 이동 목표를 정하면, 도착할 때까지 같은 장면이 반복해서 나오지 않습니다. 목적지가 멀면 경유지를 거쳐 자동으로 이동합니다."]], ["안내", ["통계 수집을 위해 플레이 결과(실험체, 엔딩, 서브스토리 엔딩, 도전과제)가 익명으로 기록됩니다. 이름은 명예의 전당에 직접 등록할 때만 저장됩니다.", "인터넷에 연결되어 있지 않거나 통계 서버에 접속할 수 없어도 게임은 그대로 즐길 수 있습니다."]]], "루미아 섬의 모든 실험체가 같은 기록 위에 서게 됩니다. 명예의 전당과 전체 플레이어 통계를 만나 보세요."], ["v3.0", "2026.10.29", [["대망의 3.0 업데이트", ["루미아 섬 생존 일지가 3.0 버전으로 새롭게 태어납니다. 이동 방식, 서브스토리, 전투 스킬, 지역 구성이 전면 개편되었으며, 나쟈 박사와 함께하는 튜토리얼이 추가되었습니다.", "3.0 업데이트 이후 처음 게임을 시작하시면 기존에 플레이하셨던 분들도 튜토리얼이 한 번 진행됩니다. 이후에는 실험체 선택 화면의 「튜토리얼 다시 보기」로 언제든 다시 보실 수 있습니다."]], ["신규 · 나쟈 박사의 튜토리얼", ["나쟈 박사가 직접 생존 요령을 안내합니다. 상태와 성향, 가방과 식량 사용, 가방 제작, 제작 목표와 재료 위치, 지도 이동, 생존자·기록·도감, 무기 강화와 숙련도, 전투, 호감도와 관계, 정신력과 성향까지 순서대로 익힐 수 있습니다.", "튜토리얼이 진행되는 동안에는 안내된 버튼이 강조 표시되며, 장면 선택지는 잠시 잠깁니다."]], ["개편 · 지도 이동", ["갈림길 장면이 사라지고, 지도에서 직접 목적지를 정하는 방식으로 바뀌었습니다.", "지도에서 현재 위치와 길로 이어진 구역(파란 테두리)을 누르면 목적지가 설정되며, 5턴 뒤 도착합니다. 이동 중에도 장면은 계속 진행됩니다.", "목적지는 지도 상단에서 언제든 취소할 수 있으며, 상단 상태창에 남은 턴이 표시됩니다.", "금지구역에 있을 때 즉시 탈출하는 기능은 기존과 동일하게 유지됩니다."]], ["개편 · 가방 제작", ["작업대 장면이 사라지고, 가방에서 언제든 제작할 수 있게 바뀌었습니다. 재료가 있으면 무기 강화, 방어구 제작, 붕대·요리·진정제·덫 등을 바로 만들 수 있습니다.", "교전 중에는 제작할 수 없습니다.", "튜토리얼에 가방 제작 안내가 추가되었습니다."]], ["개편 · 전투 도주", ["전투 중 도주가 확률 판정에서 버티기 판정으로 바뀌었습니다.", "도주를 선택하면 살아 있는 모든 적에게 등 뒤 공격을 한 번씩 받습니다. 버텨 내면 반드시 도주에 성공하고, 버티지 못하면 그대로 사망합니다.", "도주 선택지에 예상 피해가 표시되며, 현재 체력으로 버틸 수 없으면 「버티지 못한다」로 경고합니다.", "기절한 적, 달아나려는 적은 등 뒤 공격을 하지 않습니다. 강공을 준비하던 적은 더 아프게, 웅크린 적은 약하게 공격합니다.", "기존의 도주 확률 보너스(패시브, 유물, 필드 스킬 등)는 모두 「도주 시 받는 피해 감소」로 바뀌었습니다. 골절 상태에서는 도주 시 받는 피해가 15% 증가합니다.", "튜토리얼에 도주 안내가 추가되었습니다."]], ["개편 · 지역 특성", ["지역마다 특산 재료가 생겼습니다. 특산 재료는 해당 지역에서 더 많이 얻을 수 있습니다. 예: 숲·연못·개울·모래사장은 식량, 공장·경찰서·창고는 금속과 화약, 고급 주택가·호텔은 천.", "성당·절·호텔·연못에서는 정신력 회복량이 30% 증가하고, 병원에서는 체력 회복량이 25% 증가합니다.", "지도의 지역 목록에서 각 지역의 특성을 확인할 수 있습니다.", "가방의 제작 목표를 정하면 부족한 재료와 그 재료가 많이 나오는 지역이 표시되며, 가까운 지역은 따로 강조됩니다.", "지역 전용 인카운터 22종이 추가되었습니다."]], ["개편 · 전투 스킬 재사용 대기", ["전투 스킬의 재사용 대기 시간이 대폭 늘어났습니다. 기본 12턴, 술사 10턴입니다.", "재사용 대기 시간은 이제 전투 밖에서도 흐릅니다. 스킬을 쓴 뒤 적이 도주해도 다음 교전에서 쿨타임이 어색하게 남지 않습니다.", "자원을 쌓아 쓰는 실험체(케네스의 분노, 에이든의 전하)보다 재사용 대기가 짧아 자원 구조가 무의미해지던 문제가 해결되었습니다.", "스킬을 기본 공격처럼 쓰는 실험체는 예외입니다. 유스티나는 재사용 대기가 없고, 헤이즈·쇼우·Eleven은 8턴, 프리야·캐시·샬럿은 9턴, 로살리오는 10턴입니다.", "상단 상태창에 전투 스킬의 남은 재사용 대기 시간이 표시됩니다."]], ["신규 · 아글라이아 패스 서브스토리", ["아글라이아 패스의 이야기를 바탕으로 한 서브스토리 6편이 추가되었습니다. 각 이야기는 해당 실험체로 플레이할 때 진행되며, 모두 8장 내외로 구성되어 있습니다.", "「운명」 · 레녹스, 혜진, 윌리엄", "「재정의」 · 피오라, 로살리오, 카밀로 (로살리오 해금 필요)", "「특이점」 · 현우, 재키", "「속죄」 · 비앙카, 요한", "「기록」 · 제니, Eleven, 아르다", "「스릴」 · 실비아, 리오, 아이솔", "각 서브스토리에는 3~4개의 엔딩이 있으며, 모든 엔딩마다 도전과제와 유물이 준비되어 있습니다."]], ["신규 · 공용 서브스토리 「섬의 폭군」", ["어떤 실험체로든 진행할 수 있는 공용 서브스토리가 추가되었습니다. 섬을 휩쓰는 악명 높은 실험체를 둘러싸고 이야기가 펼쳐집니다.", "전용 서브스토리가 없는 실험체는 게임 중반에, 전용 서브스토리가 있는 실험체는 전용 이야기를 마친 뒤 이어서 만날 수 있습니다. 두 이야기는 동시에 진행되지 않습니다.", "엔딩: 폭군 사냥, 공범, 다른 손"]], ["신규 · 공용 서브스토리 2종", ["「마지막 방송」: 손목 장치에 잡힌 정체불명의 신호를 따라 섬 곳곳을 이동하며 숨겨진 보급품 은신처를 찾는 이야기입니다. 엔딩: 구조 신호, 독차지, 다음 사람에게", "「연구원의 일지」: 아글라이아 연구원이 남긴 일지의 찢어진 페이지를 모으는 이야기입니다. 엔딩: 진실, 소각, 거래", "두 이야기는 목적지를 정해 직접 찾아가야 다음 장이 열립니다. 목적지까지 가는 동안 「○○ 쪽으로 출발한다」 선택지가 이동 목표를 자동으로 잡아 줍니다.", "공용 서브스토리는 한 게임에 최대 2편까지 진행되며, 「섬의 폭군」을 포함한 3편 중에서 무작위로 등장합니다."]], ["개편 · 서브스토리 진행 조건", ["서브스토리의 관계 실험체는 이야기 속에서 만나기 전까지 마주치지 않습니다. 이미 함께 다니는데 이야기에서는 상대를 찾는 등 어색한 진행이 사라졌습니다.", "서브스토리 도중 관계 실험체와 적대하게 되면 이야기가 「갈라선 길」 엔딩으로 끝납니다. 적대 상태에서 이야기가 계속 진행되지 않습니다.", "서브스토리로 함께 다니는 동료는 더 이상 배신하지 않습니다. 이야기를 끝까지 마친 뒤에도 마찬가지입니다.", "일부 선택지에 「이 이야기에서 손을 뗀다 (서브스토리 종료)」가 추가되어, 원하지 않으면 이야기를 중간에 끝낼 수 있습니다."]], ["개편 · 서브스토리 엔딩과 유물", ["진 엔딩 개념이 사라지고, 모든 엔딩이 고를 만한 가치를 가지도록 유물이 재조정되었습니다.", "누군가 희생하는 엔딩일수록 남겨진 유물이 강력합니다. 행복한 엔딩은 방어와 정신력 위주, 비극적인 엔딩은 공격 위주의 유물을 남깁니다.", "「갈라선 길」 엔딩에도 유물이 주어집니다."]], ["개선 · 성향 표시", ["상단 상태창 이름 옆에 현재 성향이 표시됩니다.", "성향 옆 「i」 버튼을 누르면 현재 성향에서 정신력이 오르고 내리는 조건, 공통 회복 방법, 다른 성향의 규칙을 확인할 수 있습니다."]], ["버그 수정", ["서브스토리 장면에서 「무시하고 공격한다」를 고르면 같은 장이 계속 반복되던 문제를 수정했습니다. 이제 공격을 고르면 이야기가 다음 장으로 넘어갑니다.", "서브스토리에서 손을 뗀 뒤 같은 게임에서 같은 이야기가 다시 시작되던 문제를 수정했습니다."]], ["실험체 개편 · 바냐", ["바냐가 세계관 설정에 맞게 개편되었습니다. 환상이란 창을 통해 세상을 보는, 꿈과 현실의 경계가 없는 소녀입니다.", "역할군이 지원가에서 근접 전사로 변경되었습니다.", "[신규 패시브] 몽환 나비: 공격을 맞히면 상대에게 몽환 나비가 1개(전투 스킬은 2개) 쌓입니다. 4개가 되면 2라운드 동안 최대 체력 5%의 피해를 주고, 바냐는 피해를 흡수하는 나비 보호막을 얻습니다. 3라운드마다 「공상」으로 다음 공격 피해가 40% 증가하며, 잠든 적에게 주는 피해가 50% 증가합니다. 혼자 남겨지면 정신이 조금씩 흔들립니다.", "[신규 전투 스킬] 꿈결 가루: 모든 적에게 피해 60%를 주고 몽환 나비를 쌓으며, 맞은 적을 잠재웁니다.", "[신규 필드 스킬] 꿈 길잡이: 나비를 날려 주변 구역 실험체의 위치를 알아내고, 다음 금지구역을 꿈으로 미리 봅니다. 사용 후 잠이 쏟아져 포만이 조금 줄어듭니다. (재사용 대기 10턴)", "나비 보호막이 체력·정신·포만 아래에 보라색 게이지로 표시됩니다.", "바냐 전용 인카운터 6종이 추가되었습니다."]], ["실험체 개편 · 레니", ["레니가 세계관 설정에 맞게 개편되었습니다. 겉으로는 장난기 많은 어린아이지만, 사실은 어린아이처럼 보이도록 철저히 계산하며 움직이는 소녀입니다. 기존의 꿈 이야기 관련 설정은 바냐에게 돌아갔습니다.", "성향이 선에서 중립으로 변경되었습니다.", "[신규 패시브] 곰돌이! 공격: 교전에 함께한 동료가 있으면 매 라운드 동료마다 곰돌이가 날아가 추가 피해를 주고, 전투 스킬 재사용 대기가 1씩 줄어듭니다. 동료와 함께 있으면 정신이 차오르고, 혼자 남겨지면 정신이 흔들립니다.", "[신규 전투 스킬] 당근! 바주카: 피해 110%를 주고 30% 확률로 「에어 호른!」 기절을 겁니다. 레니와 동료의 체력을 15 회복합니다. (재사용 대기 9턴)", "[신규 필드 스킬] 스프링! 트랩: 지금 구역에 스프링 트랩을 깝니다. (재사용 대기 9턴)", "레니 전용 인카운터 6종이 추가되고, 기존 레니 인카운터가 설정에 맞게 수정되었습니다.", "레니 전용 도전과제의 이름이 「놀이터의 주인」으로 변경되었습니다."]], ["실험체 개편 · 로지", ["Corda D'arco의 용병 팀 리더라는 설정에 맞게 개편되었습니다. 성향이 냉철로 변경되었습니다.", "[신규 패시브] 지휘관: 동료가 있으면 주는 피해 +15%, 받는 피해 -10%. 배신한 동료와의 교전에서는 첫 공격 피해가 절반이 됩니다.", "[신규 전투 스킬] 이지샷: 피해 100% + 고정 피해 5. 이 한 발로 상대를 쓰러뜨리면 숙련도 경험치를 크게 얻습니다. (재사용 대기 8턴)", "[신규 필드 스킬] 뒤틀린 악의: 같은 구역 인원이 많을수록 다음 교전에서 받는 피해가 줄고(최대 40%), 이번 시간대에는 습격을 받지 않습니다."]], ["실험체 개편 · 현우", ["성향이 전투광에서 중립으로 변경되었습니다.", "[신규 패시브] 싸움꾼: 매 라운드 공격을 맞히면 체력을 (2 + 무기 등급) 회복합니다.", "[신규 전투 스킬] 도그파이트: 피해 110%와 함께 숙련도 경험치를 추가로 얻습니다. 교전마다 한 번, 새로운 상대에게만 쓸 수 있습니다.", "[신규 필드 스킬] 제대로 된 식사: 식량 2개로 음식을 만듭니다. 동료가 있으면 함께 나눠 먹어 호감과 정신이 오릅니다."]], ["실험체 개편 · 매그너스", ["필드 스킬 「오토바이 돌진」이 근처(같은 구역·이웃 구역) 실험체를 오토바이로 들이받아 피해를 주고 그대로 교전에 들어가도록 변경되었습니다. 근처에 아무도 없으면 기존처럼 두 구역 너머까지 질주합니다.", "[신규 전투 스킬] 17대 1: 모든 적에게 피해 90%. 맞힌 적이 한 명 늘 때마다 피해 +15%.", "[신규 패시브] 맷집: 「17대 1」을 두 명 이상에게 맞힐 때마다 받는 피해가 영구히 4% 줄어듭니다(최대 20%). 이동 직후 시작한 교전에서 첫 공격 +30%."]], ["실험체 개편 · 혜진", ["성향이 냉철로 변경되었습니다.", "[신규 패시브] 이화접목: 공격을 세 번 받을 때마다 받은 피해의 20%를 상대에게 되돌려 줍니다. 액운에 걸린 상대에게는 40%.", "[신규 필드 스킬] 액운: 지금 구역과 이웃 구역의 모든 실험체에게 피해를 주고 액운을 겁니다. 기존 필드 스킬 「수호 부적」은 삭제되었습니다.", "전투 스킬 「부적 결계」가 액운에 걸린 상대에게 피해 80%를 줍니다."]], ["실험체 개편 · 비앙카", ["[신규 필드 스킬] 수혈: 다음 교전 처음 3라운드 동안 받은 피해의 70%를 모아 회복합니다. 30 이상 회복하면 피의 장막(받는 피해 -15%)이 펼쳐집니다.", "[신규 전투 스킬] 블러디 핸즈: 제 피를 대가로 방어를 무시하는 고정 피해를 주고, 쓸수록 쌓이는 블러드 드롭만큼 모든 적에게 추가 피해를 줍니다. 쓸 때마다 체력 소모가 커집니다. (재사용 대기 1턴)", "패시브 「진조의 피」: 밤에 피해 +20%, 낮에는 정신 감소 +20%."]], ["실험체 개편 · 엠마", ["역할군이 지원가에서 술사로 변경되었습니다.", "[신규 패시브] CheerUP♥: 3라운드마다 다음 공격 피해 +50%, 보호막을 얻습니다. 근처에 실험체가 있으면 정신 감소 -30%.", "[신규 전투 스킬] 마술 토끼: 상대를 토끼로 바꿔(피해 60%) 한 라운드 동안 아무것도 못 하게 하고, CheerUP♥을 바로 다시 준비합니다."]], ["실험체 개편 · 헨리", ["시간이 멈춰 버린 시계공이라는 설정에 맞게 개편되었습니다. 무기가 암기로, 역할군이 술사로, 성향이 냉철로 변경되었습니다.", "[신규 패시브] 시차 균열: 두 라운드 안에 한 상대에게 최대 체력의 35% 이상 피해를 주면 타이머를 붙여, 다음 라운드에 잃은 체력에 비례한 피해를 줍니다.", "[신규 전투 스킬] 시간 재구축 영역: 보호막을 얻고 모든 적에게 피해 70%, 다음 라운드에 모든 적이 멈춥니다.", "[신규 필드 스킬] 시간 도약: 목적지가 정해져 있으면 즉시 도착하고, 없으면 이웃 구역으로 순간 이동합니다. (재사용 대기 10턴)"]], ["실험체 조정 · 쇼이치", ["소개 문구가 세계관 설정에 맞게 수정되었습니다."]], ["실험체 전용 인카운터 추가", ["로지, 현우, 매그너스, 혜진, 비앙카, 엠마, 쇼이치, 헨리 전용 인카운터 34종이 추가되었습니다."]], ["실험체 조정 · 비형", ["비형이 세계관 설정에 맞게 개편되었습니다. 무당 가문의 반골 장녀이자, 재미만 좇는 「최강최고 도깨비」입니다.", "무기가 아르카나에서 방망이로, 역할군이 술사에서 근접 전사로, 성향이 악에서 전투광으로 변경되었습니다.", "[신규 패시브] 도깨비 불: 공격을 맞힐 때마다 신력이 25 쌓입니다(전투 스킬은 50). 신력이 100이 되면 3라운드 동안 도깨비 불이 주변 모든 적에게 매 라운드 최대 체력 6%의 피해를 줍니다. 불이 타는 동안 공격을 맞히면 지속 시간이 처음으로 돌아갑니다. 포만 70 이상이면 피해 +10%, 30 미만이면 피해 -10%입니다.", "[신규 전투 스킬] 뚝딱!: 방망이로 내려친 뒤(피해 100%) 25%씩 두 번 더 두들기고 최대 체력의 7%를 회복합니다. 신력 +50. 기본 공격처럼 쓰는 스킬이라 재사용 대기 시간이 8턴입니다.", "[신규 필드 스킬] 내기 한판!: 근처 실험체에게 씨름 내기를 겁니다. 이기면 상대의 식량이나 재료를 받고, 져도 호감이 오릅니다. 아무도 없으면 신력으로 약과를 만들어 냅니다. (재사용 대기 10턴)", "신력 게이지가 체력·정신·포만 아래에 푸른색으로 표시됩니다.", "비형 전용 인카운터 8종이 추가되었습니다. 잔칫상, 알론소와의 씨름, 레니, 혜진, 유민 등과 얽힌 이야기를 만나 보세요.", "비형 전용 도전과제의 이름이 「신명나게 놀아보자!」로 변경되었습니다."]], ["실험체 조정 · 비앙카", ["비앙카가 자신을 「진조」라 칭하며, 「~이느니라」 같은 고풍스러운 말투를 사용하도록 대사가 수정되었습니다."]]], "루미아 섬 생존 일지 대망의 3.0 업데이트를 안내드립니다. 섬을 걷는 방식부터 이야기가 이어지는 방식까지, 새로워진 루미아 섬을 만나 보세요."], ["v2.11.1", "2026.10.29", [["서브스토리 개편", ["모든 서브스토리가 8장 구성으로 확장되었습니다. 장마다 이야기가 길어지고, 이전 장의 선택이 다음 장의 내용에 반영됩니다.", "서브스토리는 이제 약 10턴마다 한 장씩 이어지며, 게임 중후반에 결말에 도달합니다.", "신규 장 추가: 「무게감」 낡은 장부·빗속의 밤 / 「동화의 마지막 장」 페란테가의 문장·비 내리는 성당 / 「첫 번째와 두 번째」 자장가·바다 / 「에레보스」 시리얼과 우유·사보타주 / 「벤슨 형제」 빈 운동장·캐치볼"]], ["신규 서브스토리 · 벤슨 형제", ["로살리오로 플레이할 때만 진행되는 서브스토리 「벤슨 형제」가 추가되었습니다. 엔딩 4종(다시 배터리·삼진·끝내기·빈 마운드)과 유물 4종이 준비되어 있습니다.", "「다시 배터리」 유물 「형의 싸인볼」: 로살리오의 홈런 확률 15% → 25%", "로살리오는 히든 실험체이므로, 윌리엄으로 플레이할 때는 더 이상 섬에 등장하지 않습니다."]], ["도전과제와 엔딩 도감", ["달성하지 않은 도전과제와 엔딩은 이름이 「???」로 가려지고 달성 조건만 표시됩니다.", "달성하면 이름이 드러나고, 조건 아래에 관련된 한마디(엔딩은 결말의 한 장면)가 추가됩니다."]], ["UI", ["특수 자원이 체력·정신·포만감 아래에 별도 게이지로 표시됩니다. (유스티나 아스트라 에너지, 케네스 분노, 에이든 전하·과전하)", "교전 카드 안에 표시되던 특수 자원 문구는 삭제되었습니다."]]], "서브스토리가 한 편의 소설처럼 길게 이어지도록 개편되고, 로살리오의 「벤슨 형제」 서브스토리가 추가됩니다."], ["v2.11", "2026.10.29", [["신규 콘텐츠 · 서브스토리", ["관계가 있는 실험체로 플레이하면 서브스토리가 진행됩니다. 몇 턴마다 다음 장이 이어지며, 약 10번의 선택 끝에 서브스토리 엔딩에 도달합니다.", "「무게감」 (마커스·매그너스) - 엔딩 5종", "「동화의 마지막 장」 (루치아·세레스) - 엔딩 5종", "「첫 번째와 두 번째」 (케네스·가넷) - 엔딩 4종", "「에레보스」 (유스티나·에이든·알렉스) - 엔딩 4종", "선택에 따라 실험체 간 관계가 바뀌고, 게임 중 성향이 바뀌며, 관계 실험체가 사망할 수도 있습니다.", "서브스토리 진행 중에는 관계 실험체가 쉽게 쓰러지지 않습니다.", "서브스토리 진행 상황이 상단에 표시되며, 실험 종료 화면에서 결과를 확인할 수 있습니다."]], ["신규 콘텐츠 · 유물", ["서브스토리 엔딩에 따라 유물을 획득합니다. 유물은 해당 게임 동안 유지되는 소지형 아이템입니다.", "예시: 「에레보스 장비」 - 유스티나의 아스트라 에너지 소모 40 → 28, 에이든의 과전하 치명타 140% → 165%, 알렉스의 분석 대상 추가 피해 15% → 35% / 「두 개의 목걸이」 - 케네스의 화염 피해 +60%, 가넷의 초재생 5% → 9% / 「오토바이 키」 - 도주 확률 +20%", "보유 중인 유물은 상단에 표시됩니다."]], ["도전과제", ["서브스토리 엔딩 도전과제 18종이 추가되었습니다."]], ["신규 성향 · 정의 (유스티나 전용)", ["유스티나의 성향이 '정의'로 변경됩니다.", "선한 실험체를 처치하면 정신력이 45 감소하며, 악당을 처치하면 정신력이 14 회복됩니다.", "실험체 간 교전을 목격했을 때 선한 쪽을 돕거나, 양쪽 모두 선하다면 지고 있는 쪽을 도우면 정신력이 회복됩니다. 외면하면 정신력이 감소합니다.", "다친 실험체를 도우면 정신력이 회복되고, 외면하면 감소하며, 공격하면 크게 감소합니다.", "상대를 살려 보내면 정신력이 회복되고, 동료를 배신하면 정신력이 크게 감소합니다."]], ["시스템", ["관계가 있는 실험체로 플레이하면 상대 실험체가 같은 게임에 등장할 확률이 크게 상승합니다. 서브스토리 관계 실험체는 반드시 등장합니다."]], ["실험체 · 알렉스", ["블랙 서바이벌 설정에 따라 섬의 모든 무기를 다룹니다. 교전 중 매 라운드 무작위 무기로 바꿔 쥐며, 해당 무기의 특성이 적용됩니다."]], ["개발자 코멘트", ["관계가 있는 실험체들의 이야기를 한 판 안에서 끝까지 따라갈 수 있도록 서브스토리를 준비했습니다. 같은 실험체라도 선택에 따라 전혀 다른 결말과 유물을 얻게 되니, 여러 결말을 수집해 보세요."]]], "관계 실험체들의 서브스토리와 유물, 유스티나 전용 성향 '정의'가 추가됩니다."], ["v2.10.4", "2026.10.29", [["실험체 개편 · 유스티나", ["소개 문구 변경: 정의의 히어로를 꿈꾸는 소녀. 붙잡혀 간 에이든을 구하러 섬에 왔다.", "[신규 패시브] 아스트라 에너지: 교전마다 에너지 100으로 시작하며, 전투 스킬 사용 시 40을 소모하고 매 라운드 15를 회복합니다. 에너지가 40 미만이 되면 2턴 동안 재충전 상태가 됩니다. 「킁킁」으로 악당 냄새를 맡은 대상에게 주는 피해가 20% 증가합니다. 병원 구역에서는 정신력이 감소합니다.", "[신규 필드 스킬] 킁킁: 근처 실험체의 냄새를 맡아 선악을 판별합니다. 에이든이 섬에 있다면 위치를 감지합니다. (재사용 대기 8턴)", "[신규 전투 스킬] 연속 포격: 두 발(65%×2)을 발사하고 적중한 대상에게 표식을 남깁니다. 다음 라운드에 연이어 사용하면 섬멸 포격(160%)으로 바뀌어 표식을 터뜨리고, 주변 적에게 피해를 전이하며 에너지 25를 회복합니다. 재사용 대기가 없는 대신 에너지를 소모합니다.", "교전 화면에 아스트라 에너지가 표시됩니다.", "도전과제 변경: 「히어로 등장」 - 에이든과 함께 마지막까지 생존"]], ["실험체 개편 · 에이든", ["소개 문구 변경: 과거가 지워진 용병. 생체 전기를 다루며, VF를 없애는 것을 조건으로 실험에 참여했다.", "[신규 패시브] 과전하: 공격 적중 시 전하가 1 쌓입니다. (최대 5) 전하가 가득 차면 과전하 상태가 되어 다음 5회 공격이 확정 치명타(140%)로 적용됩니다. 과전하 종료 시 도주 확률이 15% 증가합니다.", "[신규 필드 스킬] 케이준 요리: 식량 1을 사용해 체력 15, 포만감 20, 정신력 8을 회복합니다. 동료가 있으면 함께 나눠 먹어 동료 체력이 10 회복되고 우호도가 오릅니다. (재사용 대기 10턴)", "[신규 전투 스킬] 낙뢰: 대상에게 130% 피해와 기절, 다른 적에게 90% 피해를 입힌 뒤, 두 번째 낙뢰가 모든 적에게 90% 피해를 입힙니다. 적중 시 전하가 가득 차 즉시 과전하 상태가 됩니다.", "교전 화면에 전하와 과전하 탄환이 표시됩니다.", "도전과제 변경: 「과전하」 - 한 판에 과전하 상태에 5회 돌입"]], ["실험체 개편 · 알렉스", ["소개 문구 변경: 6개 국어에 능통하고 모든 무기를 다루는 정체불명의 요원.", "[신규 패시브] 잠입: 처치 시 잠입 상태가 되어 다음 조우에서 먼저 움직이고, 다음 교전 도주 확률이 20% 증가합니다. 근접 무기(양손검·톤파)를 든 라운드에는 받는 피해가 12% 감소합니다. 「정보 수집」으로 분석한 대상에게 주는 피해가 15% 증가하며, 해당 대상의 의도를 잘못 읽지 않습니다.", "[신규 필드 스킬] 정보 수집: 두 구역 거리 내 모든 실험체의 위치를 파악하고, 그중 가장 위협적인 대상을 분석합니다. (재사용 대기 9턴)", "[신규 전투 스킬] 정밀 폭격: 위성 미사일로 모든 적에게 120% 피해를 입히고, 이후 3라운드 동안 매 라운드 모든 적에게 35% 피해를 입힙니다.", "네 가지 무기를 번갈아 사용하는 일반 공격은 그대로 유지됩니다.", "도전과제 변경: 「미제를 명제로」 - 「정보 수집」으로 분석한 실험체 3명 처치"]], ["신규 스토리 · 에레보스", ["유스티나와 에이든이 관계 실험체로 지정되었습니다. 같은 게임에 있으면 서로를 찾아 합류하며, 서로를 해치지 않습니다.", "유스티나로 알렉스를 만나면 전용 인카운터 「모르는 사람」이 발생합니다.", "알렉스·에이든·유스티나 사이의 전용 인카운터와, 세 실험체의 설정을 반영한 전용 인카운터 8종이 추가되었습니다."]], ["개발자 코멘트", ["세 실험체 모두 원작의 핵심 메커니즘(아스트라 에너지, 과전하, 정밀 폭격)을 교전 흐름 안에서 체감할 수 있도록 옮겼습니다. 유스티나는 에너지 관리, 에이든은 과전하 타이밍, 알렉스는 정보 우위를 중심으로 플레이하게 됩니다."]]], "유스티나, 에이든, 알렉스의 스킬 구성이 세계관 설정과 원작 메커니즘에 맞게 개편됩니다."], ["v2.10.3", "2026.10.29", [["실험체 개편 · 헤이즈", ["소개 문구 변경: 실수를 용납하지 않는 프로 무기상인. 최고의 효율로 최선의 이익을 추구한다.", "[신규 패시브] 웨폰 케이스: 전투 스킬 사용 후 첫 공격에 「죽음의 상인」이 발동해 피해가 45% 증가하고, 다음 도주 확률이 15% 증가합니다. 탄약이 떨어져도 웨폰 케이스에서 새 소총을 꺼내므로 공격력이 감소하지 않습니다.", "[신규 필드 스킬] 창고 호출: VF로 연결된 창고에서 탄약 15, 화약 1, 금속 1을 불러옵니다. 무기가 영웅 등급 미만이면 25% 확률로 '라벨'이 붙은 최상품을 받아 무기 등급이 1 오릅니다. 사용 시 정신력이 3 감소합니다. (재사용 대기 10턴)", "[신규 전투 스킬] 화력 전개: 사용할 때마다 총기가 바뀝니다. 40mm 유탄(모든 적에게 85%) → 산탄 포화(110%, 기절) → 기관단총(25% 6회, 무작위 대상) → 로켓 런처(150%, 다른 적에게 절반 피해) 순으로 순환합니다.", "헤이즈가 등장하는 일부 인카운터가 설정에 맞게 수정되었습니다. 헤이즈는 더 이상 투자 사기나 위장 함정을 벌이지 않으며, 헤이즈에게 산 무기가 불량품이면 재료를 돌려받습니다.", "도전과제 변경: 「어디까지나 프로답게」 - 한 판에 「화력 전개」의 네 가지 총기를 모두 사용"]], ["성향 조정", ["헤이즈: 중립 → 냉철", "케네스: 전투광 → 냉철"]], ["개발자 코멘트", ["헤이즈는 스킬마다 다른 총기를 꺼내 드는 원작의 정체성을 살려, 전투 스킬을 쓸 때마다 무기가 순환하도록 설계했습니다. 상황에 맞는 총기가 나올 차례를 계산해 스킬 사용 시점을 고르는 플레이를 의도했습니다."]]], "헤이즈의 스킬 구성이 세계관 설정에 맞게 개편되고, 일부 실험체의 성향이 조정됩니다."], ["v2.10.2", "2026.10.29", [["신규 스토리 · 첫 번째와 두 번째", ["케네스의 필드 스킬 「형제 찾기」로 얻는 흔적이 '두 번째'인 가넷의 흔적으로 변경되었습니다.", "케네스로 플레이하던 중 가넷을 만나면 전용 재회 인카운터 「두 번째」가 발생합니다. 「약속」을 새긴 상태라면 특별 선택지가 열립니다.", "가넷으로 플레이하던 중 케네스를 만나면 전용 재회 인카운터 「첫 번째」가 발생합니다.", "케네스와 가넷은 서로 동맹을 맺을 수 없습니다."]], ["실험체 개편 · 가넷", ["소개 문구 변경: 초재생 VF를 지닌 소녀. 자신을 찾으러 오지 않은 '첫 번째'를 찾고 있다.", "[신규 패시브] 익숙한 아픔: 교전 중 매 라운드 잃은 체력의 5%를 회복하고, 부상이 두 배 빠르게 회복됩니다. 잃은 체력에 비례해 주는 피해가 증가합니다. (최대 30%) 닫히고 어두운 곳에서 밤을 보내면 정신력이 감소합니다.", "[신규 필드 스킬] 자장가: 정신력을 10 회복합니다. (밤에는 16) '첫 번째'가 섬에 있다면 그의 위치를 감지합니다. (재사용 대기 8턴)", "도전과제 변경: 「다시 새겨 줄게」 - '첫 번째'와 다시 만나 매듭짓기"]]], "케네스와 가넷, '첫 번째'와 '두 번째'의 이야기가 섬에 추가됩니다."], ["v2.10.1", "2026.10.29", [["실험체 개편 · 케네스", ["소개 문구 변경: 분노를 불로 바꾸는 소년. 보육원에서 흩어진 형제들을 찾고 있다.", "[신규 패시브] 억압된 분노: 공격이 적중할 때마다 분노가 1 쌓입니다. (최대 5) 분노가 가득 차면 도끼가 불타올라, 공격이 적중할 때마다 대상 최대 체력에 비례한 화염 피해를 추가로 입히고 그 40%만큼 체력을 회복합니다. 공격하지 않고 한 턴을 보내면 분노가 2 감소합니다. 물가 구역에서는 화염 피해가 절반이 되고 정신력이 감소합니다. 동맹 제안 성공률이 10% 감소합니다.", "[신규 필드 스킬] 형제 찾기: 흩어진 형제들의 흔적을 찾습니다. 흔적을 찾지 못하면 가장 가까운 실험체의 위치를 알아냅니다. 흔적 3개를 모으면 「약속」 인카운터가 발생합니다. (재사용 대기 9턴)", "[신규 전투 스킬] 화염 분쇄: 대상을 올려 베어 기절시키고(60%) 공중에서 두 번 벤 뒤(15%×2), 내려찍어 모든 적에게 100% 피해를 입힙니다. 사용 즉시 분노가 가득 찹니다.", "교전 화면에 케네스의 분노 게이지가 표시됩니다.", "케네스 전용 인카운터 6종이 추가되고, 기존 케네스 관련 인카운터가 설정에 맞게 수정되었습니다.", "도전과제 변경: 「약속」 - 형제들의 흔적 3개를 모으고 우승"]]], "케네스의 소개와 스킬 구성이 세계관 설정에 맞게 전면 개편됩니다."], ["v2.10", "2026.10.29", [["신규 시스템 · 적 의도 예고", ["교전 중 적의 다음 행동이 카드 하단에 '▸'로 표시됩니다. 표시는 흐릿하며, 정신력이 낮을수록 잘못 읽을 확률이 높아집니다. (냉철 성향은 오독 확률 절반)", "큰 공격: 피해가 1.7배로 증가합니다. 「방어하며 빈틈을 노린다」로 받아 내면 피해가 크게 줄고 60% 확률로 반격합니다.", "방어 자세: 적에게 주는 피해가 크게 줄어드는 대신, 적의 공격도 약해집니다.", "기술 준비: 해당 턴에 공격을 적중시키면 45% 확률로 기술을 끊습니다.", "도주 기회: 해당 턴에 공격하지 않으면 적이 달아납니다."]], ["신규 콘텐츠", ["도전과제: 공통 과제 10종과 실험체별 전용 과제 1종씩, 총 103종이 추가되었습니다. 메인 화면의 「도전과제」에서 진행 상황과 실험체별 우승 횟수를 확인할 수 있습니다.", "결과 카드: 실험 종료 화면에서 「결과 카드 만들기」로 실험체, 순위, 엔딩, 처치 수, 등급, 마지막 기록을 담은 이미지를 저장하거나 공유할 수 있습니다.", "엔딩 도감: 아직 획득하지 않은 엔딩에 단서가 표시됩니다.", "초보자 팁: 처음 겪는 상황에서 한 줄 팁이 한 번씩 표시됩니다. 「팁 끄기」로 끌 수 있습니다."]], ["인카운터", ["등장 빈도가 낮던 인카운터(거래, 이동, 생존, 회상, 기록, 소리, 목격 등)의 등장 확률이 상향되었습니다.", "보급 상자 투하 확률: 60% → 75%", "실험체 간 교전을 목격할 확률이 상향되었습니다."]]], "전투의 수 싸움을 더하는 '적 의도 예고'와 함께 도전과제, 결과 카드, 엔딩 단서, 초보자 팁이 추가됩니다."], ["v2.9.4", "2026.10.29", [["난이도", ["상대 실험체의 장비 성장 속도가 크게 상향되며, 페이즈가 진행될수록 더 빨라집니다.", "상대 실험체의 무기 숙련이 페이즈와 처치 수에 따라 더 빠르게 오릅니다.", "페이즈 진행에 따른 상대 실험체의 공격력 상승 폭이 증가했습니다.", "플레이어가 주는 모든 피해: 30% 감소", "플레이어가 받는 전투 피해: 20% 증가"]], ["실험체 · 쇼이치", ["패시브 이름 변경: 「다섯 번째 패」 → 「부당거래」 (효과 동일)", "전투 스킬 이름 변경: 「부당거래」 → 「표리」 (효과 동일)"]]], "난이도가 전반적으로 상향됩니다."], ["v2.9.3", "2026.10.29", [["역할군 · 암살자", ["밤 기습(잠든 실험체 습격) 피해 배율: 2.1배 → 1.8배", "선공 피해 배율: 1.6배 → 1.45배", "낮 페널티: 낮의 정면 교전에서 피해 15% 감소 → 낮에는 모든 피해 25% 감소"]], ["실험체 · 쇼이치", ["패시브 변경: 「다섯 번째 패」 - 공격 다섯 번마다 한 번 확정 치명타가 발생합니다. 단, 이 치명타의 피해 배율은 125%입니다.", "전투 스킬 이름 변경: 「속임수」 → 「부당거래」"]]], "암살자 역할군의 밸런스가 조정됩니다."], ["v2.9.2", "2026.10.29", [["성향", ["선·중립 성향 실험체가 악행이 쌓인 실험체를 처치할 때 정신력 감소량이 줄어듭니다. 악행이 매우 많이 쌓인 실험체를 처치하면 정신력이 감소하지 않습니다.", "악행은 처치 수, 악 성향 여부, 플레이어를 배신하거나 물건을 훔친 기록 등으로 쌓입니다."]]], "성향 시스템이 일부 조정됩니다."], ["v2.9.1", "2026.10.29", [["인카운터", ["실험체와 마주치는 모든 인카운터(가위바위보, 거래, 대화, 공연, 치료 제안 등)에 「무시하고 공격한다」 선택지가 추가되었습니다.", "호의적으로 다가온 실험체를 공격하면 해당 실험체가 이를 기억하며, 악명이 상승합니다."]]], "실험체와의 조우 인카운터에 선택지가 추가됩니다."], ["v2.9", "2026.10.29", [["플레이 컨셉과 고유 패시브", ["모든 실험체에 플레이 컨셉이 부여되었습니다. 패시브, 필드 스킬, 전투 스킬이 하나의 컨셉으로 연계되며, 프로필 상단에서 확인할 수 있습니다.", "고유 패시브가 없던 모든 실험체에 고유 패시브가 추가되었습니다. (예: 재키 「피 냄새」, 매그너스 「가속」, 클리버 「원념 축적」)", "패시브와의 연계를 위해 일부 전투 스킬이 조정되었습니다. (유키, 아델라, 아디나, 다니엘, 바바라, 로지)"]], ["실험체 조정", ["루크: 성향이 악으로 변경됩니다. 청부업자 출신 설정에 따라, 처치해도 악명이 오르지 않고 목격자가 남지 않습니다.", "에이든: 성향이 냉철로 변경됩니다."]], ["인카운터", ["일반, 밈, 식량, 회복, 휴식, 회상, 밤, 야생, 기록, 재난, 실험체 카메오 등 인카운터 약 900종이 추가되었습니다. (총 약 1,170종)", "특정 실험체로 플레이할 때만 등장하는 전용 인카운터와, 특정 실험체만 고를 수 있는 특별 선택지(★)가 추가되었습니다.", "이렘으로 고양이 관련 인카운터를 만나면 특별한 상호작용이 발생합니다."]]], "모든 실험체에 고유한 플레이 컨셉이 부여되고, 인카운터가 대규모로 추가됩니다."], ["v2.8", "2026.10.29", [["신규 인카운터 · 배신", ["동맹 중 플레이어가 동료를 배신할 수 있는 인카운터 7종이 추가되었습니다. (잠든 동료, 전리품 분배, 미끼, 동료 팔아넘기기, 독 넣기, 금지구역 지름길, 쓰러진 동료)", "배신에 실패했거나 살아남은 동료는 이를 기억하고 복수하러 찾아옵니다."]], ["신규 성향 · 냉철", ["냉철: 정신력 변화 폭이 작고, 시간 경과로 정신력이 감소하지 않습니다.", "적용 실험체: 레녹스, 테오도르, 에이든, 알렉스, 로지, 타지아, 카티야, 히스이", "레녹스와 테오도르의 소개 문구에 경력이 반영되었습니다."]], ["실험체 스킬 변경", ["나딘 필드 스킬: 「야생동물 찾기」 - 짐승을 추적해 안전하게 사냥합니다.", "나딘 전투 스킬: 「사냥 본능」 - 사냥한 야생동물 1마리당 피해 15% 증가 (최대 150%)", "버니스 필드 스킬: 「사냥꾼의 덫」", "다니엘 필드 스킬: 「해부학적 관찰」 - 근처 실험체의 급소를 파악합니다. 해당 실험체와의 교전에서 40% 확률로 치명타가 발생하고, 조우 시 먼저 움직일 확률이 높아집니다.", "아이작 필드 스킬: 「누명 씌우기」 - 근처에서 가장 강한 실험체에게 누명을 씌워 주변 실험체들이 그를 공격하게 만듭니다.", "아이작 전투 스킬: 「과잉 진압」 - 대상을 기절시키고 3라운드 동안 받는 피해 50% 증가 표식을 남기며, 약해진 대상의 소지품을 압수합니다."]], ["치명타", ["모든 실험체의 치명타 피해 배율이 1.5배로 통일됩니다. (로살리오는 1.8배 유지)"]]], "플레이어가 먼저 등을 돌릴 수 있는 배신 인카운터와 신규 성향 '냉철'이 추가됩니다."], ["v2.7.1", "2026.10.28", [["실험체 · 다니엘", ["필드 스킬 변경: 「몸단장」 → 「완벽한 가면」 - 근처 실험체에게 다정한 사람인 척 접근해 호감을 크게 올리고, 자리가 있으면 동료로 끌어들입니다.", "가면을 쓴 채 끌어들인 동료를 「먼저 등을 찌른다」로 공격하면 피해가 2.2배가 되며, 배신으로 기록되지 않습니다."]]], "다니엘의 필드 스킬이 변경됩니다."], ["v2.7", "2026.10.28", [["신규 시스템 · 성향", ["모든 실험체에 성향(선·중립·악·전투광·사이코패스)이 부여되었습니다. 실험체 프로필에서 확인할 수 있습니다.", "선: 처치 시 정신력이 크게 감소하고, 상대를 살려 보내면 회복됩니다. 동료를 배신하면 정신력이 크게 무너지며, 동료와 함께 있으면 조금씩 안정됩니다.", "중립: 처치 시 정신력이 감소합니다.", "악: 처치 시 정신력이 크게 회복됩니다. 오래 싸우지 않으면 정신력이 감소하고, 상대를 살려 보내면 정신력이 감소합니다. (재키, 아드리아나, 아이솔, 아이작 등)", "전투광: 교전 중 매 라운드 정신력이 회복되며, 오래 싸우지 않으면 정신력이 감소합니다. (현우, 니키, 리 다이린, 로살리오 등)", "사이코패스: 정신력이 감소하지 않으며, 정신 붕괴가 발생하지 않습니다. (다니엘)"]]], "실험체별 성향 시스템이 추가됩니다."], ["v2.6", "2026.10.28", [["전투 스킬 개편", ["모든 실험체의 전투 스킬이 서로 다른 고유 효과를 갖도록 재설계되었습니다. (92종, 로살리오 「클러치 히터」 제외)", "연타, 흡혈, 표식, 지연 폭발, 포탑, 회피, 혼란, 반사, 봉인, 즉시 처치, 수면 등 실험체 설정을 반영한 효과가 적용됩니다.", "예시: 아야 「연속 사격」 3연속 사격 / 테오도르 「정밀 저격」 1라운드 조준 후 300% 피해 / 레니 「꿈의 가호」 2라운드 수면 / 비형 「빙의」 대상이 스스로를 공격", "각 실험체의 전투 스킬 효과는 프로필에서 확인할 수 있습니다."]], ["밸런스", ["근접 전사와 탱커의 공격력·방어력이 상향되었습니다.", "상대 실험체의 공격력이 소폭 하향되었습니다."]]], "모든 실험체의 전투 스킬이 고유 효과로 개편됩니다."], ["v2.5", "2026.10.28", [["신규 히든 실험체 · 로살리오", ["윌리엄의 동생이자, 승부조작으로 야구계에서 퇴출된 전직 야구선수입니다.", "[고유 특성] 홈런: 공격이 15% 확률로 치명타가 되어 180% 피해를 입힙니다.", "[전투 스킬] 클러치 히터: 잃은 체력이 많을수록 치명타 확률이 증가합니다.", "[필드 스킬] 일광욕: 낮의 야외에서 정신력과 체력을 회복합니다. 흐리거나 어두우면 효과 없이 불평만 늘어놓습니다.", "해금 조건: 윌리엄으로 우승하거나, 방망이를 사용하는 실험체로 2회 우승. 윌리엄으로 플레이하면 섬에서 마주칠 수도 있습니다.", "로살리오로 플레이하면 반드시 윌리엄과 마주치며, 형제의 선택에 따라 전용 엔딩 2종이 열립니다.", "엔딩이 총 59종으로 늘어났습니다."]]], "신규 히든 실험체 '로살리오'가 루미아 섬에 합류합니다."], ["v2.4.1", "2026.10.28", [["불살 루트", ["불살이 선택형 모드에서 플레이로 여는 루트로 변경되었습니다. 아직 아무도 처치하지 않았다면 교전에서 「제압만 한다」를 선택할 수 있습니다.", "한 명도 처치하지 않고 상대를 살려 보내며 우승하면 '불살' 엔딩을 획득합니다."]], ["무기 정보 수정", ["바바라 권총, 이바 투척(야구공), 이안 단검(식칼), 다르코 방망이(단봉), 이슈트반 창, 니아 권총, 슈린 레이피어(바늘), 미르카 망치, 르노어 기타, 헨리 암기", "알렉스: 양손검·권총·암기·톤파 네 가지 무기를 번갈아 사용하며, 공격할 때마다 해당 무기의 특성이 적용됩니다.", "기타 1등급 무기 이름: '보급형 기타'", "이슈트반: 역할군이 근접 전사로 변경됩니다."]], ["실험체 조정", ["클로에: 역할군이 원거리 딜러로 변경됩니다. 암살자에게 강하고, 원거리 딜러에게 약합니다.", "제니: [고유 특성] 스턴트 대역 - 게임당 한 번, 치명적인 피해를 받으면 체력 1로 버티고 즉시 그 자리를 벗어납니다."]]], "불살 루트 개편과 함께 실험체 무기 정보가 수정됩니다."], ["v2.4", "2026.10.28", [["실험체 정보", ["일부 실험체의 소개 문구를 세계관 설정에 맞게 수정했습니다. (테오도르, 레녹스, 이안, 레니, 샬럿, 가넷, 르노어, 유민, 유스티나, 니아, 코렐라인, 알론소, 이바, 얀, 이슈트반, 클리버, 루치아 등)", "실험체 프로필의 '전투력' 항목이 '플레이 난이도'로 변경되었습니다.", "니아, 유스티나, 르노어의 필드 스킬이 설정에 맞게 변경되었습니다."]], ["관계", ["마커스와 매그너스는 같은 게임에 있으면 반드시 한 팀으로 움직이며, 서로 배신하지 않습니다.", "루치아와 세레스로 플레이하면 상대가 찾아와 합류하며, 두 사람은 서로를 해치지 않습니다.", "쇼이치로 플레이하면 알렉스가 동맹을 제안해 옵니다.", "실험체 관계를 활용한 신규 인카운터 20종 이상이 추가되었습니다."]], ["배신과 기억", ["동료의 배신 여부가 신뢰도, 성격, 이해관계, 플레이어에 대한 두려움에 따라 결정됩니다. 체력이 30 미만이면 대부분의 동료가 등을 돌립니다.", "3인 동맹에서 두 동료가 공모해 플레이어를 노릴 수 있습니다.", "동료가 자원을 훔쳐 달아날 수 있습니다. (아이솔은 자주, 라우라는 매우 자주)", "실험체가 플레이어의 행동을 기억합니다. 치료나 음식 나눔을 받은 실험체는 먼저 다가오고, 배신당한 실험체는 적대적으로 대합니다.", "평판 시스템이 추가되었습니다. 악명이 높으면 현상금이 걸리고, 선행을 쌓으면 돕는 실험체가 나타납니다."]], ["정보와 소문", ["실험체 조우 시 정확한 전투력 대신 장비 상태, 전투 흔적, 부상 정도 등의 단서가 표시됩니다.", "교전 중 상대 체력이 수치 대신 상태로 표시됩니다.", "다른 구역의 소문을 들을 수 있습니다. 소문은 틀리거나 함정일 수 있습니다."]], ["생존", ["음식이 등급별로 회복량이 나뉘며, 2턴에 한 번만 먹을 수 있습니다. 교전 중에도 먹을 수 있습니다.", "상대 실험체도 음식을 모으고 교전 중에 먹어 회복합니다.", "골절, 화상, 뇌진탕, 감염 부상이 추가되었습니다. 부목과 약초로 치료할 수 있습니다.", "가방에서 제작 목표를 설정하면, 이동 시 필요한 재료가 있는 구역이 선택지에 포함됩니다.", "회복이나 보급처럼 보이는 상황이 다른 실험체의 함정일 수 있습니다.", "정신력을 회복하는 인카운터가 추가되었습니다."]], ["무기 특성", ["무기 종류별 고유 특성이 추가되었습니다. 총기는 강력하지만 탄약을 소모하고 총성으로 주변 실험체를 끌어들이며, 탄약이 없으면 피해가 크게 감소합니다.", "둔기는 상대를 휘청이게 하고, 날붙이는 출혈을 남기며, 활·석궁은 조용하고 첫 공격이 강합니다."]], ["밸런스", ["상대 실험체가 전반적으로 더 호전적으로 변경되었습니다.", "실험체 감소 속도가 느려져 후반까지 더 많은 실험체가 생존합니다.", "역할군별 공격력·방어력 조정: 암살자 하향, 술사·근접 전사·서포터 상향", "붕대 체력 회복량이 하향되었습니다. (출혈 지혈 효과는 유지)", "신규 엔딩 5종이 추가되었습니다. (총 57종)"]]], "실험체 관계, 기억, 평판, 소문 등 섬의 생태계를 확장하는 대규모 업데이트입니다."], ["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 상황이 넘어가지 않으며, 시간을 소모하지 않습니다. (이동이나 조우를 일으키는 스킬 제외)", "필드 스킬 재사용 대기 시간이 약 2배로 증가했습니다. (대부분 12~16턴)"]], ["버그 수정", ["최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다."]], ["밸런스", ["상대 실험체의 공격력이 소폭 상향되었습니다."]]], "필드 스킬 사용 방식이 개선되고, 일부 버그가 수정됩니다."], ["v2.2", "2026.10.28", [["역할군 패시브", ["탱커 「불굴」: 받는 피해 10% 감소, 체력 30% 이하에서 추가 15% 감소. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 25% 증가, 처치 시 체력 15 회복", "원거리 딜러 「선제 사격」: 선공 시 피해 35% 증가, 교전 첫 라운드 피해 30% 증가", "레인저 「야생 감각」: 교전 첫 라운드 피해 15% 증가, 안전한 사냥, 재료 획득량 증가", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 대상에게 피해 20% 증가. 낮의 정면 교전에서 피해 15% 감소", "술사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 15% 증가, 정신력 감소량 25% 감소", "서포터 「돌봄」: 회복량 35% 증가, 정신력 감소량 40% 감소, 교전 중 매 라운드 체력 2 회복"]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 고유 효과를 갖도록 재설계되었습니다. (92종) 재사용 대기 시간은 스킬별로 개별 적용됩니다."]], ["전투", ["교전 중 역할군 전용 행동이 삭제되고 역할군 패시브로 대체되었습니다.", "「방어하며 빈틈을 노린다」를 연속 선택하면 방어 효율이 점차 감소합니다.", "원거리 딜러·근접 전사 소폭 상향, 암살자 공격력 소폭 하향"]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 작동하지 않던 문제를 수정했습니다."]]], "역할군 패시브가 도입되고, 모든 필드 스킬이 개편됩니다."], ["v2.1", "2026.10.28", [["지도", ["루미아 섬 지도가 실제 지형에 맞게 개편되었습니다. 일부 구역의 위치와 이동 경로가 변경됩니다.", "신규 구역 '주유소'와 전용 이벤트가 추가되었습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]], "루미아 섬 지도가 새롭게 개편됩니다."], ["v2.0", "2026.10.28", [["연구소와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄됩니다.", "마지막 날에는 무작위 구역 하나만 최종 안전지대로 지정됩니다."]], ["신규 히든 실험체 · JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 봉쇄된 연구소를 열 수 있습니다. 연구소 중앙 컴퓨터를 장악하면 '해킹 승리'로 실험을 종료할 수 있습니다.", "해금 조건: 엔딩 5종 수집"]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 교체됩니다.", "에키온의 VF 의수가 무기 숙련도에 따라 진화하며, 진화 방향을 선택할 수 있습니다.", "역할군 상성이 추가되었습니다.", "모든 실험체에 고유 패시브와 필드 스킬이 추가되었습니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재하며, 대화와 행동으로 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다.", "우호적인 실험체와 물자를 교환할 수 있습니다."]], ["밸런스", ["동맹 하향: 동료 피해량 감소, 페이즈마다 식량 분배", "동료와 함께 도주하면 동료가 남겨질 수 있으며, 남겨진 동료는 적으로 돌아올 수 있습니다.", "정신력이 40 미만이면 정신 붕괴 이벤트가 발생하고, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다.", "지도 탭이 추가되었습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 수량이 음수가 되던 문제를 수정했습니다."]]], "루미아 섬 생존 일지의 두 번째 시즌이 시작됩니다."], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "특정 조건에서만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]], "실험 결과 평가와 히든 이벤트가 추가됩니다."], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 늘어났으며, 실험체 전용 이벤트가 추가되었습니다.", "식량 획득과 체력 회복 이벤트가 추가되었습니다."]]], "이벤트가 대폭 추가됩니다."], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 같은 체력으로 시작합니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]], "전투 시스템이 확장됩니다."], ["v1.0", "2026.10.27", [["정식 오픈", ["24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]], "루미아 섬 생존 일지가 정식 오픈했습니다."]];
+const PATCH=[["v3.4", "2026.10.29", [["유물 전면 개편", ["모든 유물(379종)의 효과가 서로 다르게 바뀌었습니다.", "서브스토리 엔딩에서 얻는 유물은 대부분 해당 실험체 전용 유물입니다. 전용 유물은 그 실험체로 플레이할 때만 힘을 씁니다. 예: 에레보스 장비(에이든)는 과전하에 들어갈 때마다 예비 과전하 탄환 2발을 더하고, 감싼 천 조각(이안)은 잠식이 더 빨리 차올라 빙의가 쉬워집니다.", "갈림길 엔딩 유물과 공용 서브스토리 유물은 공용 유물입니다. 누구나 쓸 수 있지만 그 서브스토리 실험체와 특히 잘 맞습니다. 전용 유물과 공용 유물은 약 3:1 비율입니다.", "유물 도감에 「보유 중인 유물만 보기」 버튼이 생겼습니다."]], ["장비 개편", ["무기와 방어구 제작에 필요한 재료가 늘었습니다.", "무기에 금이 가서 등급이 떨어지는 일이 더 이상 없습니다.", "인카운터 이벤트로는 장비 등급이 오르지 않습니다. 장비 등급은 제작, 그리고 적 실험체를 처치했을 때만 오릅니다. 처치한 상대가 나와 같은 무기군이며 더 좋은 무기를 들고 있었다면 그 무기를, 더 좋은 방어구를 입고 있었다면 그 방어구를 빼앗습니다.", "신규 · 초월 등급: 위클라인이 떨어뜨리는 혈액팩으로 전설 장비를 초월 등급으로 만들 수 있습니다(블러디 핸즈, 롱기누스의 창, 다인슬라이프, 하이 눈, 더 데스, 버건디 47 등)."]], ["실험체 개편 · 쇼이치", ["패시브 「부당거래」: 스킬로 중첩을 쌓아 5중첩이면 단검을 떨어뜨리고, 단검은 협상 표식이 있는 적에게 먼저 날아갑니다. 공격 다섯 번마다 확정 치명타(무자비).", "전투 스킬 「표리」를 맞히면 다음 라운드에 강화된 표리를 바로 씁니다. 필드 스킬 「협상」."]], ["실험체 개편 · 아이작", ["패시브 「착취」: 같은 상대를 세 번째 칠 때마다 추가 피해와 회복."]], ["신규 · 전용 서브스토리 2편", ["「이 구역의 왕」(아이작), 「라벨」(헤이즈)이 추가되었습니다. 이제 모든 실험체가 전용 서브스토리를 가집니다."]], ["서브스토리 · 인카운터 개선", ["서브스토리에 이름이 나오는 조연·적은 실제로 그 실험체가 섬에 나옵니다. 이름과 다른 실험체가 대신 싸우러 나오던 문제를 고쳤습니다.", "마커스·매그너스처럼 짝이 있는 실험체는 재회 인카운터가 먼저 뜬 뒤에 서브스토리가 시작됩니다.", "의미가 없던 「회상」 인카운터(복수의 길 / 구원의 길 / 어떤 길도 붙잡지 않기)를 삭제했습니다. 관련 엔딩 조건이 바뀌었습니다: 복수의 끝(다섯 명 이상 처치), 구원(동료와 함께 우승), 빈손의 승자(전용 서브스토리를 끝맺지 않은 채 우승)."]], ["실험체 · 기타", ["카티야의 성향이 사이코패스로 바뀌었습니다."]]], "모든 유물이 다시 태어났습니다. 대부분은 그 이야기의 주인만 쓸 수 있는 전용 유물입니다. 위클라인의 혈액팩으로 초월 장비를 만들 수 있습니다."], ["v3.3", "2026.10.29", [["신규 · 유물 도감", ["서브스토리 엔딩에서 얻은 유물이 도감에 영구히 기록됩니다. 실험체 선택 화면의 「유물 도감」에서 확인할 수 있습니다.", "얻어 본 유물 중 하나를 장착해 두면, 다음 게임을 그 유물을 지닌 채 시작합니다. 장착한 유물을 다시 누르면 해제됩니다.", "이전에 달성한 서브스토리 엔딩의 유물도 도감에 반영됩니다."]], ["신규 · 전용 서브스토리 4편", ["「미제 사건」(아야), 「잊혀진 죽음」(자히르), 「늑대의 숲」(나딘), 「POLARIS」(하트)가 추가되었습니다.", "모든 이야기에 중간 갈림길과 전용 엔딩, 도전과제, 유물이 준비되어 있습니다."]], ["실험체 개편 · 아야", ["패시브 「아야의 정의」: 공격받으면 보호막이 생기고, 맞을 때마다 정의가 쌓입니다.", "필드 스킬 「정의」: 쌓인 정의로 체력을 회복하고 부상을 털어 냅니다.", "전투 스킬 「2연발」: 재사용 대기가 짧은 두 발 사격."]], ["실험체 개편 · 자히르", ["패시브 「처단」: 많이 죽인 상대일수록 추가 피해를 줍니다.", "전투 스킬 「나라야나스트라」: 사신의 눈 표식이 있는 적에게 더 큰 피해를 줍니다.", "필드 스킬 「사신의 눈」: 최근 사망자가 쓰러진 곳을 보고, 이 구역의 유품을 찾아냅니다."]], ["실험체 개편 · 나딘", ["패시브 「야성」: 사냥과 처치로 야성이 쌓이며 피해가 늘어납니다.", "전투 스킬 「불스아이」: 야성에 비례해 강해지는 한 발.", "필드 스킬 「천리안」: 야생동물을 찾아 덮쳐 사냥합니다."]], ["실험체 개편 · 하트", ["패시브 「Feedback」: 공격할 때마다 음파가 추가로 날아갑니다.", "전투 스킬 「불협화음」: 상대의 공격력을 떨어뜨리고, 좋은 무기를 든 상대에게 더 큰 피해를 줍니다.", "필드 스킬 「피스메이커」: 구역을 피스존으로 선언해 이번 시간대 습격을 막습니다."]], ["실험체 개편 · 리 다이린", ["취기 게이지가 추가되었습니다. 취기 40 이상이면 맹호청권으로 공격이 한 번 더 들어가고, 100이 되면 만취해 잠시 스킬을 못 쓰는 대신 공격을 흘려 냅니다.", "교전 중 「술 마시기」로 취기를 채우며 피해를 줄일 수 있고, 전투 스킬 「호연각」은 취기를 소모해 강화됩니다."]], ["실험체 개편 · 유키", ["패시브 「완벽한 옷매무새」: 단추를 하나씩 써서 추가 피해를 주고, 체력 80% 이상이면 공격·방어가 오릅니다.", "전투 스킬 「머리치기!」는 단추가 있으면 상대를 굳힙니다. 교전 중 「옷매무새 정리」로 단추를 다시 채웁니다.", "필드 스킬 「오리가미」."]], ["실험체 개편 · 쇼우", ["패시브 「요리사의 열정」: 요리할 때마다 최대 체력이 오릅니다.", "전투 스킬 「뜨거운 맛」: 모든 적을 화염으로 볶아 화상을 입힙니다."]], ["실험체 개편 · 키아라", ["패시브 「낙인」: 낙인이 쌓일수록 상대가 받는 피해가 늘어납니다.", "체력이 절반 아래면 「폭주」로 날개를 펼쳐 매 라운드 모든 적을 휩쓸고, 전투 스킬이 「심판」(낙인 비례 고정 피해)으로 바뀝니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「리화자」(리 다이린), 「봄」(유키), 「만한전석」(쇼우), 「밝음」(키아라+엠마)이 추가되었습니다."]], ["실험체 개편 · 시셀라", ["패시브 「삶은 고통이에요」: 공격받을수록 고통이 쌓여 다음 피해를 줄입니다. 체력이 낮을수록 「윌슨! 도와줘」가 강해집니다."]], ["실험체 개편 · 아드리아나", ["전투 스킬 「방화」: 화염방사기로 모든 적을 세 번 태우고 화상과 방어력 감소를 남깁니다.", "필드 스킬 「방화」로 불을 지른 구역에서 싸우면 피해가 늘어납니다."]], ["실험체 개편 · 루크", ["패시브 「청소 완료」: 연속으로 맞힐수록 손이 빨라지고, 처치하면 잃은 체력을 회복하며 청소 완료가 쌓입니다.", "전투 스킬 「클리닝 서비스」: 세제통을 던진 뒤 상대가 잃은 체력에 비례한 돌진."]], ["실험체 개편 · 캐시", ["패시브 「외과 전문의」: 외상 3개가 쌓이면 치명적 외상으로 고정 피해를 주고 보호막을 얻습니다.", "전투 스킬 「동맥절제술」: 피해와 함께 출혈과 외상을 남깁니다. 성향이 중립으로 변경되었습니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「윌슨」(시셀라), 「반딧불이」(아드리아나+에스텔), 「애프터 서비스」(루크), 「진료 기록」(캐시)이 추가되었습니다."]], ["밸런스 · 난이도 완화", ["탐색으로 얻는 금속·천·식량·가죽·화약·약초가 더 자주 하나씩 더 나옵니다(식량은 특히 더 잘 나옵니다)."]], ["변경 · 도주", ["교전에서 도주에 성공해도 더 이상 엉뚱한 구역으로 밀려나지 않습니다. 그 자리에 남고, 쫓아오던 상대가 흩어집니다.", "지도에서 이동 목표를 정해 가던 중이라면 도주한 뒤에도 그대로 목표를 향해 갑니다."]], ["실험체 개편 · 아델라", ["전투 스킬 「프로모션」: 폰을 세 번 놓으면 다음 수는 퀸(강한 피해 + 기절), 체력 30% 이하 상대는 체크메이트.", "필드 스킬 「프로모션」: 공격으로 쌓은 수로 무기를 한 등급 진급시킵니다(블랙서바이벌 스킬)."]], ["실험체 개편 · 버니스", ["패시브 「산탄」: 공격할 때마다 산탄 추가 피해.", "전투 스킬 「레그샷」: 상대의 도주를 막고 공격력을 떨어뜨리며, 굳어 있는 상대에게 더 큰 피해를 줍니다."]], ["실험체 개편 · 바바라", ["필드 스킬 「원격 드론」: 금속으로 드론을 날려 이웃 구역의 실험체를 폭격하고, 명중할 때마다 신체 개조가 쌓여 공격·방어가 오릅니다(블랙서바이벌 스킬).", "전투 스킬 「BT-Mk2 센트리건」."]], ["실험체 개편 · 수아", ["필드 스킬 「독서」로 읽을 책을 바꾸면 전투 스킬이 바뀝니다: 오딧세이(광역·기절) / 파랑새(보호막·실명) / 돈키호테(돌진·회복).", "패시브 「마음의 양식」: 스킬을 쓰면 다음 공격이 주변까지 울리며 회복합니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「체크메이트」(아델라), 「들꽃」(버니스), 「휴머노이드」(바바라), 「읽지 않은 장」(수아)이 추가되었습니다."]], ["실험체 개편 · 레온", ["패시브 「인간 어뢰」: 물가나 물웅덩이 위에서 피해가 늘고 추가 피해를 줍니다. 세 라운드마다 물웅덩이를 만듭니다. 탐색 네 번에 한 번 재료를 하나 더 찾습니다(블랙서바이벌 「수집욕」).", "전투 스킬 「파도타기」: 모든 적을 휩쓸고 맨 앞의 적을 굳힙니다."]], ["실험체 개편 · 니키", ["패시브 「다혈질」: 받은 피해가 분노로 쌓이고, 가득 차면 3라운드 동안 다혈질로 주변까지 휩쓸어 버립니다.", "전투 스킬 「가드 & 카운터」, 필드 스킬 「스턴트 액션」(피격 피해 고정 감소)."]], ["실험체 개편 · 나타폰", ["필드 스킬 「타임트레일」: 카메라를 세워 두고 4턴 뒤 그 구역에서 회수하면 체력·숙련·정신을 얻습니다(블랙서바이벌 스킬).", "전투 스킬 「셔터 찬스」: 모든 적을 한 라운드 멈추고 피사체를 가득 채웁니다."]], ["실험체 개편 · 얀", ["패시브 「열혈의 의지」: 공격으로 쌓은 의지가 5 이상이면 다음 「니 스트라이크」가 강화됩니다.", "필드 스킬 「옥타곤의 열기」: 다음 교전 피해 증가와 함께 의지를 쥐고 시작합니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「유니콘」(레온), 「아프지 않아」(니키), 「필름」(나타폰+실비아), 「옥타곤」(얀)이 추가되었습니다."]], ["실험체 개편 · 이바", ["바이탈 포스 게이지가 추가되었습니다. 40 이상 모이면 교전 중 「VF 방출」로 모두 쏟아부어 모든 적에게 큰 피해를 줍니다.", "전투 스킬 「빛의 트라이어드」, 필드 스킬 「텔레키네시스」."]], ["실험체 개편 · 다니엘", ["패시브 「고독한 예술가」: 밤에 피해가 늘고, 자신을 몰아붙인 상대를 「예술적 소재」로 삼습니다(블랙서바이벌 스킬).", "전투 스킬 「그림자 가위」: 출혈을 남기고, 약해진 상대는 「걸작」으로 마무리합니다."]], ["실험체 개편 · 클로에", ["패시브 「살아 있는 마리오네트」: 같은 상대를 두 번 공격할 때마다 니나가 따라 찌릅니다.", "필드 스킬 「마리오네트」: 다음 교전에서 마리오네트가 5라운드 동안 적을 찌릅니다(블랙서바이벌 스킬). 전투 스킬 「공격 명령」."]], ["실험체 개편 · 셀린", ["전투 스킬 「플라즈마 폭탄」으로 폭탄을 붙이고, 교전 중 「기폭」으로 쌓인 폭탄을 한꺼번에 터뜨립니다.", "필드 스킬 「형상변환」: 할 때마다 주는 피해가 오릅니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「괴물」(이바), 「걸작」(다니엘), 「니나」(클로에), 「인식표」(셀린)가 추가되었습니다."]], ["실험체 개편 · 에키온", ["VF 게이지가 추가되었습니다. 기본 공격과 「독사의 칼날」로 게이지를 채우면 3라운드 동안 VF 폭주 상태가 되어 주변에 고정 피해를 주고, 「독사의 진노」를 쓸 수 있습니다.", "「독사의 칼날」을 맞히면 다음 라운드에 곧바로 재사용할 수 있습니다. 필드 스킬 「뒤집힌 비늘」."]], ["실험체 개편 · 마이", ["패시브 「오뜨꾸뛰르」: 기본 공격에 추가 피해가 붙고 패턴이 쌓입니다. 패턴 10개로 방어구를 확실히 강화합니다(블랙서바이벌 스킬).", "전투 스킬 「드레이프」, 필드 스킬 「오뜨꾸뛰르」."]], ["실험체 개편 · 라우라", ["전투 스킬 「날카로운 꽃」이 대상에게 예고장을 붙입니다. 예고장이 붙은 상대를 공격하면 체력을 회복합니다.", "스킬을 쓴 뒤 다음 기본 공격이 다른 적까지 휘감습니다. 필드 스킬 「예고장」."]], ["실험체 개편 · 띠아", ["전투 스킬 「브러쉬 스트로크」가 쓸 때마다 노랑, 빨강, 파랑 순으로 색을 바꿉니다. 한 적에게 두 가지 색을 묻히면 다람쥐가 나타납니다.", "필드 스킬 「가라! 다람쥐!」: 다람쥐가 재료를 물어 옵니다(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「끝까지 살아남아」(에키온), 「다비드」(마이), 「예고장」(라우라), 「다람쥐」(띠아)가 추가되었습니다."]], ["실험체 개편 · 이렘", ["교전 중 「변신」으로 이렘(공격)과 고양이(회피) 상태를 오갑니다. 이렘은 「바운싱 볼」로 적을 매혹하고 물고기 표식을 남기며, 고양이는 표식을 소모해 「냥냥 펀치」를 날립니다.", "같은 구역에 오래 머물면 적응해 더 강해집니다. 필드 스킬 「사뿐~」."]], ["실험체 개편 · 테오도르", ["패시브 「에너지 프로토콜」: 교전 시작 시 보호막을 두르고, 기본 공격으로 스킬 대기 시간을 줄입니다.", "전투 스킬 「에너지 포」가 적을 쏘고 동료를 치유합니다. 「원거리 저격」 후 증폭 스크린으로 한 번 더 발사됩니다."]], ["실험체 개편 · 데비&마를렌", ["교전 중 「교대」로 데비(전열)와 마를렌(후열)을 바꿉니다. 공격마다 블루&레드를 새기고, 다른 색을 새기면 기존 색이 터집니다.", "데비 「하드 슬래시」, 마를렌 「크레센트 댄스」."]], ["실험체 개편 · 아비게일", ["패시브 「티어링 블레이드」: 3라운드마다 기본 공격이 공간을 찢어 추가 피해를 주고 대상이 받는 피해를 올립니다.", "전투 스킬 「바이너리 스핀」: 모든 적을 두 번 벱니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「애완 인간」(이렘), 「사인볼」(테오도르), 「둘이라면」(데비&마를렌), 「약속」(아비게일)이 추가되었습니다."]], ["실험체 개편 · 알론소", ["전투 스킬 「마그네틱 펀치」로 적과 자력으로 연결되고, 다음 기본 공격이 연결을 터뜨려 추가 피해와 기절을 줍니다. 적을 기절시키면 체력을 회복합니다.", "필드 스킬 「바운싱 실드」."]], ["실험체 개편 · 츠바메", ["패시브 「오의 - 생사 각인」: 기본 공격이 각인을 새기고, 3중첩이 되면 베어 추가 피해를 줍니다.", "전투 스킬 「수리검 전개」, 필드 스킬 「제비걸음」."]], ["실험체 개편 · 카티야", ["패시브 「잿빛 사신」: 스킬 뒤 다음 기본 공격이 추가 피해를 줍니다. 처치하면 수당으로 재료를 얻습니다.", "교전마다 한 번 「정밀 조준」으로 최대 셋을 저격합니다. 필드 스킬 「목표물 포착」."]], ["실험체 개편 · 샬럿", ["패시브 「고결한 마음」: 크게 다칠 때마다 회복량이 늘어납니다.", "전투 스킬 「치유의 빛」이 빛무리 공격을 겸합니다. 체력이 절반 아래면 교전마다 한 번 「기적 실현」."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「떠돌이 개」(알론소), 「반딧불 거리」(츠바메), 「잿빛 사신」(카티야), 「한 줄기 빛」(샬럿)이 추가되었습니다."]], ["실험체 개편 · 다르코", ["패시브 「압류」: 2라운드마다 기본 공격이 상대의 방어를 빼앗아 상대는 더 아프게, 다르코는 더 단단하게 만듭니다.", "전투 스킬 「고리대금」이 이자 표식을 남기고, 표식이 있는 상대에게는 「추심」으로 기절시킵니다. 필드 스킬 「수금」."]], ["실험체 개편 · 르노어", ["패시브 「고통의 선율」: 체력이 절반 이하인 적을 스킬로 치면 추가 피해와 함께 비명을 모아 스킬 대기 시간을 줄입니다.", "전투 스킬 「스타카토」, 필드 스킬 「레퀴엠」."]], ["실험체 개편 · 유민", ["교전 중 「경운」으로 바람 지대를 펼칩니다. 바람 지대 위에서 「선풍」을 쓰면 더 큰 바람과 함께 보호막을 얻습니다.", "싸움을 피하는 데 익숙해 도주 성공률이 오릅니다. 필드 스킬 「결계」."]], ["실험체 개편 · 히스이", ["패시브 「검의 기억」: 스킬 뒤 기본 공격이 강해지고 스킬 대기 시간을 줄입니다.", "전투 스킬 「쾌연격」은 교전 첫 라운드에 거합으로 두 배 피해를 줍니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「담보」(다르코), 「스완송」(르노어), 「바람 따라」(유민), 「배신자 명부」(히스이)가 추가되었습니다. 「배신자 명부」는 츠바메가 섬에 있으면 그녀가 표적이 됩니다."]], ["실험체 개편 · 이슈트반", ["패시브 「연산」: 기본 공격과 스킬을 합쳐 4번 쓰면 다음 「관측」이 「다른 가능성」으로 강화되어 모든 적을 베고 잃은 체력을 회복합니다.", "필드 스킬 「경로 적분」."]], ["실험체 개편 · 니아", ["패시브 「K.O.」: 공격마다 중첩을 쌓아 피해를 저장하고, 저장된 피해가 남은 체력을 넘으면 즉시 K.O.시킵니다.", "전투 스킬 「아케이드 드롭」, 필드 스킬 「1UP」: 쓰러질 피해를 한 번 버팁니다."]], ["실험체 개편 · 슈린", ["패시브 「결심응진」: 유운잔영검 3중첩마다 어검이 날아가 추가 피해와 회복을 줍니다.", "전투 스킬 「비검잔위」: 어검이 2라운드 동안 회전하며 적을 베고, 다음 공격 하나를 막습니다."]], ["실험체 개편 · 블레어", ["패시브 「블레이드 시프트」: 스킬을 쓸 때마다 쌍검(연격)과 쌍날검(방어)을 오갑니다. 「이중 참격」과 「칼날폭풍」.", "교전마다 한 번 「XMS-5 활성화」로 4라운드 동안 피해가 오릅니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「다세계」(이슈트반), 「NiaH」(니아), 「검의 주인」(슈린), 「라이터」(블레어)가 추가되었습니다."]], ["편의 · 도감 검색", ["도전과제와 유물 도감에 검색창이 생겼습니다. 초성으로도 찾을 수 있습니다(예: ㅇㅂ → 이바).", "도전과제는 이름과 조건으로, 실험체 이름을 넣으면 그 실험체로 달성할 수 있는 도전과제와 서브스토리 엔딩이 나옵니다.", "유물은 이름과 효과, 해당 서브스토리 실험체 이름으로 찾을 수 있습니다."]], ["실험체 개편 · 미르카", ["패시브 「리펄스 게이지」: 받은 피해가 게이지로 쌓이고, 가득 차면 「크래시 해머」가 강화되어 기절과 여진을 일으킵니다.", "필드 스킬 「구역 장악」."]], ["실험체 개편 · 펜리르", ["패시브 「최후의 발악」: 교전마다 한 번, 쓰러질 피해를 받으면 2라운드 동안 불사 상태가 됩니다.", "전투 스킬 「찢는 손톱」: 2중첩이면 깊게 찢고 VF를 흡수해 회복합니다."]], ["실험체 개편 · 크레이버", ["패시브 「데스페라도」: 탄환 6발로 싸웁니다. 1발이 남으면 「마탄」을 쏠 수 있습니다.", "전투 스킬 「더블 탭」."]], ["실험체 개편 · 펠릭스", ["패시브 「연계 창술」: 「선풍참 → 질풍뇌격 → 반월참」으로 이어지고, 연계 사이의 기본 공격이 마지막 연계를 강화합니다.", "필드 스킬 「무화창」(블랙서바이벌 스킬)."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「뒷골목의 여왕」(미르카), 「바깥 이야기」(펜리르), 「주인 찾기」(크레이버), 「마을의 영웅」(펠릭스)이 추가되었습니다."]], ["실험체 개편 · 엘레나", ["패시브 「겨울여왕의 영지」: 공격마다 냉기가 쌓이고, 100이 되면 빙결시킵니다. 빙결된 적을 치면 추가 피해.", "필드 스킬 「링크 생성」: 구역을 나만의 무대로 만들어 머무는 동안 강해집니다(블랙서바이벌 스킬). 전투 스킬 「크리스탈 엘레강스」."]], ["실험체 개편 · 프리야", ["전투 스킬 「개화의 선율」이 사라스바티의 꽃을 피우고, 꽃이 핀 상태에서 다시 연주하면 만개해 적을 휩쓸고 동료까지 치유합니다."]], ["실험체 개편 · 아디나", ["패시브 「별읽기」: 수정구의 해·달·별을 차례로 쏘아 보냅니다(해: 큰 피해, 달: 기절, 별: 회복과 방어). 같은 천체가 연달아 나오면 컨정션으로 강화됩니다."]], ["실험체 개편 · 칼라", ["패시브 「작살 장전」: 장전 게이지가 가득 찬 기본 공격이 강해집니다.", "「관통 작살」로 작살을 꽂고, 「회수」로 꽂힌 적을 한꺼번에 당깁니다."]], ["신규 · 전용 서브스토리 4편 (추가)", ["「빙상의 여왕」(엘레나), 「담장 너머」(프리야), 「불길한 점괘」(아디나), 「할머니의 비밀」(칼라)이 추가되었습니다."]], ["실험체 개편 · 에스텔", ["패시브 「사명감」: 교전 중 매 라운드 체력을 회복하고, 쓰러질 듯한 동료에게 달려가 응급처치합니다.", "전투 스킬 「진압」: 방패를 세워 버티고, 다음 기본 공격으로 강타해 기절시킵니다."]], ["실험체 개편 · 피올로", ["패시브 「단련광」: 교전 밖에서 단련의 성과가 쌓이고, 스킬 뒤 기본 공격에 실려 추가 피해를 줍니다. 싸움이 끝나면 쓸 만한 것을 줍습니다.", "전투 스킬 「쌍절난격」, 필드 스킬 「단련」."]], ["실험체 개편 · 마르티나", ["「취재 중」에서 「방송 중」으로: 촬영 진행도가 다 차면 전투 스킬 「빨리감기」가 강해집니다.", "필드 스킬 「일시정지」: 소형 카메라를 숨겨 다음 교전 첫 상대를 붙잡습니다."]], ["신규 · 전용 서브스토리 3편 (추가)", ["「무너진 건물」(에스텔), 「마음의 틈새」(피올로), 「특종」(마르티나)이 추가되었습니다. 이로써 모든 실험체의 개편이 끝났습니다."]], ["안내", ["앞으로 블랙서바이벌에도 등장했던 실험체는 블랙서바이벌 설정과 스킬도 함께 참고해 개편합니다."]]], "지난 이야기의 흔적을 다음 게임으로 가져갈 수 있습니다. 유물 도감과 함께, 아야·자히르·나딘·하트·리 다이린·유키·쇼우·키아라·시셀라·아드리아나·루크·캐시·아델라·버니스·바바라·수아·레온·니키·나타폰·얀·이바·다니엘·클로에·셀린·에키온·마이·라우라·띠아·이렘·테오도르·데비&마를렌·아비게일·알론소·츠바메·카티야·샬럿·다르코·르노어·유민·히스이·이슈트반·니아·슈린·블레어·미르카·펜리르·크레이버·펠릭스·엘레나·프리야·아디나·칼라·에스텔·피올로·마르티나의 이야기가 시작됩니다."], ["v3.2", "2026.10.29", [["실험체 개편 · 재키", ["패시브 「피의 축제」: 공격마다 출혈이 최대 5중첩까지 쌓이며 매 라운드 피해를 줍니다. 출혈이 가득 차거나 처치에 성공하면 3라운드 동안 아드레날린 상태가 되어 추가 피해와 회복을 얻습니다.", "전투 스킬이 평소엔 「연참」(2연속 베기 + 흡혈), 아드레날린 동안엔 「학살」(잃은 체력 비례 피해, 처치 시 즉시 재사용)으로 바뀝니다.", "필드 스킬 이름이 「습격」으로 변경되었습니다."]], ["실험체 개편 · 피오라", ["역할이 브루저로 변경되었습니다. 이제 낮에도 공격력이 줄지 않습니다.", "패시브 「뚜셰」: 공격마다 표식을 새기고, 4개가 되면 추가 피해·회복과 함께 전투 스킬 재사용 대기가 줄어듭니다.", "전투 스킬 「플레슈」: 세 번 연달아 찌르고 마지막 일격으로 상대를 굳힙니다.", "필드 스킬 「자세 교정」: 동료가 있으면 자세도 바로잡아 줍니다."]], ["실험체 개편 · 아이솔", ["전투 스킬 「셈텍스 폭탄」: 상대에게 폭탄을 붙이고 2라운드 뒤 터뜨립니다. 그동안 공격할수록 폭발 피해가 커집니다.", "패시브 「유격전」: 폭탄이 터지면 3라운드 동안 주는 피해가 증가합니다. 덫 특성은 그대로 유지됩니다.", "필드 스킬 이름이 「Mok제 폭탄」으로 변경되었습니다."]], ["실험체 개편 · 실비아", ["연료 게이지가 추가되었습니다. 필드 스킬 「기동전」으로 바이크에 타고 내릴 수 있으며, 타고 있으면 목적지까지 훨씬 빨리 이동합니다.", "걸을 땐 「스피드건」(피해 + 동료 회복 + 연료 충전), 바이크를 타면 「파워슬라이드」(모든 적 피해 + 회피)로 전투 스킬이 바뀝니다.", "패시브 「그란투리스모」: 처음 밟는 구역마다 주는 피해가 늘어납니다(10개 구역 완주 시 추가 보너스)."]], ["실험체 개편 · 레녹스", ["패시브 「위풍당당」: 적에게 피해를 주면 보호막을 얻습니다.", "전투 스킬 「푸른뱀」: 채찍을 두 번 휘둘러 매 라운드 고정 피해를 주는 표식을 새기고, 상대가 도망치지 못하게 합니다.", "필드 스킬 「낚시」: 식량을 낚고 가끔 재료도 함께 건집니다. 물가에서 더 잘 낚입니다."]], ["실험체 개편 · 일레븐", ["패시브 「힘내자고!」: 전투 스킬이 맞힌 적 수만큼 일레븐 버거가 떨어지고, 체력이 낮으면 라운드마다 주워 먹어 회복합니다.", "전투 스킬 「자~ 집중!」: 모든 적을 도발해 피해를 주고, 받는 피해를 크게 줄이며 동료를 지킵니다.", "필드 스킬 「먹방 라이브」: 근처 실험체와 음식을 나눠 호감을 얻습니다."]], ["실험체 개편 · 리오", ["단궁과 화궁을 바꿔 쥘 수 있습니다. 교전 중 「카에유미」로 활을 바꾸면 카이츄가 가득 찹니다.", "전투 스킬이 활에 따라 바뀝니다: 단궁 「하나레」(모든 적 연사 + 공격력 감소) / 화궁 「하나레」(강한 한 발 + 관통).", "패시브 「카이」: 카이츄 3개가 모이면 다음 공격이 강화됩니다."]], ["실험체 개편 · 윌리엄", ["패시브 「캐치볼」: 공격할 때마다 공을 받아 쌓고, 3개가 모이면 공 두 개를 더 던집니다.", "전투 스킬 「와인드업」: 던진 공과 돌아오는 공에 모두 맞은 적은 한 라운드 굳습니다."]], ["실험체 개편 · 제니", ["패시브 「죽음의 연기」: 게임당 한 번 죽음에 이르는 피해를 받으면 죽은 척 빠져나가고, 체력을 25%까지 되찾습니다.", "필드 스킬 「페르소나」로 레드 와인(공격적)과 블랙 티(회피·도주) 배역을 바꿉니다. 전투 스킬 「레드 카펫」도 배역에 따라 상대를 끌어당기거나 밀어냅니다."]], ["실험체 개편 · 카밀로", ["역할이 브루저로 변경되었습니다.", "패시브 「올레」: 기본 공격과 전투 스킬을 번갈아 쓰면 보호막을 얻고 스킬 재사용 대기가 줄어듭니다.", "전투 스킬 「두엔데」: 춤추며 받는 피해를 절반으로 줄이고 모든 적을 두 번 베며, 두 번 다 맞은 적은 굳습니다."]], ["실험체 개편 · 요한", ["전투 스킬 「찬란한 광휘」: 나와 동료를 회복시키고 상대에게 피해를 줍니다.", "필드 스킬 「미사」: 동료를 치유하고 신성의 향로를 피워, 다음 교전에서 피해가 늘고 「찬란한 광휘」가 상대를 묶습니다.", "패시브 「빛의 가호」: 회복 효과 +20%, 동료가 있으면 매 라운드 동료 체력 회복."]], ["실험체 개편 · 마커스", ["무기가 도끼로 변경되었습니다.", "전투 스킬 「전사의 돌격」으로 상대를 충격 상태로 만들고, 충격 상태의 상대를 공격하면 「일격」이 터집니다.", "필드 스킬 「전투 교범」: 다음 교전에서 받는 피해가 줄고 공격할 때마다 체력을 회복합니다. 쉬는 틈에도 단련해 최대 체력이 조금씩 오릅니다."]], ["실험체 개편 · 아르다", ["전투 스킬 「바빌론의 입방체」: 모든 적에게 피해를 주고, 다음 라운드 입방체가 무너지며 다시 피해를 주고 적을 굳힙니다.", "패시브 「유물 탐구」: 고대의 정수 3개가 모이면 랜턴이 빛나 나와 동료를 회복시킵니다.", "필드 스킬 「발굴 조사」: 절·묘지·성당에서 특수 재료가 더 잘 나옵니다."]], ["실험체 개편 · 루치아", ["패시브 「영애의 소양」: 전투 스킬에 맞은 적에게 수정이 박히고, 수정이 박힌 적을 공격하면 깨뜨리며 추가 피해를 줍니다.", "전투 스킬 「일제 사격!」: 모든 적을 쏘고, 이미 수정이 박혀 있던 적은 굳습니다."]], ["실험체 개편 · 세레스", ["전투 스킬 「쇄도」로 돌진하며 보호막을 두르고, 이어서 「관철」로 상대를 굳힙니다. 보호막이 버티면 폭발합니다.", "패시브 「낭만을 지키는 검」: 공격하면 흑요석 파편이 박혀 매 라운드 피해를 줍니다.", "필드 스킬 「빛에게 바치는 맹세」: 루치아가 곁에 있으면 정신이 회복됩니다."]], ["개선", ["개편된 실험체들의 설명, 성향, 전용 인카운터, 도전과제가 원작 설정에 맞게 새로 작성되었습니다."]]], "원작 설정을 바탕으로 실험체 개편이 이어집니다. 이번에는 재키, 피오라, 아이솔, 실비아, 레녹스, 일레븐, 리오, 윌리엄, 제니, 카밀로, 요한, 마커스, 아르다, 루치아, 세레스입니다."], ["v3.1", "2026.10.29", [["신규 · 명예의 전당", ["우승한 플레이어는 결과 화면에서 이름을 등록해 명예의 전당에 오를 수 있습니다. 실험 점수 상위 10명이 표시됩니다.", "실험체 선택 화면의 「명예의 전당」 버튼으로 언제든 순위를 확인할 수 있습니다."]], ["신규 · 전체 플레이어 통계", ["결과 화면에 이번 판에서 본 엔딩과 서브스토리 엔딩을 전체 플레이어 중 몇 퍼센트가 보았는지 표시됩니다.", "도전과제 화면의 각 항목에 전체 플레이어 달성률이 표시됩니다.", "실험체 선택 화면에 전체 누적 플레이 수와 플레이어 수가 표시됩니다."]], ["신규 · 전용 서브스토리 7편", ["3.0에서 개편된 실험체들에게 전용 서브스토리가 추가되었습니다. 각 이야기는 7장으로 구성되며, 엔딩마다 도전과제와 유물이 준비되어 있습니다.", "「잔치」 · 비형 (레니, 알론소) — 엔딩: 천하제일, 언니, 깨진 단지", "「나비의 꿈」 · 바냐 (레니) — 엔딩: 자유롭게, 바뀐 꿈, 말하지 못한 꿈", "「놀이터」 · 레니 (시셀라) — 엔딩: 영원한 아이, 헬레나, 혼자 남은 놀이터", "「벨라」 · 로지 (아이솔) — 엔딩: 벨라, 마지막 둘, 그림자", "「비기엠마 쇼」 · 엠마 (띠아) — 엔딩: 쇼는 계속된다, 속아 준 마술사, 스페이드 수첩", "「계산서」 · 쇼이치 (캐시) — 엔딩: 청구서, 정산, 약속", "「멈춘 시계」 · 헨리 (이슈트반) — 엔딩: 다시 움직이는 시계, 되감기, 사라의 미소"]], ["실험체 개편 · 이안", ["잠식 게이지(최대 200)가 추가되었습니다. 공격을 맞히면 잠식이 쌓이고, 100이 되면 「빙의」 상태가 되어 잃은 체력의 20%를 회복합니다.", "상태에 따라 전투 스킬이 바뀝니다. 인간 상태는 「미안해요..」(모든 적 피해 + 적 공격력 감소), 빙의 상태는 「피투성이 손톱」(고정 피해 + 회복, 갉아먹기 중첩)을 사용합니다. 빙의되는 순간 빙의 스킬을 바로 쓸 수 있습니다.", "빙의 중 잠식이 100 이상이면 「해방」으로 귀신이 됩니다. 귀신은 받는 피해가 줄고, 공격마다 고정 피해와 회복, 세 번째 공격마다 공포를 겁니다. 잠식이 다하거나 「네 멋대로 설치게 두지 않겠어!!」로 저항하면 인간으로 돌아옵니다.", "필드 스킬 「단검의 목소리」: 인간일 때는 목소리에게 몸을 내주어 바로 빙의하고, 빙의 중에는 저항해 인간으로 돌아옵니다.", "잠식 게이지는 체력 바 아래에 표시되며, 교전 밖에서는 턴마다 줄어듭니다."]], ["실험체 개편 · 타지아", ["역할이 마법사(스킬 딜러)로 변경되었습니다.", "패시브 「아르띠지아나토」: 공격을 맞힌 적에게 유리 조각이 박히고, 4개가 되면 깨지며 고정 피해를 줍니다. 이때 전투 스킬이 「스틸레토」에서 「스파다」(모든 적 관통 + 밀쳐내기)로 강화됩니다.", "필드 스킬 「피아스코」: 유리 벽으로 길목을 막아 다음 교전의 첫 라운드를 봉쇄하고, 상대에게 유리 조각 2개를 박은 채 시작합니다.", "사람이 많은 곳에서는 정신이 깎이고, 바다(항구·모래사장)에서는 정신이 회복됩니다."]], ["실험체 개편 · 코렐라인", ["역할이 마법사(스킬 딜러)로 변경되었습니다.", "패시브 「인과의 이면」: 공격을 맞힌 적에게 표식을 남기고, 3개가 되면 터지며 고정 피해를 줍니다. 거짓말쟁이(흑)에게는 피해가 늘고, 흑을 처치하면 정신이 회복됩니다.", "전투 스킬 「단죄의 섬광」이 쓸 때마다 백경(현재 체력 비례 고정 피해 + 보호막)과 흑경(잃은 체력 비례 고정 피해 + 받는 피해 증가)으로 번갈아 바뀝니다.", "필드 스킬 「업경」: 살아 있는 실험체 중 거짓말쟁이(흑)와 그 위치를 알아냅니다. 교전 화면에는 상대가 흑인지 백인지 표시됩니다."]], ["신규 · 전용 서브스토리 3편", ["「유리 공방」(타지아), 「업경」(코렐라인), 「일곱 개의 목소리」(이안)가 추가되었습니다.", "세 이야기 모두 중간 선택에서 갈라지는 갈림길과 전용 엔딩, 도전과제, 유물이 준비되어 있습니다."]], ["개선", ["성향이 반대인 실험체끼리는 동맹을 잘 맺지 않습니다. 선·정의 성향과 악·사이코패스 성향은 서로 동맹 제안을 거의 받아들이지 않으며, AI 실험체끼리 팀을 꾸릴 때도 같은 규칙이 적용됩니다. 원래 관계가 있는 실험체끼리는 예외입니다.", "서브스토리 진행 중에는 관계 실험체가 다른 실험체나 사고로 사망하지 않습니다. 목숨이 위험해지면 간신히 살아남아 근처로 피신합니다. 단, 플레이어가 직접 쓰러뜨리거나 최종 단계에 들어서면 사망할 수 있습니다.", "공용 서브스토리가 게임 시작 후 30턴(선택 30회)이 지난 뒤부터 등장합니다.", "서브스토리에서 이동 목표를 정하면, 도착할 때까지 같은 장면이 반복해서 나오지 않습니다. 목적지가 멀면 경유지를 거쳐 자동으로 이동합니다."]], ["안내", ["통계 수집을 위해 플레이 결과(실험체, 엔딩, 서브스토리 엔딩, 도전과제)가 익명으로 기록됩니다. 이름은 명예의 전당에 직접 등록할 때만 저장됩니다.", "인터넷에 연결되어 있지 않거나 통계 서버에 접속할 수 없어도 게임은 그대로 즐길 수 있습니다."]]], "루미아 섬의 모든 실험체가 같은 기록 위에 서게 됩니다. 명예의 전당과 전체 플레이어 통계를 만나 보세요."], ["v3.0", "2026.10.29", [["대망의 3.0 업데이트", ["루미아 섬 생존 일지가 3.0 버전으로 새롭게 태어납니다. 이동 방식, 서브스토리, 전투 스킬, 지역 구성이 전면 개편되었으며, 나쟈 박사와 함께하는 튜토리얼이 추가되었습니다.", "3.0 업데이트 이후 처음 게임을 시작하시면 기존에 플레이하셨던 분들도 튜토리얼이 한 번 진행됩니다. 이후에는 실험체 선택 화면의 「튜토리얼 다시 보기」로 언제든 다시 보실 수 있습니다."]], ["신규 · 나쟈 박사의 튜토리얼", ["나쟈 박사가 직접 생존 요령을 안내합니다. 상태와 성향, 가방과 식량 사용, 가방 제작, 제작 목표와 재료 위치, 지도 이동, 생존자·기록·도감, 무기 강화와 숙련도, 전투, 호감도와 관계, 정신력과 성향까지 순서대로 익힐 수 있습니다.", "튜토리얼이 진행되는 동안에는 안내된 버튼이 강조 표시되며, 장면 선택지는 잠시 잠깁니다."]], ["개편 · 지도 이동", ["갈림길 장면이 사라지고, 지도에서 직접 목적지를 정하는 방식으로 바뀌었습니다.", "지도에서 현재 위치와 길로 이어진 구역(파란 테두리)을 누르면 목적지가 설정되며, 5턴 뒤 도착합니다. 이동 중에도 장면은 계속 진행됩니다.", "목적지는 지도 상단에서 언제든 취소할 수 있으며, 상단 상태창에 남은 턴이 표시됩니다.", "금지구역에 있을 때 즉시 탈출하는 기능은 기존과 동일하게 유지됩니다."]], ["개편 · 가방 제작", ["작업대 장면이 사라지고, 가방에서 언제든 제작할 수 있게 바뀌었습니다. 재료가 있으면 무기 강화, 방어구 제작, 붕대·요리·진정제·덫 등을 바로 만들 수 있습니다.", "교전 중에는 제작할 수 없습니다.", "튜토리얼에 가방 제작 안내가 추가되었습니다."]], ["개편 · 전투 도주", ["전투 중 도주가 확률 판정에서 버티기 판정으로 바뀌었습니다.", "도주를 선택하면 살아 있는 모든 적에게 등 뒤 공격을 한 번씩 받습니다. 버텨 내면 반드시 도주에 성공하고, 버티지 못하면 그대로 사망합니다.", "도주 선택지에 예상 피해가 표시되며, 현재 체력으로 버틸 수 없으면 「버티지 못한다」로 경고합니다.", "기절한 적, 달아나려는 적은 등 뒤 공격을 하지 않습니다. 강공을 준비하던 적은 더 아프게, 웅크린 적은 약하게 공격합니다.", "기존의 도주 확률 보너스(패시브, 유물, 필드 스킬 등)는 모두 「도주 시 받는 피해 감소」로 바뀌었습니다. 골절 상태에서는 도주 시 받는 피해가 15% 증가합니다.", "튜토리얼에 도주 안내가 추가되었습니다."]], ["개편 · 지역 특성", ["지역마다 특산 재료가 생겼습니다. 특산 재료는 해당 지역에서 더 많이 얻을 수 있습니다. 예: 숲·연못·개울·모래사장은 식량, 공장·경찰서·창고는 금속과 화약, 고급 주택가·호텔은 천.", "성당·절·호텔·연못에서는 정신력 회복량이 30% 증가하고, 병원에서는 체력 회복량이 25% 증가합니다.", "지도의 지역 목록에서 각 지역의 특성을 확인할 수 있습니다.", "가방의 제작 목표를 정하면 부족한 재료와 그 재료가 많이 나오는 지역이 표시되며, 가까운 지역은 따로 강조됩니다.", "지역 전용 인카운터 22종이 추가되었습니다."]], ["개편 · 전투 스킬 재사용 대기", ["전투 스킬의 재사용 대기 시간이 대폭 늘어났습니다. 기본 12턴, 술사 10턴입니다.", "재사용 대기 시간은 이제 전투 밖에서도 흐릅니다. 스킬을 쓴 뒤 적이 도주해도 다음 교전에서 쿨타임이 어색하게 남지 않습니다.", "자원을 쌓아 쓰는 실험체(케네스의 분노, 에이든의 전하)보다 재사용 대기가 짧아 자원 구조가 무의미해지던 문제가 해결되었습니다.", "스킬을 기본 공격처럼 쓰는 실험체는 예외입니다. 유스티나는 재사용 대기가 없고, 헤이즈·쇼우·Eleven은 8턴, 프리야·캐시·샬럿은 9턴, 로살리오는 10턴입니다.", "상단 상태창에 전투 스킬의 남은 재사용 대기 시간이 표시됩니다."]], ["신규 · 아글라이아 패스 서브스토리", ["아글라이아 패스의 이야기를 바탕으로 한 서브스토리 6편이 추가되었습니다. 각 이야기는 해당 실험체로 플레이할 때 진행되며, 모두 8장 내외로 구성되어 있습니다.", "「운명」 · 레녹스, 혜진, 윌리엄", "「재정의」 · 피오라, 로살리오, 카밀로 (로살리오 해금 필요)", "「특이점」 · 현우, 재키", "「속죄」 · 비앙카, 요한", "「기록」 · 제니, Eleven, 아르다", "「스릴」 · 실비아, 리오, 아이솔", "각 서브스토리에는 3~4개의 엔딩이 있으며, 모든 엔딩마다 도전과제와 유물이 준비되어 있습니다."]], ["신규 · 공용 서브스토리 「섬의 폭군」", ["어떤 실험체로든 진행할 수 있는 공용 서브스토리가 추가되었습니다. 섬을 휩쓰는 악명 높은 실험체를 둘러싸고 이야기가 펼쳐집니다.", "전용 서브스토리가 없는 실험체는 게임 중반에, 전용 서브스토리가 있는 실험체는 전용 이야기를 마친 뒤 이어서 만날 수 있습니다. 두 이야기는 동시에 진행되지 않습니다.", "엔딩: 폭군 사냥, 공범, 다른 손"]], ["신규 · 공용 서브스토리 2종", ["「마지막 방송」: 손목 장치에 잡힌 정체불명의 신호를 따라 섬 곳곳을 이동하며 숨겨진 보급품 은신처를 찾는 이야기입니다. 엔딩: 구조 신호, 독차지, 다음 사람에게", "「연구원의 일지」: 아글라이아 연구원이 남긴 일지의 찢어진 페이지를 모으는 이야기입니다. 엔딩: 진실, 소각, 거래", "두 이야기는 목적지를 정해 직접 찾아가야 다음 장이 열립니다. 목적지까지 가는 동안 「○○ 쪽으로 출발한다」 선택지가 이동 목표를 자동으로 잡아 줍니다.", "공용 서브스토리는 한 게임에 최대 2편까지 진행되며, 「섬의 폭군」을 포함한 3편 중에서 무작위로 등장합니다."]], ["개편 · 서브스토리 진행 조건", ["서브스토리의 관계 실험체는 이야기 속에서 만나기 전까지 마주치지 않습니다. 이미 함께 다니는데 이야기에서는 상대를 찾는 등 어색한 진행이 사라졌습니다.", "서브스토리 도중 관계 실험체와 적대하게 되면 이야기가 「갈라선 길」 엔딩으로 끝납니다. 적대 상태에서 이야기가 계속 진행되지 않습니다.", "서브스토리로 함께 다니는 동료는 더 이상 배신하지 않습니다. 이야기를 끝까지 마친 뒤에도 마찬가지입니다.", "일부 선택지에 「이 이야기에서 손을 뗀다 (서브스토리 종료)」가 추가되어, 원하지 않으면 이야기를 중간에 끝낼 수 있습니다."]], ["개편 · 서브스토리 엔딩과 유물", ["진 엔딩 개념이 사라지고, 모든 엔딩이 고를 만한 가치를 가지도록 유물이 재조정되었습니다.", "누군가 희생하는 엔딩일수록 남겨진 유물이 강력합니다. 행복한 엔딩은 방어와 정신력 위주, 비극적인 엔딩은 공격 위주의 유물을 남깁니다.", "「갈라선 길」 엔딩에도 유물이 주어집니다."]], ["개선 · 성향 표시", ["상단 상태창 이름 옆에 현재 성향이 표시됩니다.", "성향 옆 「i」 버튼을 누르면 현재 성향에서 정신력이 오르고 내리는 조건, 공통 회복 방법, 다른 성향의 규칙을 확인할 수 있습니다."]], ["버그 수정", ["서브스토리 장면에서 「무시하고 공격한다」를 고르면 같은 장이 계속 반복되던 문제를 수정했습니다. 이제 공격을 고르면 이야기가 다음 장으로 넘어갑니다.", "서브스토리에서 손을 뗀 뒤 같은 게임에서 같은 이야기가 다시 시작되던 문제를 수정했습니다."]], ["실험체 개편 · 바냐", ["바냐가 세계관 설정에 맞게 개편되었습니다. 환상이란 창을 통해 세상을 보는, 꿈과 현실의 경계가 없는 소녀입니다.", "역할군이 지원가에서 근접 전사로 변경되었습니다.", "[신규 패시브] 몽환 나비: 공격을 맞히면 상대에게 몽환 나비가 1개(전투 스킬은 2개) 쌓입니다. 4개가 되면 2라운드 동안 최대 체력 5%의 피해를 주고, 바냐는 피해를 흡수하는 나비 보호막을 얻습니다. 3라운드마다 「공상」으로 다음 공격 피해가 40% 증가하며, 잠든 적에게 주는 피해가 50% 증가합니다. 혼자 남겨지면 정신이 조금씩 흔들립니다.", "[신규 전투 스킬] 꿈결 가루: 모든 적에게 피해 60%를 주고 몽환 나비를 쌓으며, 맞은 적을 잠재웁니다.", "[신규 필드 스킬] 꿈 길잡이: 나비를 날려 주변 구역 실험체의 위치를 알아내고, 다음 금지구역을 꿈으로 미리 봅니다. 사용 후 잠이 쏟아져 포만이 조금 줄어듭니다. (재사용 대기 10턴)", "나비 보호막이 체력·정신·포만 아래에 보라색 게이지로 표시됩니다.", "바냐 전용 인카운터 6종이 추가되었습니다."]], ["실험체 개편 · 레니", ["레니가 세계관 설정에 맞게 개편되었습니다. 겉으로는 장난기 많은 어린아이지만, 사실은 어린아이처럼 보이도록 철저히 계산하며 움직이는 소녀입니다. 기존의 꿈 이야기 관련 설정은 바냐에게 돌아갔습니다.", "성향이 선에서 중립으로 변경되었습니다.", "[신규 패시브] 곰돌이! 공격: 교전에 함께한 동료가 있으면 매 라운드 동료마다 곰돌이가 날아가 추가 피해를 주고, 전투 스킬 재사용 대기가 1씩 줄어듭니다. 동료와 함께 있으면 정신이 차오르고, 혼자 남겨지면 정신이 흔들립니다.", "[신규 전투 스킬] 당근! 바주카: 피해 110%를 주고 30% 확률로 「에어 호른!」 기절을 겁니다. 레니와 동료의 체력을 15 회복합니다. (재사용 대기 9턴)", "[신규 필드 스킬] 스프링! 트랩: 지금 구역에 스프링 트랩을 깝니다. (재사용 대기 9턴)", "레니 전용 인카운터 6종이 추가되고, 기존 레니 인카운터가 설정에 맞게 수정되었습니다.", "레니 전용 도전과제의 이름이 「놀이터의 주인」으로 변경되었습니다."]], ["실험체 개편 · 로지", ["Corda D'arco의 용병 팀 리더라는 설정에 맞게 개편되었습니다. 성향이 냉철로 변경되었습니다.", "[신규 패시브] 지휘관: 동료가 있으면 주는 피해 +15%, 받는 피해 -10%. 배신한 동료와의 교전에서는 첫 공격 피해가 절반이 됩니다.", "[신규 전투 스킬] 이지샷: 피해 100% + 고정 피해 5. 이 한 발로 상대를 쓰러뜨리면 숙련도 경험치를 크게 얻습니다. (재사용 대기 8턴)", "[신규 필드 스킬] 뒤틀린 악의: 같은 구역 인원이 많을수록 다음 교전에서 받는 피해가 줄고(최대 40%), 이번 시간대에는 습격을 받지 않습니다."]], ["실험체 개편 · 현우", ["성향이 전투광에서 중립으로 변경되었습니다.", "[신규 패시브] 싸움꾼: 매 라운드 공격을 맞히면 체력을 (2 + 무기 등급) 회복합니다.", "[신규 전투 스킬] 도그파이트: 피해 110%와 함께 숙련도 경험치를 추가로 얻습니다. 교전마다 한 번, 새로운 상대에게만 쓸 수 있습니다.", "[신규 필드 스킬] 제대로 된 식사: 식량 2개로 음식을 만듭니다. 동료가 있으면 함께 나눠 먹어 호감과 정신이 오릅니다."]], ["실험체 개편 · 매그너스", ["필드 스킬 「오토바이 돌진」이 근처(같은 구역·이웃 구역) 실험체를 오토바이로 들이받아 피해를 주고 그대로 교전에 들어가도록 변경되었습니다. 근처에 아무도 없으면 기존처럼 두 구역 너머까지 질주합니다.", "[신규 전투 스킬] 17대 1: 모든 적에게 피해 90%. 맞힌 적이 한 명 늘 때마다 피해 +15%.", "[신규 패시브] 맷집: 「17대 1」을 두 명 이상에게 맞힐 때마다 받는 피해가 영구히 4% 줄어듭니다(최대 20%). 이동 직후 시작한 교전에서 첫 공격 +30%."]], ["실험체 개편 · 혜진", ["성향이 냉철로 변경되었습니다.", "[신규 패시브] 이화접목: 공격을 세 번 받을 때마다 받은 피해의 20%를 상대에게 되돌려 줍니다. 액운에 걸린 상대에게는 40%.", "[신규 필드 스킬] 액운: 지금 구역과 이웃 구역의 모든 실험체에게 피해를 주고 액운을 겁니다. 기존 필드 스킬 「수호 부적」은 삭제되었습니다.", "전투 스킬 「부적 결계」가 액운에 걸린 상대에게 피해 80%를 줍니다."]], ["실험체 개편 · 비앙카", ["[신규 필드 스킬] 수혈: 다음 교전 처음 3라운드 동안 받은 피해의 70%를 모아 회복합니다. 30 이상 회복하면 피의 장막(받는 피해 -15%)이 펼쳐집니다.", "[신규 전투 스킬] 블러디 핸즈: 제 피를 대가로 방어를 무시하는 고정 피해를 주고, 쓸수록 쌓이는 블러드 드롭만큼 모든 적에게 추가 피해를 줍니다. 쓸 때마다 체력 소모가 커집니다. (재사용 대기 1턴)", "패시브 「진조의 피」: 밤에 피해 +20%, 낮에는 정신 감소 +20%."]], ["실험체 개편 · 엠마", ["역할군이 지원가에서 술사로 변경되었습니다.", "[신규 패시브] CheerUP♥: 3라운드마다 다음 공격 피해 +50%, 보호막을 얻습니다. 근처에 실험체가 있으면 정신 감소 -30%.", "[신규 전투 스킬] 마술 토끼: 상대를 토끼로 바꿔(피해 60%) 한 라운드 동안 아무것도 못 하게 하고, CheerUP♥을 바로 다시 준비합니다."]], ["실험체 개편 · 헨리", ["시간이 멈춰 버린 시계공이라는 설정에 맞게 개편되었습니다. 무기가 암기로, 역할군이 술사로, 성향이 냉철로 변경되었습니다.", "[신규 패시브] 시차 균열: 두 라운드 안에 한 상대에게 최대 체력의 35% 이상 피해를 주면 타이머를 붙여, 다음 라운드에 잃은 체력에 비례한 피해를 줍니다.", "[신규 전투 스킬] 시간 재구축 영역: 보호막을 얻고 모든 적에게 피해 70%, 다음 라운드에 모든 적이 멈춥니다.", "[신규 필드 스킬] 시간 도약: 목적지가 정해져 있으면 즉시 도착하고, 없으면 이웃 구역으로 순간 이동합니다. (재사용 대기 10턴)"]], ["실험체 조정 · 쇼이치", ["소개 문구가 세계관 설정에 맞게 수정되었습니다."]], ["실험체 전용 인카운터 추가", ["로지, 현우, 매그너스, 혜진, 비앙카, 엠마, 쇼이치, 헨리 전용 인카운터 34종이 추가되었습니다."]], ["실험체 조정 · 비형", ["비형이 세계관 설정에 맞게 개편되었습니다. 무당 가문의 반골 장녀이자, 재미만 좇는 「최강최고 도깨비」입니다.", "무기가 아르카나에서 방망이로, 역할군이 술사에서 근접 전사로, 성향이 악에서 전투광으로 변경되었습니다.", "[신규 패시브] 도깨비 불: 공격을 맞힐 때마다 신력이 25 쌓입니다(전투 스킬은 50). 신력이 100이 되면 3라운드 동안 도깨비 불이 주변 모든 적에게 매 라운드 최대 체력 6%의 피해를 줍니다. 불이 타는 동안 공격을 맞히면 지속 시간이 처음으로 돌아갑니다. 포만 70 이상이면 피해 +10%, 30 미만이면 피해 -10%입니다.", "[신규 전투 스킬] 뚝딱!: 방망이로 내려친 뒤(피해 100%) 25%씩 두 번 더 두들기고 최대 체력의 7%를 회복합니다. 신력 +50. 기본 공격처럼 쓰는 스킬이라 재사용 대기 시간이 8턴입니다.", "[신규 필드 스킬] 내기 한판!: 근처 실험체에게 씨름 내기를 겁니다. 이기면 상대의 식량이나 재료를 받고, 져도 호감이 오릅니다. 아무도 없으면 신력으로 약과를 만들어 냅니다. (재사용 대기 10턴)", "신력 게이지가 체력·정신·포만 아래에 푸른색으로 표시됩니다.", "비형 전용 인카운터 8종이 추가되었습니다. 잔칫상, 알론소와의 씨름, 레니, 혜진, 유민 등과 얽힌 이야기를 만나 보세요.", "비형 전용 도전과제의 이름이 「신명나게 놀아보자!」로 변경되었습니다."]], ["실험체 조정 · 비앙카", ["비앙카가 자신을 「진조」라 칭하며, 「~이느니라」 같은 고풍스러운 말투를 사용하도록 대사가 수정되었습니다."]]], "루미아 섬 생존 일지 대망의 3.0 업데이트를 안내드립니다. 섬을 걷는 방식부터 이야기가 이어지는 방식까지, 새로워진 루미아 섬을 만나 보세요."], ["v2.11.1", "2026.10.29", [["서브스토리 개편", ["모든 서브스토리가 8장 구성으로 확장되었습니다. 장마다 이야기가 길어지고, 이전 장의 선택이 다음 장의 내용에 반영됩니다.", "서브스토리는 이제 약 10턴마다 한 장씩 이어지며, 게임 중후반에 결말에 도달합니다.", "신규 장 추가: 「무게감」 낡은 장부·빗속의 밤 / 「동화의 마지막 장」 페란테가의 문장·비 내리는 성당 / 「첫 번째와 두 번째」 자장가·바다 / 「에레보스」 시리얼과 우유·사보타주 / 「벤슨 형제」 빈 운동장·캐치볼"]], ["신규 서브스토리 · 벤슨 형제", ["로살리오로 플레이할 때만 진행되는 서브스토리 「벤슨 형제」가 추가되었습니다. 엔딩 4종(다시 배터리·삼진·끝내기·빈 마운드)과 유물 4종이 준비되어 있습니다.", "「다시 배터리」 유물 「형의 싸인볼」: 로살리오의 홈런 확률 15% → 25%", "로살리오는 히든 실험체이므로, 윌리엄으로 플레이할 때는 더 이상 섬에 등장하지 않습니다."]], ["도전과제와 엔딩 도감", ["달성하지 않은 도전과제와 엔딩은 이름이 「???」로 가려지고 달성 조건만 표시됩니다.", "달성하면 이름이 드러나고, 조건 아래에 관련된 한마디(엔딩은 결말의 한 장면)가 추가됩니다."]], ["UI", ["특수 자원이 체력·정신·포만감 아래에 별도 게이지로 표시됩니다. (유스티나 아스트라 에너지, 케네스 분노, 에이든 전하·과전하)", "교전 카드 안에 표시되던 특수 자원 문구는 삭제되었습니다."]]], "서브스토리가 한 편의 소설처럼 길게 이어지도록 개편되고, 로살리오의 「벤슨 형제」 서브스토리가 추가됩니다."], ["v2.11", "2026.10.29", [["신규 콘텐츠 · 서브스토리", ["관계가 있는 실험체로 플레이하면 서브스토리가 진행됩니다. 몇 턴마다 다음 장이 이어지며, 약 10번의 선택 끝에 서브스토리 엔딩에 도달합니다.", "「무게감」 (마커스·매그너스) - 엔딩 5종", "「동화의 마지막 장」 (루치아·세레스) - 엔딩 5종", "「첫 번째와 두 번째」 (케네스·가넷) - 엔딩 4종", "「에레보스」 (유스티나·에이든·알렉스) - 엔딩 4종", "선택에 따라 실험체 간 관계가 바뀌고, 게임 중 성향이 바뀌며, 관계 실험체가 사망할 수도 있습니다.", "서브스토리 진행 중에는 관계 실험체가 쉽게 쓰러지지 않습니다.", "서브스토리 진행 상황이 상단에 표시되며, 실험 종료 화면에서 결과를 확인할 수 있습니다."]], ["신규 콘텐츠 · 유물", ["서브스토리 엔딩에 따라 유물을 획득합니다. 유물은 해당 게임 동안 유지되는 소지형 아이템입니다.", "예시: 「에레보스 장비」 - 유스티나의 아스트라 에너지 소모 40 → 28, 에이든의 과전하 치명타 140% → 165%, 알렉스의 분석 대상 추가 피해 15% → 35% / 「두 개의 목걸이」 - 케네스의 화염 피해 +60%, 가넷의 초재생 5% → 9% / 「오토바이 키」 - 도주 확률 +20%", "보유 중인 유물은 상단에 표시됩니다."]], ["도전과제", ["서브스토리 엔딩 도전과제 18종이 추가되었습니다."]], ["신규 성향 · 정의 (유스티나 전용)", ["유스티나의 성향이 '정의'로 변경됩니다.", "선한 실험체를 처치하면 정신력이 45 감소하며, 악당을 처치하면 정신력이 14 회복됩니다.", "실험체 간 교전을 목격했을 때 선한 쪽을 돕거나, 양쪽 모두 선하다면 지고 있는 쪽을 도우면 정신력이 회복됩니다. 외면하면 정신력이 감소합니다.", "다친 실험체를 도우면 정신력이 회복되고, 외면하면 감소하며, 공격하면 크게 감소합니다.", "상대를 살려 보내면 정신력이 회복되고, 동료를 배신하면 정신력이 크게 감소합니다."]], ["시스템", ["관계가 있는 실험체로 플레이하면 상대 실험체가 같은 게임에 등장할 확률이 크게 상승합니다. 서브스토리 관계 실험체는 반드시 등장합니다."]], ["실험체 · 알렉스", ["블랙 서바이벌 설정에 따라 섬의 모든 무기를 다룹니다. 교전 중 매 라운드 무작위 무기로 바꿔 쥐며, 해당 무기의 특성이 적용됩니다."]], ["개발자 코멘트", ["관계가 있는 실험체들의 이야기를 한 판 안에서 끝까지 따라갈 수 있도록 서브스토리를 준비했습니다. 같은 실험체라도 선택에 따라 전혀 다른 결말과 유물을 얻게 되니, 여러 결말을 수집해 보세요."]]], "관계 실험체들의 서브스토리와 유물, 유스티나 전용 성향 '정의'가 추가됩니다."], ["v2.10.4", "2026.10.29", [["실험체 개편 · 유스티나", ["소개 문구 변경: 정의의 히어로를 꿈꾸는 소녀. 붙잡혀 간 에이든을 구하러 섬에 왔다.", "[신규 패시브] 아스트라 에너지: 교전마다 에너지 100으로 시작하며, 전투 스킬 사용 시 40을 소모하고 매 라운드 15를 회복합니다. 에너지가 40 미만이 되면 2턴 동안 재충전 상태가 됩니다. 「킁킁」으로 악당 냄새를 맡은 대상에게 주는 피해가 20% 증가합니다. 병원 구역에서는 정신력이 감소합니다.", "[신규 필드 스킬] 킁킁: 근처 실험체의 냄새를 맡아 선악을 판별합니다. 에이든이 섬에 있다면 위치를 감지합니다. (재사용 대기 8턴)", "[신규 전투 스킬] 연속 포격: 두 발(65%×2)을 발사하고 적중한 대상에게 표식을 남깁니다. 다음 라운드에 연이어 사용하면 섬멸 포격(160%)으로 바뀌어 표식을 터뜨리고, 주변 적에게 피해를 전이하며 에너지 25를 회복합니다. 재사용 대기가 없는 대신 에너지를 소모합니다.", "교전 화면에 아스트라 에너지가 표시됩니다.", "도전과제 변경: 「히어로 등장」 - 에이든과 함께 마지막까지 생존"]], ["실험체 개편 · 에이든", ["소개 문구 변경: 과거가 지워진 용병. 생체 전기를 다루며, VF를 없애는 것을 조건으로 실험에 참여했다.", "[신규 패시브] 과전하: 공격 적중 시 전하가 1 쌓입니다. (최대 5) 전하가 가득 차면 과전하 상태가 되어 다음 5회 공격이 확정 치명타(140%)로 적용됩니다. 과전하 종료 시 도주 확률이 15% 증가합니다.", "[신규 필드 스킬] 케이준 요리: 식량 1을 사용해 체력 15, 포만감 20, 정신력 8을 회복합니다. 동료가 있으면 함께 나눠 먹어 동료 체력이 10 회복되고 우호도가 오릅니다. (재사용 대기 10턴)", "[신규 전투 스킬] 낙뢰: 대상에게 130% 피해와 기절, 다른 적에게 90% 피해를 입힌 뒤, 두 번째 낙뢰가 모든 적에게 90% 피해를 입힙니다. 적중 시 전하가 가득 차 즉시 과전하 상태가 됩니다.", "교전 화면에 전하와 과전하 탄환이 표시됩니다.", "도전과제 변경: 「과전하」 - 한 판에 과전하 상태에 5회 돌입"]], ["실험체 개편 · 알렉스", ["소개 문구 변경: 6개 국어에 능통하고 모든 무기를 다루는 정체불명의 요원.", "[신규 패시브] 잠입: 처치 시 잠입 상태가 되어 다음 조우에서 먼저 움직이고, 다음 교전 도주 확률이 20% 증가합니다. 근접 무기(양손검·톤파)를 든 라운드에는 받는 피해가 12% 감소합니다. 「정보 수집」으로 분석한 대상에게 주는 피해가 15% 증가하며, 해당 대상의 의도를 잘못 읽지 않습니다.", "[신규 필드 스킬] 정보 수집: 두 구역 거리 내 모든 실험체의 위치를 파악하고, 그중 가장 위협적인 대상을 분석합니다. (재사용 대기 9턴)", "[신규 전투 스킬] 정밀 폭격: 위성 미사일로 모든 적에게 120% 피해를 입히고, 이후 3라운드 동안 매 라운드 모든 적에게 35% 피해를 입힙니다.", "네 가지 무기를 번갈아 사용하는 일반 공격은 그대로 유지됩니다.", "도전과제 변경: 「미제를 명제로」 - 「정보 수집」으로 분석한 실험체 3명 처치"]], ["신규 스토리 · 에레보스", ["유스티나와 에이든이 관계 실험체로 지정되었습니다. 같은 게임에 있으면 서로를 찾아 합류하며, 서로를 해치지 않습니다.", "유스티나로 알렉스를 만나면 전용 인카운터 「모르는 사람」이 발생합니다.", "알렉스·에이든·유스티나 사이의 전용 인카운터와, 세 실험체의 설정을 반영한 전용 인카운터 8종이 추가되었습니다."]], ["개발자 코멘트", ["세 실험체 모두 원작의 핵심 메커니즘(아스트라 에너지, 과전하, 정밀 폭격)을 교전 흐름 안에서 체감할 수 있도록 옮겼습니다. 유스티나는 에너지 관리, 에이든은 과전하 타이밍, 알렉스는 정보 우위를 중심으로 플레이하게 됩니다."]]], "유스티나, 에이든, 알렉스의 스킬 구성이 세계관 설정과 원작 메커니즘에 맞게 개편됩니다."], ["v2.10.3", "2026.10.29", [["실험체 개편 · 헤이즈", ["소개 문구 변경: 실수를 용납하지 않는 프로 무기상인. 최고의 효율로 최선의 이익을 추구한다.", "[신규 패시브] 웨폰 케이스: 전투 스킬 사용 후 첫 공격에 「죽음의 상인」이 발동해 피해가 45% 증가하고, 다음 도주 확률이 15% 증가합니다. 탄약이 떨어져도 웨폰 케이스에서 새 소총을 꺼내므로 공격력이 감소하지 않습니다.", "[신규 필드 스킬] 창고 호출: VF로 연결된 창고에서 탄약 15, 화약 1, 금속 1을 불러옵니다. 무기가 영웅 등급 미만이면 25% 확률로 '라벨'이 붙은 최상품을 받아 무기 등급이 1 오릅니다. 사용 시 정신력이 3 감소합니다. (재사용 대기 10턴)", "[신규 전투 스킬] 화력 전개: 사용할 때마다 총기가 바뀝니다. 40mm 유탄(모든 적에게 85%) → 산탄 포화(110%, 기절) → 기관단총(25% 6회, 무작위 대상) → 로켓 런처(150%, 다른 적에게 절반 피해) 순으로 순환합니다.", "헤이즈가 등장하는 일부 인카운터가 설정에 맞게 수정되었습니다. 헤이즈는 더 이상 투자 사기나 위장 함정을 벌이지 않으며, 헤이즈에게 산 무기가 불량품이면 재료를 돌려받습니다.", "도전과제 변경: 「어디까지나 프로답게」 - 한 판에 「화력 전개」의 네 가지 총기를 모두 사용"]], ["성향 조정", ["헤이즈: 중립 → 냉철", "케네스: 전투광 → 냉철"]], ["개발자 코멘트", ["헤이즈는 스킬마다 다른 총기를 꺼내 드는 원작의 정체성을 살려, 전투 스킬을 쓸 때마다 무기가 순환하도록 설계했습니다. 상황에 맞는 총기가 나올 차례를 계산해 스킬 사용 시점을 고르는 플레이를 의도했습니다."]]], "헤이즈의 스킬 구성이 세계관 설정에 맞게 개편되고, 일부 실험체의 성향이 조정됩니다."], ["v2.10.2", "2026.10.29", [["신규 스토리 · 첫 번째와 두 번째", ["케네스의 필드 스킬 「형제 찾기」로 얻는 흔적이 '두 번째'인 가넷의 흔적으로 변경되었습니다.", "케네스로 플레이하던 중 가넷을 만나면 전용 재회 인카운터 「두 번째」가 발생합니다. 「약속」을 새긴 상태라면 특별 선택지가 열립니다.", "가넷으로 플레이하던 중 케네스를 만나면 전용 재회 인카운터 「첫 번째」가 발생합니다.", "케네스와 가넷은 서로 동맹을 맺을 수 없습니다."]], ["실험체 개편 · 가넷", ["소개 문구 변경: 초재생 VF를 지닌 소녀. 자신을 찾으러 오지 않은 '첫 번째'를 찾고 있다.", "[신규 패시브] 익숙한 아픔: 교전 중 매 라운드 잃은 체력의 5%를 회복하고, 부상이 두 배 빠르게 회복됩니다. 잃은 체력에 비례해 주는 피해가 증가합니다. (최대 30%) 닫히고 어두운 곳에서 밤을 보내면 정신력이 감소합니다.", "[신규 필드 스킬] 자장가: 정신력을 10 회복합니다. (밤에는 16) '첫 번째'가 섬에 있다면 그의 위치를 감지합니다. (재사용 대기 8턴)", "도전과제 변경: 「다시 새겨 줄게」 - '첫 번째'와 다시 만나 매듭짓기"]]], "케네스와 가넷, '첫 번째'와 '두 번째'의 이야기가 섬에 추가됩니다."], ["v2.10.1", "2026.10.29", [["실험체 개편 · 케네스", ["소개 문구 변경: 분노를 불로 바꾸는 소년. 보육원에서 흩어진 형제들을 찾고 있다.", "[신규 패시브] 억압된 분노: 공격이 적중할 때마다 분노가 1 쌓입니다. (최대 5) 분노가 가득 차면 도끼가 불타올라, 공격이 적중할 때마다 대상 최대 체력에 비례한 화염 피해를 추가로 입히고 그 40%만큼 체력을 회복합니다. 공격하지 않고 한 턴을 보내면 분노가 2 감소합니다. 물가 구역에서는 화염 피해가 절반이 되고 정신력이 감소합니다. 동맹 제안 성공률이 10% 감소합니다.", "[신규 필드 스킬] 형제 찾기: 흩어진 형제들의 흔적을 찾습니다. 흔적을 찾지 못하면 가장 가까운 실험체의 위치를 알아냅니다. 흔적 3개를 모으면 「약속」 인카운터가 발생합니다. (재사용 대기 9턴)", "[신규 전투 스킬] 화염 분쇄: 대상을 올려 베어 기절시키고(60%) 공중에서 두 번 벤 뒤(15%×2), 내려찍어 모든 적에게 100% 피해를 입힙니다. 사용 즉시 분노가 가득 찹니다.", "교전 화면에 케네스의 분노 게이지가 표시됩니다.", "케네스 전용 인카운터 6종이 추가되고, 기존 케네스 관련 인카운터가 설정에 맞게 수정되었습니다.", "도전과제 변경: 「약속」 - 형제들의 흔적 3개를 모으고 우승"]]], "케네스의 소개와 스킬 구성이 세계관 설정에 맞게 전면 개편됩니다."], ["v2.10", "2026.10.29", [["신규 시스템 · 적 의도 예고", ["교전 중 적의 다음 행동이 카드 하단에 '▸'로 표시됩니다. 표시는 흐릿하며, 정신력이 낮을수록 잘못 읽을 확률이 높아집니다. (냉철 성향은 오독 확률 절반)", "큰 공격: 피해가 1.7배로 증가합니다. 「방어하며 빈틈을 노린다」로 받아 내면 피해가 크게 줄고 60% 확률로 반격합니다.", "방어 자세: 적에게 주는 피해가 크게 줄어드는 대신, 적의 공격도 약해집니다.", "기술 준비: 해당 턴에 공격을 적중시키면 45% 확률로 기술을 끊습니다.", "도주 기회: 해당 턴에 공격하지 않으면 적이 달아납니다."]], ["신규 콘텐츠", ["도전과제: 공통 과제 10종과 실험체별 전용 과제 1종씩, 총 103종이 추가되었습니다. 메인 화면의 「도전과제」에서 진행 상황과 실험체별 우승 횟수를 확인할 수 있습니다.", "결과 카드: 실험 종료 화면에서 「결과 카드 만들기」로 실험체, 순위, 엔딩, 처치 수, 등급, 마지막 기록을 담은 이미지를 저장하거나 공유할 수 있습니다.", "엔딩 도감: 아직 획득하지 않은 엔딩에 단서가 표시됩니다.", "초보자 팁: 처음 겪는 상황에서 한 줄 팁이 한 번씩 표시됩니다. 「팁 끄기」로 끌 수 있습니다."]], ["인카운터", ["등장 빈도가 낮던 인카운터(거래, 이동, 생존, 회상, 기록, 소리, 목격 등)의 등장 확률이 상향되었습니다.", "보급 상자 투하 확률: 60% → 75%", "실험체 간 교전을 목격할 확률이 상향되었습니다."]]], "전투의 수 싸움을 더하는 '적 의도 예고'와 함께 도전과제, 결과 카드, 엔딩 단서, 초보자 팁이 추가됩니다."], ["v2.9.4", "2026.10.29", [["난이도", ["상대 실험체의 장비 성장 속도가 크게 상향되며, 페이즈가 진행될수록 더 빨라집니다.", "상대 실험체의 무기 숙련이 페이즈와 처치 수에 따라 더 빠르게 오릅니다.", "페이즈 진행에 따른 상대 실험체의 공격력 상승 폭이 증가했습니다.", "플레이어가 주는 모든 피해: 30% 감소", "플레이어가 받는 전투 피해: 20% 증가"]], ["실험체 · 쇼이치", ["패시브 이름 변경: 「다섯 번째 패」 → 「부당거래」 (효과 동일)", "전투 스킬 이름 변경: 「부당거래」 → 「표리」 (효과 동일)"]]], "난이도가 전반적으로 상향됩니다."], ["v2.9.3", "2026.10.29", [["역할군 · 암살자", ["밤 기습(잠든 실험체 습격) 피해 배율: 2.1배 → 1.8배", "선공 피해 배율: 1.6배 → 1.45배", "낮 페널티: 낮의 정면 교전에서 피해 15% 감소 → 낮에는 모든 피해 25% 감소"]], ["실험체 · 쇼이치", ["패시브 변경: 「다섯 번째 패」 - 공격 다섯 번마다 한 번 확정 치명타가 발생합니다. 단, 이 치명타의 피해 배율은 125%입니다.", "전투 스킬 이름 변경: 「속임수」 → 「부당거래」"]]], "암살자 역할군의 밸런스가 조정됩니다."], ["v2.9.2", "2026.10.29", [["성향", ["선·중립 성향 실험체가 악행이 쌓인 실험체를 처치할 때 정신력 감소량이 줄어듭니다. 악행이 매우 많이 쌓인 실험체를 처치하면 정신력이 감소하지 않습니다.", "악행은 처치 수, 악 성향 여부, 플레이어를 배신하거나 물건을 훔친 기록 등으로 쌓입니다."]]], "성향 시스템이 일부 조정됩니다."], ["v2.9.1", "2026.10.29", [["인카운터", ["실험체와 마주치는 모든 인카운터(가위바위보, 거래, 대화, 공연, 치료 제안 등)에 「무시하고 공격한다」 선택지가 추가되었습니다.", "호의적으로 다가온 실험체를 공격하면 해당 실험체가 이를 기억하며, 악명이 상승합니다."]]], "실험체와의 조우 인카운터에 선택지가 추가됩니다."], ["v2.9", "2026.10.29", [["플레이 컨셉과 고유 패시브", ["모든 실험체에 플레이 컨셉이 부여되었습니다. 패시브, 필드 스킬, 전투 스킬이 하나의 컨셉으로 연계되며, 프로필 상단에서 확인할 수 있습니다.", "고유 패시브가 없던 모든 실험체에 고유 패시브가 추가되었습니다. (예: 재키 「피 냄새」, 매그너스 「가속」, 클리버 「원념 축적」)", "패시브와의 연계를 위해 일부 전투 스킬이 조정되었습니다. (유키, 아델라, 아디나, 다니엘, 바바라, 로지)"]], ["실험체 조정", ["루크: 성향이 악으로 변경됩니다. 청부업자 출신 설정에 따라, 처치해도 악명이 오르지 않고 목격자가 남지 않습니다.", "에이든: 성향이 냉철로 변경됩니다."]], ["인카운터", ["일반, 밈, 식량, 회복, 휴식, 회상, 밤, 야생, 기록, 재난, 실험체 카메오 등 인카운터 약 900종이 추가되었습니다. (총 약 1,170종)", "특정 실험체로 플레이할 때만 등장하는 전용 인카운터와, 특정 실험체만 고를 수 있는 특별 선택지(★)가 추가되었습니다.", "이렘으로 고양이 관련 인카운터를 만나면 특별한 상호작용이 발생합니다."]]], "모든 실험체에 고유한 플레이 컨셉이 부여되고, 인카운터가 대규모로 추가됩니다."], ["v2.8", "2026.10.29", [["신규 인카운터 · 배신", ["동맹 중 플레이어가 동료를 배신할 수 있는 인카운터 7종이 추가되었습니다. (잠든 동료, 전리품 분배, 미끼, 동료 팔아넘기기, 독 넣기, 금지구역 지름길, 쓰러진 동료)", "배신에 실패했거나 살아남은 동료는 이를 기억하고 복수하러 찾아옵니다."]], ["신규 성향 · 냉철", ["냉철: 정신력 변화 폭이 작고, 시간 경과로 정신력이 감소하지 않습니다.", "적용 실험체: 레녹스, 테오도르, 에이든, 알렉스, 로지, 타지아, 카티야, 히스이", "레녹스와 테오도르의 소개 문구에 경력이 반영되었습니다."]], ["실험체 스킬 변경", ["나딘 필드 스킬: 「야생동물 찾기」 - 짐승을 추적해 안전하게 사냥합니다.", "나딘 전투 스킬: 「사냥 본능」 - 사냥한 야생동물 1마리당 피해 15% 증가 (최대 150%)", "버니스 필드 스킬: 「사냥꾼의 덫」", "다니엘 필드 스킬: 「해부학적 관찰」 - 근처 실험체의 급소를 파악합니다. 해당 실험체와의 교전에서 40% 확률로 치명타가 발생하고, 조우 시 먼저 움직일 확률이 높아집니다.", "아이작 필드 스킬: 「누명 씌우기」 - 근처에서 가장 강한 실험체에게 누명을 씌워 주변 실험체들이 그를 공격하게 만듭니다.", "아이작 전투 스킬: 「과잉 진압」 - 대상을 기절시키고 3라운드 동안 받는 피해 50% 증가 표식을 남기며, 약해진 대상의 소지품을 압수합니다."]], ["치명타", ["모든 실험체의 치명타 피해 배율이 1.5배로 통일됩니다. (로살리오는 1.8배 유지)"]]], "플레이어가 먼저 등을 돌릴 수 있는 배신 인카운터와 신규 성향 '냉철'이 추가됩니다."], ["v2.7.1", "2026.10.28", [["실험체 · 다니엘", ["필드 스킬 변경: 「몸단장」 → 「완벽한 가면」 - 근처 실험체에게 다정한 사람인 척 접근해 호감을 크게 올리고, 자리가 있으면 동료로 끌어들입니다.", "가면을 쓴 채 끌어들인 동료를 「먼저 등을 찌른다」로 공격하면 피해가 2.2배가 되며, 배신으로 기록되지 않습니다."]]], "다니엘의 필드 스킬이 변경됩니다."], ["v2.7", "2026.10.28", [["신규 시스템 · 성향", ["모든 실험체에 성향(선·중립·악·전투광·사이코패스)이 부여되었습니다. 실험체 프로필에서 확인할 수 있습니다.", "선: 처치 시 정신력이 크게 감소하고, 상대를 살려 보내면 회복됩니다. 동료를 배신하면 정신력이 크게 무너지며, 동료와 함께 있으면 조금씩 안정됩니다.", "중립: 처치 시 정신력이 감소합니다.", "악: 처치 시 정신력이 크게 회복됩니다. 오래 싸우지 않으면 정신력이 감소하고, 상대를 살려 보내면 정신력이 감소합니다. (재키, 아드리아나, 아이솔, 아이작 등)", "전투광: 교전 중 매 라운드 정신력이 회복되며, 오래 싸우지 않으면 정신력이 감소합니다. (현우, 니키, 리 다이린, 로살리오 등)", "사이코패스: 정신력이 감소하지 않으며, 정신 붕괴가 발생하지 않습니다. (다니엘)"]]], "실험체별 성향 시스템이 추가됩니다."], ["v2.6", "2026.10.28", [["전투 스킬 개편", ["모든 실험체의 전투 스킬이 서로 다른 고유 효과를 갖도록 재설계되었습니다. (92종, 로살리오 「클러치 히터」 제외)", "연타, 흡혈, 표식, 지연 폭발, 포탑, 회피, 혼란, 반사, 봉인, 즉시 처치, 수면 등 실험체 설정을 반영한 효과가 적용됩니다.", "예시: 아야 「연속 사격」 3연속 사격 / 테오도르 「정밀 저격」 1라운드 조준 후 300% 피해 / 레니 「꿈의 가호」 2라운드 수면 / 비형 「빙의」 대상이 스스로를 공격", "각 실험체의 전투 스킬 효과는 프로필에서 확인할 수 있습니다."]], ["밸런스", ["근접 전사와 탱커의 공격력·방어력이 상향되었습니다.", "상대 실험체의 공격력이 소폭 하향되었습니다."]]], "모든 실험체의 전투 스킬이 고유 효과로 개편됩니다."], ["v2.5", "2026.10.28", [["신규 히든 실험체 · 로살리오", ["윌리엄의 동생이자, 승부조작으로 야구계에서 퇴출된 전직 야구선수입니다.", "[고유 특성] 홈런: 공격이 15% 확률로 치명타가 되어 180% 피해를 입힙니다.", "[전투 스킬] 클러치 히터: 잃은 체력이 많을수록 치명타 확률이 증가합니다.", "[필드 스킬] 일광욕: 낮의 야외에서 정신력과 체력을 회복합니다. 흐리거나 어두우면 효과 없이 불평만 늘어놓습니다.", "해금 조건: 윌리엄으로 우승하거나, 방망이를 사용하는 실험체로 2회 우승. 윌리엄으로 플레이하면 섬에서 마주칠 수도 있습니다.", "로살리오로 플레이하면 반드시 윌리엄과 마주치며, 형제의 선택에 따라 전용 엔딩 2종이 열립니다.", "엔딩이 총 59종으로 늘어났습니다."]]], "신규 히든 실험체 '로살리오'가 루미아 섬에 합류합니다."], ["v2.4.1", "2026.10.28", [["불살 루트", ["불살이 선택형 모드에서 플레이로 여는 루트로 변경되었습니다. 아직 아무도 처치하지 않았다면 교전에서 「제압만 한다」를 선택할 수 있습니다.", "한 명도 처치하지 않고 상대를 살려 보내며 우승하면 '불살' 엔딩을 획득합니다."]], ["무기 정보 수정", ["바바라 권총, 이바 투척(야구공), 이안 단검(식칼), 다르코 방망이(단봉), 이슈트반 창, 니아 권총, 슈린 레이피어(바늘), 미르카 망치, 르노어 기타, 헨리 암기", "알렉스: 양손검·권총·암기·톤파 네 가지 무기를 번갈아 사용하며, 공격할 때마다 해당 무기의 특성이 적용됩니다.", "기타 1등급 무기 이름: '보급형 기타'", "이슈트반: 역할군이 근접 전사로 변경됩니다."]], ["실험체 조정", ["클로에: 역할군이 원거리 딜러로 변경됩니다. 암살자에게 강하고, 원거리 딜러에게 약합니다.", "제니: [고유 특성] 스턴트 대역 - 게임당 한 번, 치명적인 피해를 받으면 체력 1로 버티고 즉시 그 자리를 벗어납니다."]]], "불살 루트 개편과 함께 실험체 무기 정보가 수정됩니다."], ["v2.4", "2026.10.28", [["실험체 정보", ["일부 실험체의 소개 문구를 세계관 설정에 맞게 수정했습니다. (테오도르, 레녹스, 이안, 레니, 샬럿, 가넷, 르노어, 유민, 유스티나, 니아, 코렐라인, 알론소, 이바, 얀, 이슈트반, 클리버, 루치아 등)", "실험체 프로필의 '전투력' 항목이 '플레이 난이도'로 변경되었습니다.", "니아, 유스티나, 르노어의 필드 스킬이 설정에 맞게 변경되었습니다."]], ["관계", ["마커스와 매그너스는 같은 게임에 있으면 반드시 한 팀으로 움직이며, 서로 배신하지 않습니다.", "루치아와 세레스로 플레이하면 상대가 찾아와 합류하며, 두 사람은 서로를 해치지 않습니다.", "쇼이치로 플레이하면 알렉스가 동맹을 제안해 옵니다.", "실험체 관계를 활용한 신규 인카운터 20종 이상이 추가되었습니다."]], ["배신과 기억", ["동료의 배신 여부가 신뢰도, 성격, 이해관계, 플레이어에 대한 두려움에 따라 결정됩니다. 체력이 30 미만이면 대부분의 동료가 등을 돌립니다.", "3인 동맹에서 두 동료가 공모해 플레이어를 노릴 수 있습니다.", "동료가 자원을 훔쳐 달아날 수 있습니다. (아이솔은 자주, 라우라는 매우 자주)", "실험체가 플레이어의 행동을 기억합니다. 치료나 음식 나눔을 받은 실험체는 먼저 다가오고, 배신당한 실험체는 적대적으로 대합니다.", "평판 시스템이 추가되었습니다. 악명이 높으면 현상금이 걸리고, 선행을 쌓으면 돕는 실험체가 나타납니다."]], ["정보와 소문", ["실험체 조우 시 정확한 전투력 대신 장비 상태, 전투 흔적, 부상 정도 등의 단서가 표시됩니다.", "교전 중 상대 체력이 수치 대신 상태로 표시됩니다.", "다른 구역의 소문을 들을 수 있습니다. 소문은 틀리거나 함정일 수 있습니다."]], ["생존", ["음식이 등급별로 회복량이 나뉘며, 2턴에 한 번만 먹을 수 있습니다. 교전 중에도 먹을 수 있습니다.", "상대 실험체도 음식을 모으고 교전 중에 먹어 회복합니다.", "골절, 화상, 뇌진탕, 감염 부상이 추가되었습니다. 부목과 약초로 치료할 수 있습니다.", "가방에서 제작 목표를 설정하면, 이동 시 필요한 재료가 있는 구역이 선택지에 포함됩니다.", "회복이나 보급처럼 보이는 상황이 다른 실험체의 함정일 수 있습니다.", "정신력을 회복하는 인카운터가 추가되었습니다."]], ["무기 특성", ["무기 종류별 고유 특성이 추가되었습니다. 총기는 강력하지만 탄약을 소모하고 총성으로 주변 실험체를 끌어들이며, 탄약이 없으면 피해가 크게 감소합니다.", "둔기는 상대를 휘청이게 하고, 날붙이는 출혈을 남기며, 활·석궁은 조용하고 첫 공격이 강합니다."]], ["밸런스", ["상대 실험체가 전반적으로 더 호전적으로 변경되었습니다.", "실험체 감소 속도가 느려져 후반까지 더 많은 실험체가 생존합니다.", "역할군별 공격력·방어력 조정: 암살자 하향, 술사·근접 전사·서포터 상향", "붕대 체력 회복량이 하향되었습니다. (출혈 지혈 효과는 유지)", "신규 엔딩 5종이 추가되었습니다. (총 57종)"]]], "실험체 관계, 기억, 평판, 소문 등 섬의 생태계를 확장하는 대규모 업데이트입니다."], ["v2.3", "2026.10.28", [["필드 스킬", ["필드 스킬을 사용해도 현재 상황이 넘어가지 않으며, 시간을 소모하지 않습니다. (이동이나 조우를 일으키는 스킬 제외)", "필드 스킬 재사용 대기 시간이 약 2배로 증가했습니다. (대부분 12~16턴)"]], ["버그 수정", ["최후의 1인이 되었는데도 금지구역 장치가 작동해 사망하던 문제를 수정했습니다."]], ["밸런스", ["상대 실험체의 공격력이 소폭 상향되었습니다."]]], "필드 스킬 사용 방식이 개선되고, 일부 버그가 수정됩니다."], ["v2.2", "2026.10.28", [["역할군 패시브", ["탱커 「불굴」: 받는 피해 10% 감소, 체력 30% 이하에서 추가 15% 감소. 출혈로 체력이 줄지 않습니다.", "근접 전사 「투쟁 본능」: 체력 50% 이하에서 주는 피해 25% 증가, 처치 시 체력 15 회복", "원거리 딜러 「선제 사격」: 선공 시 피해 35% 증가, 교전 첫 라운드 피해 30% 증가", "레인저 「야생 감각」: 교전 첫 라운드 피해 15% 증가, 안전한 사냥, 재료 획득량 증가", "암살자 「그림자 걸음」: 기습을 덜 당하며, 체력 절반 이하인 대상에게 피해 20% 증가. 낮의 정면 교전에서 피해 15% 감소", "술사 「마력 순환」: 전투 스킬 재사용 대기 2턴, 전투 스킬 피해 15% 증가, 정신력 감소량 25% 감소", "서포터 「돌봄」: 회복량 35% 증가, 정신력 감소량 40% 감소, 교전 중 매 라운드 체력 2 회복"]], ["필드 스킬 개편", ["모든 실험체의 필드 스킬이 고유 효과를 갖도록 재설계되었습니다. (92종) 재사용 대기 시간은 스킬별로 개별 적용됩니다."]], ["전투", ["교전 중 역할군 전용 행동이 삭제되고 역할군 패시브로 대체되었습니다.", "「방어하며 빈틈을 노린다」를 연속 선택하면 방어 효율이 점차 감소합니다.", "원거리 딜러·근접 전사 소폭 상향, 암살자 공격력 소폭 하향"]], ["버그 수정", ["섬 대부분이 금지구역일 때 일부 이동 효과가 정상 작동하지 않던 문제를 수정했습니다."]]], "역할군 패시브가 도입되고, 모든 필드 스킬이 개편됩니다."], ["v2.1", "2026.10.28", [["지도", ["루미아 섬 지도가 실제 지형에 맞게 개편되었습니다. 일부 구역의 위치와 이동 경로가 변경됩니다.", "신규 구역 '주유소'와 전용 이벤트가 추가되었습니다.", "연구소가 지도 중앙에 별도 구역으로 표시됩니다."]]], "루미아 섬 지도가 새롭게 개편됩니다."], ["v2.0", "2026.10.28", [["연구소와 최종 안전지대", ["연구소가 실험 기간 동안 봉쇄됩니다.", "마지막 날에는 무작위 구역 하나만 최종 안전지대로 지정됩니다."]], ["신규 히든 실험체 · JP", ["보안 노드를 해킹해 데이터 조각을 모으고, 봉쇄된 연구소를 열 수 있습니다. 연구소 중앙 컴퓨터를 장악하면 '해킹 승리'로 실험을 종료할 수 있습니다.", "해금 조건: 엔딩 5종 수집"]], ["신규 적", ["연구소 최심부에 미스터 메이지가 등장합니다.", "보스 감마가 추가되었습니다."]], ["전투", ["무기가 실제 아이템 이름으로 표시되며, 등급이 오를 때마다 교체됩니다.", "에키온의 VF 의수가 무기 숙련도에 따라 진화하며, 진화 방향을 선택할 수 있습니다.", "역할군 상성이 추가되었습니다.", "모든 실험체에 고유 패시브와 필드 스킬이 추가되었습니다."]], ["실험체 관계", ["실험체마다 플레이어에 대한 우호도가 존재하며, 대화와 행동으로 짐작할 수 있습니다.", "실험체마다 성장 속도가 다릅니다.", "우호적인 실험체와 물자를 교환할 수 있습니다."]], ["밸런스", ["동맹 하향: 동료 피해량 감소, 페이즈마다 식량 분배", "동료와 함께 도주하면 동료가 남겨질 수 있으며, 남겨진 동료는 적으로 돌아올 수 있습니다.", "정신력이 40 미만이면 정신 붕괴 이벤트가 발생하고, 0이 되면 사망합니다.", "식량 획득량이 감소했습니다."]], ["신규 콘텐츠", ["엔딩 52종과 엔딩 도감이 추가되었습니다.", "모든 실험체에 3단계 개인 스토리가 추가되었습니다.", "지도 탭이 추가되었습니다."]], ["버그 수정", ["가방과 선택지에서 동시에 식량을 사용하면 수량이 음수가 되던 문제를 수정했습니다."]]], "루미아 섬 생존 일지의 두 번째 시즌이 시작됩니다."], ["v1.4", "2026.10.28", [["신규 콘텐츠", ["실험 종료 시 실험 점수와 연구 등급(D-~S+)이 표시됩니다.", "특정 조건에서만 등장하는 히든 이벤트 6종이 추가되었습니다."]], ["조정", ["일부 이벤트의 등장 빈도가 조정되었습니다."]]], "실험 결과 평가와 히든 이벤트가 추가됩니다."], ["v1.3", "2026.10.28", [["신규 콘텐츠", ["대성공과 대실패가 추가되었습니다.", "무작위 이벤트가 약 180종으로 늘어났으며, 실험체 전용 이벤트가 추가되었습니다.", "식량 획득과 체력 회복 이벤트가 추가되었습니다."]]], "이벤트가 대폭 추가됩니다."], ["v1.2", "2026.10.28", [["전투", ["무기 숙련도(D~S+)가 추가되었습니다.", "실험체별 전투 스킬과 역할군별 특성이 추가되었습니다.", "모든 실험체가 같은 체력으로 시작합니다."]], ["조정", ["선택지의 예상 결과가 더 이상 표시되지 않습니다.", "기습 이벤트가 추가되었습니다."]]], "전투 시스템이 확장됩니다."], ["v1.0", "2026.10.27", [["정식 오픈", ["24명의 실험체 중 최후의 1인이 되어 섬을 탈출하세요."]]], "루미아 섬 생존 일지가 정식 오픈했습니다."]];
 function patchSheet(){openSheet(`<h4>패치 노트</h4><p class="muted">루미아 섬 생존 일지 업데이트 소식을 안내드립니다.</p>${PATCH.map(([v,d,secs,intro],i)=>`<section class="pn"><div class="pn-h"><b>${v}</b><span class="muted">${d}</span>${i===0?'<span class="badge gold">최신</span>':''}</div>${intro?`<p class="pn-intro">${esc(intro)}</p>`:''}${secs.map(([t,l])=>`<h5>${esc(t)}</h5><ul>${l.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</section>`).join('')}`)}
 
 /* ---------- select ---------- */
@@ -12043,7 +12795,7 @@ function sheetBody(k){
     <h4>무기</h4><p><b class="g${m.wg}">[${GR[m.wg]}] ${esc(myWname())}</b> <span class="muted">${esc(m.p.w)} · 숙련 ${MG[m.ml]}${m.p.id==='echion'?' · 숙련도에 따라 진화':''}</span></p>
     <h4>재료</h4><div class="grid">${Object.entries(MATN).map(([key,l])=>`<div class="cell"><span>${l}</span><b>${m.inv[key]}</b></div>`).join('')}</div>
     <h4>덫</h4><p>${m.it.trap}개 · 교전 중이나 특정 장면에서 쓸 수 있다.</p>
-    <h4>특수 재료</h4><p class="muted">${sp.length?sp.map(([s,v])=>`${esc(s)} ×${v}`).join(', '):'없음. 운석·생명의 나무는 방송된 지역에서, 미스릴·포스 코어·VF 혈액 샘플은 알파·감마·오메가·위클라인에게서 얻는다.'}</p>
+    <h4>특수 재료</h4><p class="muted">${sp.length?sp.map(([s,v])=>`${esc(s)} ×${v}`).join(', '):'없음. 운석·생명의 나무는 방송된 지역에서, 미스릴·포스 코어는 알파·감마·오메가에게서, 혈액팩은 위클라인에게서만 얻는다. 혈액팩으로 전설 장비를 초월 등급으로 만들 수 있다.'}</p>
     <h4>제작 목표 · 이동할 때 필요한 재료가 있는 구역이 선택지에 나온다</h4><div class="use">${['weapon','armor','both',null].map(g=>`<button data-goal="${g||''}" ${G.goal===g?'class="on"':''}><b>${g?GOALN[g]:'목표 해제'}</b><span>${g&&G.goal===g?'설정됨':''}</span></button>`).join('')}</div>${G.goal?`<p class="muted">${(()=>{const N=goalNeeds();return N.done?'목표 등급을 모두 달성했다.':N.mats.length||N.sp?`부족: ${N.mats.map(k=>MATN[k]).join('·')}${N.sp?' · 특수 재료':''}`:'재료가 모두 모였다. 작업대에서 만들 수 있다.'})()}</p>`:''}
     <h4>제작법 · 작업대 장면에서 만든다</h4><ul class="rec">${recipes().map(r=>`<li class="${canPay(r)?'ok':''}"><b>${esc(r.l)}</b><span>${esc(costText(r))}</span></li>`).join('')}</ul>`;
   }
@@ -12122,14 +12874,14 @@ function render(){renderBase();try{showTip()}catch(e){}}
 
 /* ---------- ending hints ---------- */
 const END_HINT={
- 1:'특별한 조건 없이 마지막 한 명이 된다.',2:'회상 속에서 복수의 길을 고르며 우승한다.',3:'회상 속에서 구원의 길을 고르며 우승한다.',4:'회상 속에서 어떤 길도 붙잡지 않은 채 우승한다.',
+ 1:'특별한 조건 없이 마지막 한 명이 된다.',2:'다섯 명 이상 쓰러뜨리고 우승한다.',3:'동료와 함께 끝까지 살아남아 우승한다.',4:'전용 서브스토리를 끝맺지 않은 채 우승한다.',
  5:'8명 이상을 쓰러뜨리고 우승한다.',6:'거의 싸우지 않고 그림자 속에서 우승한다.',7:'동료를 두 번 이상 배신하고 우승한다.',8:'누군가의 희생 끝에 우승한다.',
  9:'세 명 이상을 살려 보내고 우승한다.',10:'정신이 무너지기 직전인 채로 우승한다.',11:'싸움 말고 섬을 떠날 다른 길이 있다.',12:'연구소의 시스템을 손에 넣는다.',
  13:'연구소를 장악하기 전에, 그곳의 주인부터 쓰러뜨린다.',14:'출구가 있다는 이야기를 끝까지 믿어 본다.',15:'길을 건널 땐 조심하자.',16:'닭들에게 인정받는다.',
  17:'나쟈의 제안에서 힘을 택한다.',18:'나쟈의 제안에서 진실을 택한다.',19:'이전 실험의 흔적을 끝까지 따라간다.',
  20:'세레스로, 루치아와 함께 우승한다.',21:'루치아로, 세레스와 함께 우승한다.',22:'아야로, 섬의 악당을 심판하고 우승한다.',23:'재키로, 피를 충분히 보고 우승한다.',
- 24:'에스텔로, 불을 지르는 자를 막고 우승한다.',25:'블레어로, VF 실험체를 사냥하고 우승한다.',26:'펜리르로, 복수의 길을 걸으며 우승한다.',27:'에키온으로, 의수를 끝까지 완성하고 우승한다.',
- 28:'마르티나로, 촬영을 끝까지 마치고 우승한다.',29:'시우카이로, 요리를 여러 번 하고 우승한다.',30:'미르카로, 구원의 길을 걸으며 우승한다.',31:'클리버로 우승하거나, 원념을 짊어진 채 우승한다.',
+ 24:'에스텔로, 불을 지르는 자를 막고 우승한다.',25:'블레어로, VF 실험체를 사냥하고 우승한다.',26:'펜리르로, 세 명 이상 쓰러뜨리고 우승한다.',27:'에키온으로, 의수를 끝까지 완성하고 우승한다.',
+ 28:'마르티나로, 촬영을 끝까지 마치고 우승한다.',29:'시우카이로, 요리를 여러 번 하고 우승한다.',30:'미르카로, 동료와 함께 우승한다.',31:'클리버로 우승하거나, 원념을 짊어진 채 우승한다.',
  32:'첫날을 넘기지 못한다.',33:'교전 중에 쓰러진다.',34:'믿었던 동료의 손에 쓰러진다.',35:'버리고 떠났던 동료에게 쓰러진다.',36:'금지구역에서 빠져나오지 못한다.',
  37:'굶주림을 이기지 못한다.',38:'피가 멎지 않는다.',39:'누군가의 덫에 걸린다.',40:'야생동물에게 당한다.',41:'닭에게 진다.',42:'정신이 완전히 무너진다.',
  43:'연구소의 주인에게 쓰러진다.',44:'섬을 떠도는 거대한 괴수에게 당한다.',45:'섬의 재난에 휩쓸린다.',46:'먹지 말아야 할 것을 먹거나, 독에 당한다.',47:'아무도 예상 못 한 어이없는 사고.',
