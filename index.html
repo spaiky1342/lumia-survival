@@ -11980,7 +11980,8 @@ function rx(id,only,desc,h){if(!RELICS[id])return;{const nm0=RELICS[id][0]+': ';
   const tag=RLX[id].only?`[전용 · ${RLX[id].only.map(i=>BY[i]?BY[i].n:i).join('·')}] `:'[공용] ';RELICS[id][1]=tag+desc;RELICS[id][2]=(h&&h.fx)||{}}
 /* 서브스토리 하나: 엔딩 유물 = 전용, 갈림길(side) 유물 = 공용 */
 function rxStory(sid,defs){const S=SUBS[sid];if(!S)return;const own=S.common?null:(S.pov&&S.pov.length?S.pov:(S.cast||[]));
-  for(const [e,v] of Object.entries(defs)){const id=sid+'_'+e;if(e==='rift'&&RELICS[id])RELICS[id][0]='갈라선 길의 표식 · '+S.n;const common=S.common||e==='side'||v.common;rx(id,common?null:own,v.d,v)}}
+  const keys=Object.keys(defs).filter(e=>RELICS[sid+'_'+e]);const nC=Math.max(1,Math.round(keys.length/4));const pubs=['side','rift','lost'].filter(e=>keys.includes(e)).slice(0,nC);
+  for(const [e,v] of Object.entries(defs)){const id=sid+'_'+e;if(e==='rift'&&RELICS[id])RELICS[id][0]='갈라선 길의 표식 · '+S.n;const common=S.common||pubs.includes(e)||v.common;rx(id,common?null:own,v.d,v)}}
 /* ---- 기존 능력치 파이프라인은 활성 유물만 ---- */
 relicFx=function(k){let v=null;for(const id of (G&&G.me&&G.me.relics)||[]){if(!rxOn(id))continue;const R=RELICS[id];if(!R)continue;const x=R[2][k];if(x==null)continue;v=v==null?x:(typeof x==='number'&&!['jsCost','gRegen','adCrit','alexIntel','kFire','flee'].includes(k)?v*x:x)}return v};
 {const gr=giveRelic;giveRelic=function(id){const me=G.me;const had=me&&(me.relics||[]).includes(id);
@@ -12570,18 +12571,18 @@ function relicSetEq(id){try{id?localStorage.setItem(RELIC_EQ,id):localStorage.re
 /* which story / ending a relic comes from */
 function relicSrc(id){const i=id.lastIndexOf('_');const sid=id.slice(0,i),e=id.slice(i+1);const S=SUBS[sid];if(!S)return null;
   const E=e==='side'?S.ends.side:e==='rift'?(S.ends.rift||RIFT):S.ends[e];return{sid,S,e,E}}
-let RELIC_OWN=false;
+let RELIC_OWN=(()=>{try{return localStorage.getItem('lumia_relic_own')==='1'}catch(e){return false}})();
 function relicSheet(){
   const own=relicOwned(),eq=relicEq();const all=Object.keys(RELICS).filter(id=>relicSrc(id));const ids=RELIC_OWN?all.filter(id=>own.has(id)):all;
   const groups={};ids.forEach(id=>{const r=relicSrc(id);(groups[r.sid]=groups[r.sid]||[]).push(id)});
   const n=all.filter(id=>own.has(id)).length;
-  const html=`<h4>유물 도감 · ${n}/${all.length}</h4><p><button class="btn-sub" id="relown" style="padding:6px 12px">${RELIC_OWN?'전체 유물 보기':'보유 중인 유물만 보기'}</button></p>${RELIC_OWN&&!ids.length?'<p class="muted">아직 얻은 유물이 없다.</p>':''}<p class="muted">서브스토리 엔딩에서 얻은 유물은 도감에 남는다. 얻어 본 유물 중 하나를 골라 두면 다음 게임을 그 유물을 지닌 채 시작한다. 한 번 더 누르면 해제된다.</p>
+  const html=`<h4>유물 도감 · ${n}/${all.length}</h4><p style="display:flex;gap:8px"><button class="btn-sub" data-own="0" style="flex:1;padding:8px 10px;${RELIC_OWN?'opacity:.55':'outline:2px solid currentColor'}">전체 ${all.length}</button><button class="btn-sub" data-own="1" style="flex:1;padding:8px 10px;${RELIC_OWN?'outline:2px solid currentColor':'opacity:.55'}">보유 중 ${n}</button></p>${RELIC_OWN&&!ids.length?'<p class="muted">아직 얻은 유물이 없다.</p>':''}<p class="muted">서브스토리 엔딩에서 얻은 유물은 도감에 남는다. 얻어 본 유물 중 하나를 골라 두면 다음 게임을 그 유물을 지닌 채 시작한다. 한 번 더 누르면 해제된다.</p>
   <p class="muted">지금 장착: ${eq&&own.has(eq)&&RELICS[eq]?`<b>「${esc(RELICS[eq][0])}」</b> · ${esc(RELICS[eq][1])}`:'없음'}</p>
   ${Object.entries(groups).map(([sid,list])=>`<h4>${esc(SUBS[sid].n)}</h4><ul class="ach">${list.map(id=>{const r=relicSrc(id);const on=own.has(id);const R=RELICS[id];
     return on?`<li class="on${id===eq?' eqr':''}" data-r="${id}" style="cursor:pointer"><b>${id===eq?'★ ':'✓ '}${esc(R[0])}</b><span>${esc(R[1])}</span><small>${esc(r.E?r.E[0]:'')} 엔딩${id===eq?' · 장착 중':' · 눌러서 장착'}</small></li>`
     :`<li data-rl="${id}"><b>???</b><span>${esc(r.E?(r.E[2]||r.E[1]||''):'')}</span></li>`}).join('')}</ul>`).join('')}`;
   openSheet(html);
-  const sh=document.getElementById('pbody');if(sh)sh.onclick=e=>{if(e.target.closest('#relown')){RELIC_OWN=!RELIC_OWN;relicSheet();return}const li=e.target.closest('[data-r]');if(!li)return;const id=li.dataset.r;relicSetEq(relicEq()===id?'':id);relicSheet();const b=document.getElementById('relb');if(b)b.textContent=relicBtnText()};
+  const sh=document.getElementById('pbody');if(sh)sh.onclick=e=>{const ob=e.target.closest('[data-own]');if(ob){RELIC_OWN=ob.dataset.own==='1';try{localStorage.setItem('lumia_relic_own',RELIC_OWN?'1':'0')}catch(x){}relicSheet();return}const li=e.target.closest('[data-r]');if(!li)return;const id=li.dataset.r;relicSetEq(relicEq()===id?'':id);relicSheet();const b=document.getElementById('relb');if(b)b.textContent=relicBtnText()};
 }
 function relicBtnText(){const own=relicOwned();const tot=Object.keys(RELICS).filter(id=>relicSrc(id)).length;const eq=relicEq();return`유물 도감 ${[...own].filter(id=>relicSrc(id)).length}/${tot}${eq&&own.has(eq)&&RELICS[eq]?` · ${RELICS[eq][0]}`:''}`}
 if(typeof selectScreen==='function'){const ss=selectScreen;selectScreen=function(){ss();const acts=document.querySelector('.hero-acts');if(!acts)return;
