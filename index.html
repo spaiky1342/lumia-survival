@@ -6631,7 +6631,7 @@ function storyRift(id){if(!SUBS[id].ends.rift)SUBS[id].ends.rift=RIFT.slice()}
 function rebuildAchSub(){ACH_SUB.length=0;Object.entries(SUBS).forEach(([id,S])=>Object.entries(S.ends).forEach(([e,E])=>ACH_SUB.push(['s:'+id+':'+e,S.n,E[0],E[1]])));Object.entries(SUBS).forEach(([id,S])=>Object.entries(S.ends).forEach(([e,E])=>{if(E[2]&&!SUB_HINT[id+':'+e])SUB_HINT[id+':'+e]=E[2];if(e==='rift')SUB_HINT[id+':rift']=RIFT[2]}))}
 
 function startSub(id,extra){
-  const S=SUBS[id];if(!S)return;
+  const S=SUBS[id];if(!S)return;G.subUsed=G.subUsed||new Set();if(G.subUsed.has(id))return;G.subUsed.add(id);if(id==='ty')G.tyDone=1;
   G.sub=Object.assign({id,ch:0,next:G.choices+6,fl:{},done:false,met:false},extra||{});G.subCast=null;
   if(S.cast){const pid=G.me.p.id;for(const c of S.cast){if(c===pid||npcById(c))continue;
     const n=G.npcs.find(x=>x.alive&&x.team!=='me'&&!Object.values(SUBS).some(T=>T.cast&&T.cast.includes(x.c.id))&&!x.c.bonds.length);if(!n)continue;
@@ -6643,7 +6643,7 @@ function subCandidates(pid){
   return Object.keys(SUBS).filter(k=>{const S=SUBS[k];if(S.common)return false;if(!(S.pov||S.cast).includes(pid))return false;return S.can?S.can(pid):true});
 }
 {const ir=initRun;initRun=function(pid){ir(pid);
-  G.sub=null;G.subCast=null;G.dest=null;
+  G.sub=null;G.subCast=null;G.dest=null;G.subUsed=new Set();G.tyDone=0;
   const c=subCandidates(pid);
   if(c.length)startSub(pick(c));
   G.tyAt=c.length?9999:14;
@@ -6674,7 +6674,7 @@ function subCard(){
 {const se=subEnd;subEnd=function(e){const s=G.sub;const was=s&&s.done;se(e);if(s&&!was&&s.done)subFinish()}}
 function drawCard(){
   const s=G.sub;
-  if((!s||s.done)&&!G.tyDone&&G.choices>=(G.tyAt||9999)&&G.phase<FINAL-1&&!G.fight){const v=tyrantPick();if(v){startSub('ty',{vid:v.c.id});G.sub.next=G.choices}else{G.tyDone=1}}
+  if((!s||s.done)&&!G.tyDone&&G.choices>=(G.tyAt||9999)&&G.phase<FINAL-1&&!G.fight){const v=tyrantPick();if(v){startSub('ty',{vid:v.c.id});if(G.sub&&G.sub.id==='ty')G.sub.next=G.choices}else{G.tyDone=1}}
   const t=G.sub;
   if(t&&!t.done&&G.choices>=t.next&&!G.fight&&!G.zones.has(G.me.area)&&G.phase<FINAL){const c=subCard();if(c)return c}
   return drawCardMain();
