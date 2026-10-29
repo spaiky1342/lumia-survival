@@ -7201,7 +7201,7 @@ function goCard(fl,key,title,text,label){
   if(!fl[key]||G.zones.has(fl[key])||!passable(fl[key]))fl[key]=subFar(1,2);
   const tgt=fl[key];if(!tgt){fl[key]=G.me.area;return null}if(G.me.area===tgt)return null;
   const hop=nextHop(tgt);if(!hop){fl[key]=G.me.area;return null}
-  return{title,text:T(text,`목적지: ${tgt}`),opts:[{l:G.dest&&G.dest.a===nextHop(tgt)?`${tgt} 쪽으로 계속 간다`:`${tgt} 쪽으로 출발한다 (${label||'이동 목표 설정'})`,noTwist:1,f:()=>{const h=nextHop(tgt);if(h&&(!G.dest||G.dest.a!==h))setDest(h);G.sub.next=G.choices+3;log(`${tgt}까지 가야 한다. 우선 ${h}부터.`)}}]};
+  return{title,text:T(text,`목적지: ${tgt}`),opts:[{l:G.dest&&G.dest.a===nextHop(tgt)?`${tgt} 쪽으로 계속 간다`:`${tgt} 쪽으로 출발한다 (${label||'이동 목표 설정'})`,noTwist:1,f:()=>{const s=G.sub,h=nextHop(tgt);s.goal=tgt;s.autoGo=1;s.hop=h;if(h&&(!G.dest||G.dest.a!==h))setDest(h);s.next=G.choices+15;log(h===tgt?`${J(tgt,"으로")} 향한다. 도착하면 이야기가 이어진다.`:`${tgt}까지 간다. ${J(h,"을")} 거쳐 자동으로 이동한다. 도착하면 이야기가 이어진다.`)}}]};
 }
 function holdUntil(fl,key){if(fl[key]&&(G.zones.has(fl[key])||!passable(fl[key])))fl[key]=null;return !!fl[key]&&G.me.area===fl[key]}
 
@@ -7261,6 +7261,15 @@ Object.assign(RELICS,{
 });
 ['cs_sig','cs_log'].forEach(k=>{const S=SUBS[k];S.ch=S.ch.map((f,i)=>fl=>{const c=f(fl);if(c&&c.title&&!/^\d+장/.test(c.title))c.title=`${i+1}장 · ${c.title}`;return c})});
 rebuildAchSub();
+
+/* travel goals set by a substory: no repeated cards; move hop by hop automatically */
+{const sc=subCard;subCard=function(){const s=G.sub;if(s&&s.goal&&G.me.area!==s.goal)return null;if(s&&s.goal&&G.me.area===s.goal){s.goal=null;s.autoGo=0}return sc()}}
+{const te=tickExtra;tickExtra=function(){te();const s=G.sub;if(!s||s.done||!s.goal||G.over)return;
+  if(G.zones.has(s.goal)||!passable(s.goal)){s.goal=null;s.autoGo=0;s.next=G.choices;return}
+  if(G.me.area===s.goal){s.next=G.choices;return}
+  if(G.dest&&s.hop&&G.dest.a!==s.hop)s.autoGo=0;
+  if(s.autoGo&&!G.dest&&!G.fight){const h=nextHop(s.goal);if(h){s.hop=h;setDest(h)}}
+  if(!s.autoGo&&!G.dest&&G.choices>=s.next){s.goal=null}}}
 
 /* ===================== V3.0 · REWORKS: ROZZI, HYUNWOO, MAGNUS, HYEJIN, BIANCA, EMMA, SHOICHI, HENRY ===================== */
 const setD=(id,o)=>{if(BY[id])Object.assign(BY[id],o)};
