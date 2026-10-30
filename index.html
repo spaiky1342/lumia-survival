@@ -13711,7 +13711,7 @@ const pctS=(a,b)=>b>0?(a/b*100<1&&a>0?(a/b*100).toFixed(1):Math.round(a/b*100))+
 async function netSubmitRun(){
   const pid=netPid();if(!pid)return;const E=getEnding();
   const base={pid,char_id:G.me.p.id,ending:'E'+E.no,win:!!G.over.win,subs:(G.subLog||[]).slice(0,10),ver:PATCH[0][0]};
-  const ext={phase:G.over.phase??G.phase,turns:G.choices|0,kills:G.me.kills|0};let ok=await netReq('/runs',Object.assign({diff:G.diff|0},ext,base));if(ok===false)ok=await netReq('/runs',Object.assign({},ext,base));if(ok===false)await netReq('/runs',base);
+  const ext={phase:G.over.phase??G.phase,turns:G.choices|0,kills:G.me.kills|0};const rl=G.me.startRelic||null;let ok=await netReq('/runs',Object.assign({diff:G.diff|0,relic:rl,relics:(G.me.relics||[]).slice(0,12)},ext,base));if(ok===false)ok=await netReq('/runs',Object.assign({diff:G.diff|0},ext,base));if(ok===false)ok=await netReq('/runs',Object.assign({},ext,base));if(ok===false)await netReq('/runs',base);
   let done;try{done=new Set(JSON.parse(localStorage.getItem(ACHSYNC_KEY)||'[]'))}catch(e){done=new Set()}
   const todo=[...loadAch()].filter(k=>!done.has(k)&&k.length<=60).slice(0,40);
   for(const k of todo){const r=await netReq('/player_ach',[{pid,ach:k}]);if(r)done.add(k)}
