@@ -13115,7 +13115,7 @@ function sawCard(){const me=G.me;
    opts:[{l:'시동줄을 당긴다',noTwist:1,f:()=>{me.sawOn=1;
       log(me.p.id==='cliver'?'"하하! 이거 좋네! 시끄러운 게 최고지!" 크레이버가 웃음을 터뜨렸다.':me.p.id==='jackie'?'"…이 소리, 좋아." 재키가 눈을 가늘게 떴다.':'부르르르르릉——! 섬 전체에 울릴 만큼 시끄럽다.','warn');
       niSay(['"엔진음 사운드 디자인 좋다. 근데 어그로 끌리는 거 알지?"','"이거 들면 머리가 톱 되는 거 아니야? 아니구나."']);
-      log('(다음 교전 첫 3라운드 피해 +30% · 소리를 듣고 누군가 다가온다)','news');
+      log('(다음 교전 첫 3라운드 피해 +15% · 소리를 듣고 누군가 다가온다)','news');
       const c=G.npcs.filter(n=>n.alive&&n.team!=='me'&&!n.busy&&(n.area===me.area||ADJ[me.area].includes(n.area))&&!bonded(n.c,me.p));if(c.length){const n=pick(c);chain(()=>ambushCard(n))}}},
     {l:'분해한다',noTwist:1,f:()=>{me.inv.metal+=2;me.inv.powder++;niSay(['"재료 루팅. 효율충 선택."']);log('톱날과 엔진을 떼어 냈다. (금속 +2, 화약 +1)')}}]}}
 function chickCard(){const me=G.me;
@@ -13130,7 +13130,7 @@ const MEMES=[['sande',sandeCard],['sticker',stickerCard],['book',bookCard],['fru
 {const ph=pHook;pHook=function(name,...a){ph(name,...a);const me=G.me;if(!me)return;
   if(name==='start'){const F=a[0];
     if(me.sealGuard&&allies().length){me.sealGuard=0;F.nf.guardHits=(F.nf.guardHits||0)+1;F.nf.guardMul=0;log(`손등의 문양이 빛났다. ${J(nm(allies()[0]),'이')} 몸을 날려 첫 공격을 대신 막는다!`,'crit-good')}
-    if(me.sawOn){me.sawOn=0;F.nf.mult=Math.max(F.nf.mult||1,1.3);F.nf.multRounds=Math.max(F.nf.multRounds||0,3);log('부르르릉——! 톱날이 돈다. (3라운드 동안 피해 +30%)','crit-good')}}
+    if(me.sawOn){me.sawOn=0;F.nf.mult=Math.max(F.nf.mult||1,1.15);F.nf.multRounds=Math.max(F.nf.multRounds||0,3);log('부르르릉——! 톱날이 돈다. (3라운드 동안 피해 +15%)','crit-good')}}
   if(name==='tick'&&me.noSwim&&!G.fight&&WATER.has(me.area)){san(me.p.id==='leon'?-3:-1.5)}}}
 
 /* ===================== UI ===================== */
