@@ -13719,14 +13719,14 @@ function hofHTML(rows,hi){
   if(!rows.length)return'<p class="muted">아직 등록된 우승자가 없다. 첫 번째 이름을 새겨 보자.</p>';
   return`<ol class="hof">${rows.map((r,i)=>`<li class="${i<3?'top':''} ${hi&&hi(r)?'me':''}"><b class="r">${i+1}</b><span>${esc(r.name)}${r.diff?` <span class="hofd">고난 ${Number(r.diff)}</span>`:''}<small>${esc(r.char_name)} · ${esc(r.ending||'')}</small></span><em>${esc(r.grade||'')} ${Number(r.score).toLocaleString()}</em></li>`).join('')}</ol>`;
 }
-let HOF_TAB='n';
+let HOF_TAB='a';
 async function hofSheet(){
   openSheet('<h4>명예의 전당</h4><p class="muted">불러오는 중…</p>');
   const path=HOF_TAB==='a'?'/hall_top_all':'/hall_top';let rows=await netReq(path);const pb=document.getElementById('pbody');if(!pb)return;
   if(HOF_TAB==='n'&&rows)rows=rows.filter(r=>!r.diff);
   const st=await netStats();
   const tab=(k,l)=>`<button class="btn-sub" data-hof="${k}" style="flex:1;padding:8px 10px;${HOF_TAB===k?'outline:2px solid currentColor':'opacity:.55'}">${l}</button>`;
-  pb.innerHTML=`<h4>명예의 전당 · TOP 10</h4><p style="display:flex;gap:8px">${tab('n','노말')}${tab('a','전체 (고난 포함)')}</p><p class="muted">${HOF_TAB==='a'?'노말과 고난을 모두 합친 최고 점수. 고난 점수에는 배율이 붙는다.':'고난 없이 우승한 기록만.'} 우승한 실험체만 이름을 올릴 수 있다. 점수가 같으면 먼저 오른 사람이 위.</p>${rows===null&&HOF_TAB==='a'?'<p class="muted">전체 랭킹은 아직 준비 중이다.</p>':hofHTML(rows)}${st?`<p class="netline">전체 누적 ${st.runs.toLocaleString()}판 · 플레이어 ${st.players.toLocaleString()}명</p>`:''}`;
+  pb.innerHTML=`<h4>명예의 전당 · TOP 10</h4><p style="display:flex;gap:8px">${tab('a','전체 (고난 포함)')}${tab('n','노말')}</p><p class="muted">${HOF_TAB==='a'?'노말과 고난을 모두 합친 최고 점수. 고난 점수에는 배율이 붙는다.':'고난 없이 우승한 기록만.'} 우승한 실험체만 이름을 올릴 수 있다. 점수가 같으면 먼저 오른 사람이 위.</p>${rows===null&&HOF_TAB==='a'?'<p class="muted">전체 랭킹은 아직 준비 중이다.</p>':hofHTML(rows)}${st?`<p class="netline">전체 누적 ${st.runs.toLocaleString()}판 · 플레이어 ${st.players.toLocaleString()}명</p>`:''}`;
   pb.onclick=e=>{const b=e.target.closest('[data-hof]');if(b&&b.dataset.hof!==HOF_TAB){HOF_TAB=b.dataset.hof;hofSheet()}};
 }
 /* select screen: hall of fame button + global counter */
